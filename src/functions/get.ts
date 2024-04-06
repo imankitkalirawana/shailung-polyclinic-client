@@ -1,18 +1,67 @@
 import axios from "axios";
 import { API_BASE_URL } from "../utils/config";
-import toast from "react-hot-toast";
 
 export const getAllUsers = async () => {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
-            headers: {
-                Authorization: `${localStorage.getItem("token")}`,
-            },
-        });
-        const data = response.data;
-        return data;
-    } catch (error) {
-        console.log(error);
-        toast.error("Failed to fetch users!");
-    }
+    const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    const data = response.data;
+    return data;
 }
+
+export const getLoggedUser = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/user/profile`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    return response;
+}
+
+export const getAllDoctors = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/user/doctors`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    const data = response.data;
+    return data;
+
+}
+
+export const getAllTests = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/test/all`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    return response;
+}
+
+export const countAll = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/count`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    const data = response.data;
+    return data;
+}
+
+export const getAllAvailableTests = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/available-test/all`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    const data = response.data;
+    return data;
+}
+export const getWebsite = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/website`);
+    const data = response.data;
+    return data;
+}
+

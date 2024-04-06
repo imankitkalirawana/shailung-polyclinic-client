@@ -1,4 +1,4 @@
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useFormik } from "formik";
 import axios from "axios";
 import { API_BASE_URL } from "../../utils/config";

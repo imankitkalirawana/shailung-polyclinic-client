@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { API_BASE_URL } from "../../../utils/config";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { humanReadableDate } from "./Users";
 import { EditIcon } from "../../icons/Icons";
 
@@ -41,7 +41,7 @@ const ViewUser = () => {
             </p>
           </div>
           <Link
-            to={`/admin/users/${id}/edit`}
+            to={`/dashboard/users/${id}/edit`}
             className="btn btn-primary btn-sm"
           >
             <EditIcon className="h-5 w-5" />

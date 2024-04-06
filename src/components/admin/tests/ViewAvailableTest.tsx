@@ -3,7 +3,7 @@ import { EditIcon } from "../../icons/Icons";
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../../../utils/config";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { humanReadableDate } from "../user/Users";
 
 interface Test {
@@ -73,7 +73,7 @@ const ViewAvailableTest = () => {
             </p>
           </div>
           <Link
-            to={`/admin/tests/available-tests/${id}/edit`}
+            to={`/dashboard/tests/available-tests/${id}/edit`}
             className="btn btn-primary btn-sm"
           >
             <EditIcon className="h-5 w-5" />

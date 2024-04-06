@@ -8,7 +8,7 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import Homepage from "./components/Homepage/Homepage";
 import Profile from "./components/Profile";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 import Website from "./components/update/Website/Website";
 import Login from "./components/auth/Login";
 import ForgotPassword from "./components/auth/ForgotPassword";
@@ -46,7 +46,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Homepage />} />
                   <Route path="/profile" element={<Profile />} />
-                  <Route path="/admin/*" element={<Admin />}>
+                  <Route path="/dashboard/*" element={<Admin />}>
                     <Route path="" element={<Dashboard />} />
                     <Route path="users" element={<Users />} />
                     <Route path="users/:id" element={<ViewUser />} />
@@ -99,7 +99,7 @@ function App() {
         </Routes>
       </Router>
 
-      <Toaster position="bottom-center" containerClassName="mt-16" />
+      <Toaster richColors closeButton />
     </>
   );
 }

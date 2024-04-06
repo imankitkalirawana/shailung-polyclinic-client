@@ -20,8 +20,8 @@
     "formik": "^2.4.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.22.3",
+    "sonner": "^1.4.41",
     "xlsx": "^0.18.5",
     "yarn": "^1.22.22",
     "yup": "^1.4.0"

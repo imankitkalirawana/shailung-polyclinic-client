@@ -13,7 +13,8 @@ import { API_BASE_URL } from "../../../utils/config";
 import { humanReadableDate } from "../user/Users";
 import { TestStatus } from "../../../utils/config";
 import NotFound from "../../NotFound";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
+import { getAllDoctors, getAllTests } from "../../../functions/get";
 
 interface Test {
   _id: string;
@@ -97,7 +98,7 @@ const Tests = () => {
         return;
       }
       if (status === "completed") {
-        navigate(`/admin/tests/complete/${test._id}`);
+        navigate(`/dashboard/tests/complete/${test._id}`);
         return;
       }
       await testStatus(test._id, status);
@@ -133,11 +134,7 @@ const Tests = () => {
     fetchAllTests();
   }, []);
   const fetchAllTests = async () => {
-    const response = await axios.get(`${API_BASE_URL}/api/test/all`, {
-      headers: {
-        Authorization: `${localStorage.getItem("token")}`,
-      },
-    });
+    const response = await getAllTests();
     const data = response.data;
     setTests(data);
   };
@@ -176,7 +173,14 @@ const Tests = () => {
           <div className="flex justify-between items-center">
             <h2 className="my-6 text-2xl font-semibold">Tests</h2>
             <div className="flex gap-2 flex-row-reverse">
-              <button className="btn btn-outline btn-sm hover:btn-primary">
+              <button
+                className="btn btn-outline btn-sm hover:btn-primary"
+                onClick={() =>
+                  toast.message("Not yet available", {
+                    description: "This feature is not yet available",
+                  })
+                }
+              >
                 Export to Excel
               </button>
             </div>
@@ -305,15 +309,7 @@ const Tests = () => {
                             ? humanReadableDate(test.appointmentdate)
                             : "Not Scheduled"}
                         </td>
-                        <td className="px-4 py-3 text-sm modify flex gap-2">
-                          <button
-                            className="btn btn-sm btn-circle btn-ghost hover:btn-outline tooltip flex tooltip-error items-center justify-center"
-                            aria-label="Delete"
-                            onClick={() => handleDeleteClick(test)}
-                            data-tip="Delete"
-                          >
-                            <TrashXIcon className="w-4 h-4 button" />
-                          </button>
+                        <td className="px-4 py-3 text-sm modify justify-end flex gap-2">
                           {test.status !== "completed" && (
                             <button
                               className={`btn btn-sm btn-circle hover:btn-outline tooltip flex ${
@@ -341,7 +337,7 @@ const Tests = () => {
                                   !test.testDetail.doctorData
                                     ? "tooltip-primary"
                                     : "tooltip-warning btn-ghost"
-                                } hover:btn-outline tooltip flex items-center justify-center`}
+                                } hover:btn-outline tooltip tooltip-left flex items-center justify-center`}
                                 aria-label="Assign Doctor"
                                 onClick={() => {
                                   handleAssignClick(test);
@@ -353,6 +349,14 @@ const Tests = () => {
                                 <StethoscopeIcon className="w-4 h-4 button" />
                               </button>
                             )}
+                          <button
+                            className="btn ml-4 btn-sm btn-circle btn-ghost hover:btn-outline tooltip flex tooltip-error items-center justify-center"
+                            aria-label="Delete"
+                            onClick={() => handleDeleteClick(test)}
+                            data-tip="Delete"
+                          >
+                            <TrashXIcon className="w-4 h-4 button" />
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -510,20 +514,13 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
     } catch (err) {
       console.log(err);
     } finally {
-      fetchTests();
+      const response = await getAllTests();
+      const data = response.data;
+      setTests(data);
       onClose();
     }
   };
 
-  const fetchTests = async () => {
-    const response = await axios.get(`${API_BASE_URL}/api/test/all`, {
-      headers: {
-        Authorization: `${localStorage.getItem("token")}`,
-      },
-    });
-    const data = response.data;
-    setTests(data);
-  };
   return (
     <>
       <div className="modal modal-open backdrop-blur-sm" role="dialog">
@@ -571,15 +568,9 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
   const [selectedDoctor, setSelectedDoctor] = useState<string>("");
   useEffect(() => {
     const fetchAllDoctors = async () => {
-      const response = await axios.get(`${API_BASE_URL}/api/user/doctors`, {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
-      });
-      const data = response.data;
+      const data = await getAllDoctors();
       setDoctors(data);
     };
-
     fetchAllDoctors();
   }, []);
 

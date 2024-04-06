@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../utils/auth";
 import { useFormik } from "formik";
+import { getWebsite } from "../functions/get";
 
 const themes = ["light", "dark"];
 
@@ -27,12 +28,12 @@ const Navbar = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await axios.get(`${API_BASE_URL}/api/website`);
-      const data = response.data;
+      const website = await getWebsite();
+
       formik.setValues((prevValues) => ({
         ...prevValues,
-        title: data.title,
-        logo: data.logo,
+        title: website.title,
+        logo: website.logo,
       }));
     };
     fetchData();
@@ -94,7 +95,7 @@ const Navbar = () => {
             >
               {loggedIn && user?.role === "admin" && (
                 <li>
-                  <Link to={"/admin/tests"}>Tests</Link>
+                  <Link to={"/dashboard/tests"}>Tests</Link>
                 </li>
               )}
               <li>
@@ -176,10 +177,10 @@ const Navbar = () => {
                 {user && user.role === "admin" && (
                   <>
                     <li>
-                      <Link to="/admin">Dashboard</Link>
+                      <Link to="/dashboard">Dashboard</Link>
                     </li>
                     <li>
-                      <Link to="/admin/website">My Website</Link>
+                      <Link to="/dashboard/website">My Website</Link>
                     </li>
                   </>
                 )}

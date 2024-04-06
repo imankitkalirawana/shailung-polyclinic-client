@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { humanReadableDate } from "../user/Users";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import {
@@ -51,7 +51,7 @@ const AvailableTests = () => {
     ) {
       return;
     }
-    navigate(`/admin/tests/available-tests/${id}`);
+    navigate(`/dashboard/tests/available-tests/${id}`);
   };
 
   useEffect(() => {
@@ -151,8 +151,7 @@ const AvailableTests = () => {
                               </td>
                               <td className="px-4 py-3 text-sm modify">
                                 <Link
-                                  to={`/admin/tests/available-tests/${test._id}/edit`}
-                                  // to={""}
+                                  to={`/dashboard/tests/available-tests/${test._id}/edit`}
                                   className="btn btn-sm btn-circle btn-ghost"
                                   aria-label="Edit"
                                 >

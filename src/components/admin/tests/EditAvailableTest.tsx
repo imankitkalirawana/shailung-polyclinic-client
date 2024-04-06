@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { API_BASE_URL } from "../../../utils/config";
 import { PlusIcon, XIcon } from "../../icons/Icons";
 
@@ -47,7 +47,7 @@ const EditAvailableTest = () => {
           },
         });
         toast.success("Updated Successfully");
-        navigate("/admin/tests/available-tests");
+        navigate("/dashboard/tests/available-tests");
       } catch (error: any) {
         console.log(error.message);
         toast.error(error.message);

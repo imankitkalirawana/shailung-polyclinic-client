@@ -3,7 +3,7 @@ import { TestStatus } from "../../utils/config";
 import { humanReadableDate } from "../admin/user/Users";
 import axios from "axios";
 import { API_BASE_URL } from "../../utils/config";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { SearchIcon } from "../icons/Icons";
 import { isLoggedIn } from "../../utils/auth";

@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE_URL, Roles } from "../../../utils/config";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 
 const User = () => {
   const navigate = useNavigate();
@@ -50,7 +50,7 @@ const User = () => {
           }
         );
         toast.success(response.data.message);
-        navigate("/admin/users");
+        navigate("/dashboard/users");
       } catch (error: any) {
         console.log(error.message);
         toast.error(error.message);

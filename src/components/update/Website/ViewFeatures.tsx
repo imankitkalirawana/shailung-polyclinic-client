@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 // import Features from "../../Homepage/Features";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { useFormik } from "formik";
@@ -250,7 +250,7 @@ export const ViewFeatures = () => {
             ))}
         </div>
         <div className="flex items-center gap-2 justify-end mt-12">
-          <a href="/admin" className="btn btn-sm">
+          <a href="/dashboard" className="btn btn-sm">
             Cancel
           </a>
           <button

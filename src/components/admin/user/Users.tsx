@@ -10,11 +10,13 @@ import {
   TrashXIcon,
 } from "../../icons/Icons";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useFormik } from "formik";
 import { Roles } from "../../../utils/config";
 import * as XLSX from "xlsx";
 import NotFound from "../../NotFound";
+import { getAllUsers } from "../../../functions/get";
+import { deleteUser } from "../../../functions/delete";
 
 interface User {
   _id: string;
@@ -54,26 +56,21 @@ const Users = () => {
   };
 
   useEffect(() => {
-    const fetchUsers = async (userType: any) => {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
-      });
-      const data = response.data;
+    const fetchData = async (userType: any) => {
+      const users = await getAllUsers();
       if (userType === "employee") {
         setUsers(
-          data.filter(
+          users.filter(
             (user: any) => user.role === "admin" || user.role === "member"
           )
         );
       } else if (userType === "user") {
-        setUsers(data.filter((user: any) => user.role === "user"));
+        setUsers(users.filter((user: any) => user.role === "user"));
       } else {
-        setUsers(data);
+        setUsers(users);
       }
     };
-    fetchUsers(userType);
+    fetchData(userType);
   }, []);
 
   const handleSearch = (user: any) => {
@@ -157,7 +154,7 @@ const Users = () => {
     ) {
       return;
     }
-    navigate(`/admin/users/${id}`);
+    navigate(`/dashboard/users/${id}`);
   };
 
   const exportToExcel = async () => {
@@ -332,24 +329,23 @@ const Users = () => {
                             <td className="px-4 py-3 text-sm">
                               {humanReadableDate(user.updatedat)}
                             </td>
-                            <td className="px-4 py-3 text-sm modify">
-                              <>
-                                <Link
-                                  to={`/admin/users/${user._id}/edit`}
-                                  // to={""}
-                                  className="btn btn-sm btn-circle btn-ghost"
-                                  aria-label="Edit"
-                                >
-                                  <EditIcon className="w-4 h-4 button" />
-                                </Link>
-                                <button
-                                  className="btn btn-sm btn-circle btn-ghost hover:btn-outline"
-                                  aria-label="Delete"
-                                  onClick={() => handleDeleteClick(user)}
-                                >
-                                  <TrashXIcon className="w-4 h-4 button" />
-                                </button>
-                              </>
+                            <td className="px-4 py-3 text-sm flex items-center gap-4 justify-center modify">
+                              <Link
+                                to={`/dashboard/users/${user._id}/edit`}
+                                className="btn btn-sm btn-circle tooltip tooltip-info flex items-center justify-center btn-ghost"
+                                aria-label="Edit"
+                                data-tip="Edit"
+                              >
+                                <EditIcon className="w-4 h-4 button" />
+                              </Link>
+                              <button
+                                className="btn btn-sm btn-circle flex justify-center items-center tooltip-error tooltip btn-ghost hover:btn-outline"
+                                aria-label="Delete"
+                                onClick={() => handleDeleteClick(user)}
+                                data-tip="Delete"
+                              >
+                                <TrashXIcon className="w-4 h-4 button" />
+                              </button>
                             </td>
                           </tr>
                         )
@@ -441,14 +437,9 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
 }) => {
   const handleDelete = async (user: User) => {
     try {
-      console.log("Deleing");
-      await axios.delete(`${API_BASE_URL}/api/admin/user/${user._id}`, {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
+      await deleteUser(user._id).then(() => {
+        fetchUsers();
       });
-      // update the users list
-      await fetchUsers();
       toast.success("User deleted successfully");
       onClose();
     } catch (error: any) {
@@ -458,13 +449,8 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
   };
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
-      });
-      const data = response.data;
-      setUsers(data);
+      const users = await getAllUsers();
+      setUsers(users);
     } catch (error) {
       console.error("Error fetching users:", error);
     }

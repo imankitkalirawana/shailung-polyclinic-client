@@ -8,10 +8,15 @@ import {
   UsersIcon,
 } from "../icons/Icons";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { API_BASE_URL, Roles, TestStatus } from "../../utils/config";
+import { Roles, TestStatus } from "../../utils/config";
 import { isLoggedIn } from "../../utils/auth";
-import { getAllUsers } from "../../functions/get";
+import {
+  countAll,
+  getAllAvailableTests,
+  getAllTests,
+  getAllUsers,
+} from "../../functions/get";
+import { toast } from "sonner";
 
 interface User {
   _id: string;
@@ -93,48 +98,21 @@ const Dashboard = () => {
     }
   }, []);
   useEffect(() => {
-    // const fetchUsers = async () => {
-    //   const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
-    //     headers: {
-    //       Authorization: `${localStorage.getItem("token")}`,
-    //     },
-    //   });
-    //   const data = response.data;
-    //   setUsers(data.reverse());
-    // };
     const fetchData = async () => {
-      const users = await getAllUsers();
-      setUsers(users);
-    };
-
-    const fetchTests = async () => {
-      const response = await axios.get(`${API_BASE_URL}/api/test/all`, {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
-      });
-      const data = response.data;
-      setTests(data.reverse());
-    };
-    // fetchUsers();
-    fetchData();
-    fetchTests();
-    const count = async () => {
-      const response = await axios.get(`${API_BASE_URL}/api/count`);
-      setCountData(response.data);
-    };
-    count();
-    const fetchAvailableTests = async () => {
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}/api/available-test/all`
-        );
-        setAvailableTests(response.data.reverse());
+        const users = await getAllUsers();
+        setUsers(users);
+        const tests = await getAllTests();
+        setTests(tests.data);
+        const availabletests = await getAllAvailableTests();
+        setAvailableTests(availabletests);
+        const count = await countAll();
+        setCountData(count);
       } catch (error) {
-        console.log(error);
+        toast.error("Failed to fetch data");
       }
     };
-    fetchAvailableTests();
+    fetchData();
   }, []);
 
   return (
@@ -157,11 +135,16 @@ const Dashboard = () => {
               <AppWindowIcon className="w-5 h-5 mr-2 text-primary" />
               <span>You can update your website data here</span>
             </div>
-            <span className="link inline-flex text-primary">Update Now</span>
+            <span
+              className="link inline-flex text-nowrap text-primary"
+              role="button"
+            >
+              Update Now
+            </span>
           </Link>
           <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
             <Link
-              to={"/admin/users?type=user"}
+              to={"/dashboard/users?type=user"}
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
             >
               <div className="p-3 mr-4 bg-primary rounded-full text-base-100">
@@ -178,7 +161,7 @@ const Dashboard = () => {
               </div>
             </Link>
             <Link
-              to={"/admin/tests"}
+              to={"/dashboard/tests"}
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
             >
               <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
@@ -186,11 +169,13 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="mb-2 text-sm font-medium">Test done</p>
-                <p className="text-lg font-semibold">{countData.testCount}</p>
+                <p className="text-lg font-semibold">
+                  {countData.testCount || 0}
+                </p>
               </div>
             </Link>
             <Link
-              to="/admin/users?type=employee"
+              to="/dashboard/users?type=employee"
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
             >
               <div className="p-3 mr-4 rounded-full bg-primary text-base-100">
@@ -207,7 +192,7 @@ const Dashboard = () => {
               </div>
             </Link>
             <Link
-              to="/admin/tests/available-tests"
+              to="/dashboard/tests/available-tests"
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
             >
               <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
@@ -257,7 +242,7 @@ const UserCard = ({ users }: UserCardProps) => {
         <div className="flex justify-between items-center">
           <h2 className="my-6 text-2xl font-semibold">Users</h2>
           <Link
-            to="/admin/users"
+            to="/dashboard/users"
             className="btn btn-outline hover:btn-primary btn-sm"
           >
             <span>View all</span>
@@ -287,7 +272,7 @@ const UserCard = ({ users }: UserCardProps) => {
                       className="cursor-pointer hover:bg-primary/5"
                       role="button"
                       onClick={() => {
-                        navigate(`/admin/users/${user._id}`);
+                        navigate(`/dashboard/users/${user._id}`);
                       }}
                     >
                       <td className="px-4 py-3 text-sm">
@@ -305,7 +290,9 @@ const UserCard = ({ users }: UserCardProps) => {
                       <td className="px-4 py-3">
                         <div className="flex items-center text-sm">
                           <div>
-                            <p className="font-semibold">{user.name}</p>
+                            <p className="font-semibold text-nowrap">
+                              {user.name}
+                            </p>
                             <p className="text-xs">{user.username}</p>
                           </div>
                         </div>
@@ -317,7 +304,7 @@ const UserCard = ({ users }: UserCardProps) => {
                         {user.phone ? user.phone : "-"}
                       </td>
 
-                      <td className="px-4 py-3 text-sm">
+                      <td className="px-4 py-3 text-nowrap text-sm">
                         {humanReadableDate(user.updatedat)}
                       </td>
                     </tr>
@@ -378,7 +365,7 @@ const TestCard = ({ tests }: TestCardProps) => {
         <div className="flex justify-between items-center">
           <h2 className="my-6 text-2xl font-semibold">Tests</h2>
           <Link
-            to="/admin/tests"
+            to="/dashboard/tests"
             className="btn btn-outline hover:btn-primary btn-sm"
           >
             <span>View all</span>
@@ -412,7 +399,7 @@ const TestCard = ({ tests }: TestCardProps) => {
                       className="cursor-pointer hover:bg-primary/5"
                       role="button"
                       onClick={() => {
-                        navigate(`/admin/test/${test._id}`);
+                        navigate(`/dashboard/test/${test._id}`);
                       }}
                     >
                       <td className="px-4 py-3 text-sm">
@@ -524,7 +511,7 @@ export const AvailableTestCard = ({ tests }: AvailableTestCardProps) => {
             Available Tests in Lab
           </h2>
           <Link
-            to="/admin/tests/available-tests"
+            to="/dashboard/tests/available-tests"
             className="btn btn-outline hover:btn-primary btn-sm"
           >
             <span>View all</span>
@@ -555,7 +542,9 @@ export const AvailableTestCard = ({ tests }: AvailableTestCardProps) => {
                         className="cursor-pointer hover:bg-primary/5"
                         role="button"
                         onClick={() => {
-                          navigate(`/admin/tests/available-tests/${test._id}`);
+                          navigate(
+                            `/dashboard/tests/available-tests/${test._id}`
+                          );
                         }}
                       >
                         <td className="px-4 py-3 text-sm">

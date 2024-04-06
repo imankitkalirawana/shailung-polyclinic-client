@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import axios from "axios";
 import { API_BASE_URL } from "../../utils/config";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

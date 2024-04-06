@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { PlusIcon, XIcon } from "../../icons/Icons";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { isLoggedIn } from "../../../utils/auth";
 import { useFormik } from "formik";
 import { UploadMultipleFiles } from "../../../utils/FileHandling";
@@ -53,7 +53,7 @@ const Complete = () => {
 
   useEffect(() => {
     if (test?.isDone) {
-      window.location.href = "/admin/tests";
+      window.location.href = "/dashboard/tests";
       toast.error("Test already completed");
     }
   }, [test]);

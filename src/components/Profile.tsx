@@ -1,44 +1,31 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { useFormik } from "formik";
 import { API_BASE_URL } from "../utils/config";
 import { isLoggedIn } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import { UploadSingleFile, DeleteFile } from "../utils/FileHandling";
-
-interface User {
-  _id: string;
-  name: string;
-  photo: string;
-  username: string;
-  email: string;
-  phone: string;
-  bio: string;
-  role: string;
-  address: string;
-  createdat: string;
-  updatedat: string;
-  theme: string;
-}
+import { getLoggedUser } from "../functions/get";
+import { deleteSelf } from "../functions/delete";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { loggedIn } = isLoggedIn();
-  const [user, setUser] = useState<User>({} as User);
+  // const [user, setUser] = useState<User>({} as User);
   const [isDeleting, setIsDeleting] = useState(false);
   const [file, setFile] = useState<File | null>(null);
 
   const formik = useFormik({
     initialValues: {
-      name: user.name || "",
-      username: user.username || "",
-      email: user.email || "",
-      phone: user.phone || "",
-      bio: user.bio || "",
-      address: user.address || "",
+      name: "",
+      username: "",
+      email: "",
+      phone: "",
+      bio: "",
+      address: "",
       confirmusername: "",
-      photo: user.photo || "profile-default.webp",
+      photo: "profile-default.webp",
       previewPhoto: "",
     },
     onSubmit: async (values) => {
@@ -78,12 +65,7 @@ const Profile = () => {
     // fetch user data
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/user/profile`, {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        });
-        setUser(res.data);
+        const res = await getLoggedUser();
         formik.setValues({
           ...formik.values,
           name: res.data.name,
@@ -106,16 +88,13 @@ const Profile = () => {
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await axios.delete(`${API_BASE_URL}/api/user/profile`, {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
+      await deleteSelf().then(() => {
+        toast.success("Account deleted successfully");
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("userData");
+        navigate("/auth/login");
       });
-      toast.success("Account deleted successfully");
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
-      localStorage.removeItem("userData");
-      navigate("/auth/login");
     } catch (error: any) {
       console.error(error);
       toast.error(error.message);
@@ -140,7 +119,7 @@ const Profile = () => {
     }
   };
 
-  if (!user) return <>Not Logged IN</>;
+  // if (!user) return <>Not Logged IN</>;
 
   return (
     <div className="col-span-full lg:col-span-9 max-w-6xl mx-auto my-24 px-8">
@@ -507,7 +486,7 @@ const Profile = () => {
         </div>
       </form>
       <div className="divider my-12"></div>
-      {user.email && <Security />}
+      {formik.values.email && <Security />}
     </div>
   );
 };

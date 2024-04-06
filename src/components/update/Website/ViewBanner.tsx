@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../../../utils/config";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useFormik } from "formik";
 
 export const ViewBanner = () => {
@@ -99,7 +99,7 @@ export const ViewBanner = () => {
           </div>
         </div>
         <div className="flex items-center gap-2 justify-end mt-12">
-          <a href="/admin" className="btn btn-sm">
+          <a href="/dashboard" className="btn btn-sm">
             Cancel
           </a>
           <button

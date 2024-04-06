@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../../../utils/config";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { isLoggedIn } from "../../../utils/auth";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
@@ -233,7 +233,7 @@ const Website = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 justify-end mt-12">
-            <a href="/admin" className="btn btn-sm">
+            <a href="/dashboard" className="btn btn-sm">
               Cancel
             </a>
             <button

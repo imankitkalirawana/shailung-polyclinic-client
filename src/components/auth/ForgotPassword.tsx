@@ -4,7 +4,7 @@ import { API_BASE_URL } from "../../utils/config";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { ExternalLinkIcon } from "../icons/Icons";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 
 const ForgotPassword = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);

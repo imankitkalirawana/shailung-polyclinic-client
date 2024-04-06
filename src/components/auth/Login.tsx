@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/config";
 import { useFormik } from "formik";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import * as Yup from "yup";
 
 interface Country {
@@ -143,8 +143,8 @@ const Login = () => {
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
             className="mx-auto h-10 w-auto"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
+            src="/logo.webp"
+            alt="Shailung Polyclinic"
           />
           <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">
             {isOfficial

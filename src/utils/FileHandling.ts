@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "./config";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export const DeleteFile = async (file: string) => {
     try {

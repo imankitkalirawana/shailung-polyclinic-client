@@ -4,7 +4,7 @@ import { HistoryIcon, SquareCrossIcon } from "../icons/Icons";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast } from "sonner";
 import { API_BASE_URL } from "../../utils/config";
 import { isLoggedIn } from "../../utils/auth";
 
