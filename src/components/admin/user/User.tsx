@@ -4,9 +4,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE_URL, Roles } from "../../../utils/config";
 import axios from "axios";
 import { toast } from "sonner";
+import { isLoggedIn } from "../../../utils/auth";
+import NotFound from "../../NotFound";
 
 const User = () => {
   const navigate = useNavigate();
+  const { user } = isLoggedIn();
+
+  if (user?.role !== "admin") {
+    return (
+      <div className="my-24" onLoad={() => {}}>
+        <NotFound message="You are not allowed to access this page" />
+      </div>
+    );
+  }
   const { id }: any = useParams();
 
   useEffect(() => {
@@ -116,7 +127,7 @@ const User = () => {
                   <img
                     src={
                       formik.values.photo
-                        ? formik.values.photo
+                        ? `${API_BASE_URL}/api/upload/${formik.values.photo}`
                         : "https://ui-avatars.com/api/?name=" +
                           formik.values.name
                     }

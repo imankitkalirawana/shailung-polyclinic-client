@@ -32,6 +32,7 @@ const New = () => {
   const [user, setUser] = useState<User>({} as User);
   const [selectedTest, setSelectedTest] = useState<Tests>({} as Tests);
   const [submitting, setSubmitting] = useState(false);
+  const [isConfirm, setIsConfirm] = useState(false);
   const [isModal, setIsModal] = useState(false);
 
   useEffect(() => {
@@ -400,7 +401,8 @@ const New = () => {
                   <div className="form-control col-span-2">
                     <button
                       className="btn btn-primary w-full"
-                      type="submit"
+                      type="button"
+                      onClick={() => setIsConfirm(true)}
                       disabled={
                         formik.values.testid === "" ||
                         formik.values.testfor === "" ||
@@ -421,6 +423,12 @@ const New = () => {
         </div>
       </div>
       {isModal && <SubmittedModal onClose={() => setIsModal(false)} />}
+      {isConfirm && (
+        <ConfirmModal
+          onClose={() => setIsConfirm(false)}
+          onConfirm={formik.handleSubmit}
+        />
+      )}
     </>
   );
 };
@@ -451,6 +459,43 @@ const SubmittedModal: React.FC<ModalProps> = ({ onClose }) => {
             <Link to="/appointment/history" className="btn btn-primary">
               View Appointment History
             </Link>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+interface ConfirmModalProps {
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
+// confirm modal
+const ConfirmModal: React.FC<ConfirmModalProps> = ({ onClose, onConfirm }) => {
+  return (
+    <>
+      <div className="modal modal-open backdrop-blur-md" role="dialog">
+        <div className="modal-box max-w-md">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-lg">Confirm Appointment</h3>
+          </div>
+          <p className="py-4">
+            Are you sure you want to book this appointment? Please confirm.
+          </p>
+          <div className="modal-action flex">
+            <button
+              className="btn btn-primary flex-1"
+              onClick={() => {
+                onConfirm();
+                onClose();
+              }}
+            >
+              Confirm
+            </button>
+            <button className="btn flex-1" onClick={onClose}>
+              Cancel
+            </button>
           </div>
         </div>
       </div>

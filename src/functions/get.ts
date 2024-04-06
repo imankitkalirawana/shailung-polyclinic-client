@@ -1,8 +1,8 @@
 import axios from "axios";
 import { API_BASE_URL } from "../utils/config";
 
-export const getAllUsers = async () => {
-    const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
+export const getAllUsers = async (role: string) => {
+    const response = await axios.get(`${API_BASE_URL}/api/admin/users/${role}`, {
         headers: {
             Authorization: `${localStorage.getItem("token")}`,
         },

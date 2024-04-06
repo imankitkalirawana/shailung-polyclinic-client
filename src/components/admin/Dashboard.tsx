@@ -1,10 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import {
   AppWindowIcon,
+  AtomIcon,
+  CellIcon,
   LeftAngle,
   MicroscopeIcon,
   RightAngle,
-  UsersGroup,
   UsersIcon,
 } from "../icons/Icons";
 import { useEffect, useState } from "react";
@@ -86,22 +87,28 @@ const humanReadableDate = (date: string) => {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { loggedIn, user } = isLoggedIn();
-  const [countData, setCountData] = useState<any>({}); // [1
+  const [countData, setCountData] = useState<any>({});
 
   const [users, setUsers] = useState<User[]>([]);
   const [tests, setTests] = useState<Test[]>([]);
   const [availabletests, setAvailableTests] = useState<AvailableTest[]>([]);
 
   useEffect(() => {
-    if (!loggedIn || user?.role !== "admin") {
-      navigate("/");
+    if (!loggedIn) {
+      navigate("/auth/login");
     }
   }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const users = await getAllUsers();
-        setUsers(users);
+        if (user?.role === "admin") {
+          const users = await getAllUsers("all");
+          setUsers(users);
+        } else {
+          const users = await getAllUsers("user");
+          setUsers(users);
+        }
         const tests = await getAllTests();
         setTests(tests.data);
         const availabletests = await getAllAvailableTests();
@@ -127,21 +134,25 @@ const Dashboard = () => {
               Welcome back, {user?.username}
             </p>
           </div>
-          <Link
-            className="flex items-center justify-between p-4 mb-8 text-sm font-semibold text-content-100 bg-primary/10 rounded-lg shadow-md focus:outline-none focus:shadow-outline-purple"
-            to="website"
-          >
-            <div className="flex items-center">
-              <AppWindowIcon className="w-5 h-5 mr-2 text-primary" />
-              <span>You can update your website data here</span>
-            </div>
-            <span
-              className="link inline-flex text-nowrap text-primary"
-              role="button"
-            >
-              Update Now
-            </span>
-          </Link>
+          {user?.role === "admin" && (
+            <>
+              <Link
+                className="flex items-center justify-between p-4 mb-8 text-sm font-semibold text-content-100 bg-primary/10 rounded-lg shadow-md focus:outline-none focus:shadow-outline-purple"
+                to="website"
+              >
+                <div className="flex items-center">
+                  <AppWindowIcon className="w-5 h-5 mr-2 text-primary" />
+                  <span>You can update your website data here</span>
+                </div>
+                <span
+                  className="link inline-flex text-nowrap text-primary"
+                  role="button"
+                >
+                  Update Now
+                </span>
+              </Link>
+            </>
+          )}
           <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
             <Link
               to={"/dashboard/users?type=user"}
@@ -152,12 +163,7 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="mb-2 text-sm font-medium">Total users</p>
-                <p className="text-lg font-semibold">
-                  {users.length -
-                    users.filter(
-                      (user) => user.role === "admin" || user.role == "member"
-                    ).length || 0}
-                </p>
+                <p className="text-lg font-semibold">{users.length - 1 || 0}</p>
               </div>
             </Link>
             <Link
@@ -170,7 +176,7 @@ const Dashboard = () => {
               <div>
                 <p className="mb-2 text-sm font-medium">Test done</p>
                 <p className="text-lg font-semibold">
-                  {countData.testCount || 0}
+                  {countData.testsDone || 0}
                 </p>
               </div>
             </Link>
@@ -179,16 +185,11 @@ const Dashboard = () => {
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
             >
               <div className="p-3 mr-4 rounded-full bg-primary text-base-100">
-                <UsersGroup className="w-5 h-5" />
+                <CellIcon className="w-5 h-5" />
               </div>
               <div>
-                <p className="mb-2 text-sm font-medium">Total Employee</p>
-                <p className="text-lg font-semibold">
-                  {/* filter users with role as "admin" */}
-                  {users.filter(
-                    (user) => user.role === "admin" || user.role == "member"
-                  ).length - 1 || 0}
-                </p>
+                <p className="mb-2 text-sm font-medium">Total Tests</p>
+                <p className="text-lg font-semibold">{tests.length || 0}</p>
               </div>
             </Link>
             <Link
@@ -196,17 +197,7 @@ const Dashboard = () => {
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
             >
               <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
+                <AtomIcon className="w-5 h-5" />
               </div>
               <div>
                 <p className="mb-2 text-sm font-medium">Available Tests</p>
@@ -423,25 +414,24 @@ const TestCard = ({ tests }: TestCardProps) => {
                       <td className="px-4 py-3">
                         <div className="flex items-center text-sm">
                           <div>
-                            <p className="font-semibold">
+                            <p className="font-semibold text-nowrap">
                               {test.testDetail.testData.name}
                             </p>
-                            <p className="text-xs"></p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm">
+                      <td className="px-4 py-3 text-sm text-nowrap">
                         {test.testDetail.userData.name}
                       </td>
                       <td className="px-4 py-3 text-sm">
                         {test.testDetail.userData.phone}
                       </td>
-                      <td className="px-4 py-3 text-sm">
+                      <td className="px-4 py-3 text-sm text-nowrap">
                         {test.testDetail.doctorData
                           ? test.testDetail.doctorData.name
                           : "Not Assigned"}
                       </td>
-                      <td className="px-4 py-3 text-sm">
+                      <td className="px-4 py-3 text-sm text-nowrap">
                         {humanReadableDate(test.updatedat)}
                       </td>
                     </tr>
@@ -562,22 +552,26 @@ export const AvailableTestCard = ({ tests }: AvailableTestCardProps) => {
                         <td className="px-4 py-3">
                           <div className="flex items-center text-sm">
                             <div>
-                              <p className="font-semibold">{test.name}</p>
+                              <p className="font-semibold text-nowrap">
+                                {test.name}
+                              </p>
                               <p className="text-xs"></p>
                             </div>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-sm max-w-48 text-ellipsis overflow-hidden whitespace-nowrap">
+                        <td className="px-4 py-3 text-sm max-w-48 text-ellipsis overflow-hidden whitespace-nowrap text-nowrap">
                           {test.description}
                         </td>
-                        <td className="px-4 py-3 text-sm">
+                        <td className="px-4 py-3 text-sm text-nowrap">
                           {test.price
                             .toString()
                             .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                         </td>
-                        <td className="px-4 py-3 text-sm">{test.duration}</td>
+                        <td className="px-4 py-3 text-sm text-nowrap">
+                          {test.duration}
+                        </td>
 
-                        <td className="px-4 py-3 text-sm">
+                        <td className="px-4 py-3 text-sm text-nowrap">
                           {humanReadableDate(test.updatedat)}
                         </td>
                       </tr>

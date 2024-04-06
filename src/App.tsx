@@ -98,7 +98,6 @@ function App() {
           </Route>
         </Routes>
       </Router>
-
       <Toaster richColors closeButton />
     </>
   );

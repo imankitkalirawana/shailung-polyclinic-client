@@ -5,10 +5,12 @@ import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
 import { humanReadableDate } from "./Users";
 import { EditIcon } from "../../icons/Icons";
+import { isLoggedIn } from "../../../utils/auth";
 
 const ViewUser = () => {
   const { id }: any = useParams();
-  const [user, setUser] = useState<any>({});
+  const { user } = isLoggedIn();
+  const [getUser, setUser] = useState<any>({});
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -40,13 +42,15 @@ const ViewUser = () => {
               Personal details and application.
             </p>
           </div>
-          <Link
-            to={`/dashboard/users/${id}/edit`}
-            className="btn btn-primary btn-sm"
-          >
-            <EditIcon className="h-5 w-5" />
-            Edit
-          </Link>
+          {user?.role === "admin" && (
+            <Link
+              to={`/dashboard/users/${id}/edit`}
+              className="btn btn-primary btn-sm"
+            >
+              <EditIcon className="h-5 w-5" />
+              Edit
+            </Link>
+          )}
         </div>
         <div className="mt-6">
           <div>
@@ -54,78 +58,80 @@ const ViewUser = () => {
               <img
                 className="object-cover w-full h-full rounded-full"
                 src={
-                  user.photo
-                    ? user.photo
-                    : "https://ui-avatars.com/api/?name=" + user.name
+                  getUser.photo
+                    ? `${API_BASE_URL}/api/upload/${getUser.photo}`
+                    : "https://ui-avatars.com/api/?name=" + getUser.name
                 }
-                alt={user.name}
+                alt={getUser.name}
                 loading="lazy"
               />
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Full name</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {user.name}
+                {getUser.name}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Username</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {user.username}
+                {getUser.username}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Gender</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {user.gender}
+                {getUser.gender}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Age</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {user.age} years
+                {getUser.age} years
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Role</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {user.role}
+                {getUser.role}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Email address</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {user.email}
+                {getUser.email}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Phone Number</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {user.phone}
+                {getUser.phone}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Bio</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {user.bio}
+                {getUser.bio}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Address</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {user.address}
+                {getUser.address}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Registered On</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {humanReadableDate(user.addeddate)}
+                {humanReadableDate(getUser.addeddate)}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Updated On</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {user.updatedat ? humanReadableDate(user.updatedat) : "N/A"}
+                {getUser.updatedat
+                  ? humanReadableDate(getUser.updatedat)
+                  : "N/A"}
               </dd>
             </div>
             <div className="hidden">

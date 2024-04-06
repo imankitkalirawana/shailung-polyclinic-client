@@ -7,7 +7,7 @@ const Admin = () => {
   const { loggedIn, user } = isLoggedIn();
   if (!loggedIn) {
     window.location.href = "/auth/login";
-  } else if (loggedIn && user?.role !== "admin") {
+  } else if (loggedIn && user?.role !== "admin" && user?.role !== "member") {
     return (
       <div className="my-24" onLoad={() => {}}>
         <NotFound message="You are not allowed to access this page" />

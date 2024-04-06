@@ -17,6 +17,7 @@ import * as XLSX from "xlsx";
 import NotFound from "../../NotFound";
 import { getAllUsers } from "../../../functions/get";
 import { deleteUser } from "../../../functions/delete";
+import { isLoggedIn } from "../../../utils/auth";
 
 interface User {
   _id: string;
@@ -43,6 +44,7 @@ export const humanReadableDate = (date: string) => {
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const { user } = isLoggedIn();
   const [searchParams] = useSearchParams();
   const userType = searchParams.get("type");
   const offset = 10;
@@ -57,14 +59,14 @@ const Users = () => {
 
   useEffect(() => {
     const fetchData = async (userType: any) => {
-      const users = await getAllUsers();
+      const users = await getAllUsers("all");
       if (userType === "employee") {
         setUsers(
           users.filter(
             (user: any) => user.role === "admin" || user.role === "member"
           )
         );
-      } else if (userType === "user") {
+      } else if (userType === "user" || user?.role === "member") {
         setUsers(users.filter((user: any) => user.role === "user"));
       } else {
         setUsers(users);
@@ -175,6 +177,8 @@ const Users = () => {
     XLSX.writeFile(wb, `${fileName}.xlsx`);
   };
 
+  const loggedUser = user;
+
   return (
     <>
       <div className="container mx-auto p-4">
@@ -191,15 +195,17 @@ const Users = () => {
               <label htmlFor="add_user" className="btn btn-primary btn-sm">
                 <span>Add User</span>
               </label>
-              <button
-                className="btn btn-outline hover:btn-primary btn-sm btn-circle tooltip tooltip-bottom flex"
-                data-tip="Export to Excel"
-                onClick={() => {
-                  exportToExcel();
-                }}
-              >
-                <ExportTableIcon className="w-4 h-4" />
-              </button>
+              {user?.role === "admin" && (
+                <button
+                  className="btn btn-outline hover:btn-primary btn-sm btn-circle tooltip tooltip-bottom flex"
+                  data-tip="Export to Excel"
+                  onClick={() => {
+                    exportToExcel();
+                  }}
+                >
+                  <ExportTableIcon className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
           <div className="relative w-full max-w-md mb-4">
@@ -261,7 +267,9 @@ const Users = () => {
                     >
                       Date
                     </th>
-                    <th className="px-4 py-3">Actions</th>
+                    {user?.role === "admin" && (
+                      <th className="px-4 py-3">Actions</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="bg-primary/10 divide-y">
@@ -308,51 +316,87 @@ const Users = () => {
                                     alt={user.name}
                                     loading="lazy"
                                   />
-                                  <div
-                                    className="absolute inset-0 rounded-full shadow-inner"
-                                    aria-hidden="true"
-                                  ></div>
                                 </div>
                                 <div>
-                                  <p className="font-semibold">{user.name}</p>
-                                  <p className="text-xs">{user.username}</p>
+                                  <p className="font-semibold text-nowrap">
+                                    {user.name}
+                                  </p>
+                                  <p className="text-xs text-nowrap">
+                                    {user.username}
+                                  </p>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-4 py-3 text-sm">
+                            <td className="px-4 py-3 text-sm text-nowrap">
                               {user.email ? user.email : "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm">
+                            <td className="px-4 py-3 text-sm text-nowrap">
                               {user.phone ? user.phone : "-"}
                             </td>
 
-                            <td className="px-4 py-3 text-sm">
+                            <td className="px-4 py-3 text-sm text-nowrap">
                               {humanReadableDate(user.updatedat)}
                             </td>
-                            <td className="px-4 py-3 text-sm flex items-center gap-4 justify-center modify">
-                              <Link
-                                to={`/dashboard/users/${user._id}/edit`}
-                                className="btn btn-sm btn-circle tooltip tooltip-info flex items-center justify-center btn-ghost"
-                                aria-label="Edit"
-                                data-tip="Edit"
-                              >
-                                <EditIcon className="w-4 h-4 button" />
-                              </Link>
-                              <button
-                                className="btn btn-sm btn-circle flex justify-center items-center tooltip-error tooltip btn-ghost hover:btn-outline"
-                                aria-label="Delete"
-                                onClick={() => handleDeleteClick(user)}
-                                data-tip="Delete"
-                              >
-                                <TrashXIcon className="w-4 h-4 button" />
-                              </button>
-                            </td>
+                            {loggedUser?.role === "admin" && (
+                              <td className="px-4 py-3 text-sm flex items-center gap-4 justify-center modify">
+                                <Link
+                                  to={`/dashboard/users/${user._id}/edit`}
+                                  className="btn btn-sm btn-circle tooltip tooltip-info flex items-center justify-center btn-ghost"
+                                  aria-label="Edit"
+                                  data-tip="Edit"
+                                >
+                                  <EditIcon className="w-4 h-4 button" />
+                                </Link>
+                                <button
+                                  className="btn btn-sm btn-circle flex justify-center items-center tooltip-error tooltip btn-ghost hover:btn-outline"
+                                  aria-label="Delete"
+                                  onClick={() => handleDeleteClick(user)}
+                                  data-tip="Delete"
+                                >
+                                  <TrashXIcon className="w-4 h-4 button" />
+                                </button>
+                              </td>
+                            )}
                           </tr>
                         )
                     )}
+                  <tr className="bg-primary/20">
+                    <td
+                      className="px-4 py-3 text-sm"
+                      colSpan={user?.role === "admin" ? 5 : 4}
+                    >
+                      Showing {initialItem + 1}-{finalItem} of {users.length}
+                    </td>
+                    <td className="px-4 py-3 text-sm flex justify-end">
+                      <button
+                        className="btn btn-sm btn-ghost btn-circle"
+                        aria-label="Previous"
+                        onClick={() => {
+                          if (initialItem > 0) {
+                            setInitialItem(initialItem - offset);
+                            setFinalItem(finalItem - offset);
+                          }
+                        }}
+                      >
+                        <LeftAngle className="w-4 h-4 fill-current" />
+                      </button>
+                      <button
+                        className="btn btn-sm btn-ghost btn-circle"
+                        aria-label="Next"
+                        onClick={() => {
+                          if (finalItem < users.length) {
+                            setInitialItem(initialItem + offset);
+                            setFinalItem(finalItem + offset);
+                          }
+                        }}
+                      >
+                        <RightAngle className="w-4 h-4 fill-current" />
+                      </button>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
-              <div
+              {/* <div
                 className={`grid px-4 py-3 text-xs font-semibold tracking-wideuppercase border-t bg-primary/20 sm:grid-cols-9`}
               >
                 <span className="flex items-center col-span-3">
@@ -405,7 +449,7 @@ const Users = () => {
                     </ul>
                   </nav>
                 </span>
-              </div>
+              </div> */}
             </div>
           ) : (
             <NotFound message="No users found" />
@@ -449,7 +493,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
   };
   const fetchUsers = async () => {
     try {
-      const users = await getAllUsers();
+      const users = await getAllUsers("all");
       setUsers(users);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -486,6 +530,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
 const AddUser = () => {
   const navigate = useNavigate();
   const [isAdding, setIsAdding] = useState(false);
+  const { user } = isLoggedIn();
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -631,26 +676,27 @@ const AddUser = () => {
                   required
                 />
               </div>
-
-              <div>
-                <label htmlFor="role" className="label">
-                  <span className="label-text">Role</span>
-                </label>
-                <select
-                  className="select select-bordered w-full max-w-xs"
-                  name="role"
-                  id="role"
-                  onChange={formik.handleChange}
-                  value={formik.values.role}
-                >
-                  <option disabled>Select Role for user</option>
-                  {Roles.map((role) => (
-                    <option value={role.value} key={role.value}>
-                      {role.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {user?.role === "admin" && (
+                <div>
+                  <label htmlFor="role" className="label">
+                    <span className="label-text">Role</span>
+                  </label>
+                  <select
+                    className="select select-bordered w-full max-w-xs"
+                    name="role"
+                    id="role"
+                    onChange={formik.handleChange}
+                    value={formik.values.role}
+                  >
+                    <option disabled>Select Role for user</option>
+                    {Roles.map((role) => (
+                      <option value={role.value} key={role.value}>
+                        {role.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div className="modal-action flex">
                 <button

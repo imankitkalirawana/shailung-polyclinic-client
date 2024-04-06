@@ -184,6 +184,13 @@ const Navbar = () => {
                     </li>
                   </>
                 )}
+                {user && user.role === "member" && (
+                  <>
+                    <li>
+                      <Link to="/dashboard">Dashboard</Link>
+                    </li>
+                  </>
+                )}
                 <li className="text-error">
                   <a onClick={handleLogout}>Logout</a>
                 </li>

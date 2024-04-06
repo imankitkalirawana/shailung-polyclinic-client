@@ -15,6 +15,7 @@ import { TestStatus } from "../../../utils/config";
 import NotFound from "../../NotFound";
 import { toast } from "sonner";
 import { getAllDoctors, getAllTests } from "../../../functions/get";
+import { isLoggedIn } from "../../../utils/auth";
 
 interface Test {
   _id: string;
@@ -71,6 +72,7 @@ export const testStatus = async (testId: any, status: string) => {
 
 const Tests = () => {
   const [tests, setTests] = useState<Test[]>([]);
+  const { user } = isLoggedIn();
   const [searchQuery, setSearchQuery] = useState("");
   const offset = 10;
   const [initialItem, setInitialItem] = useState(0);
@@ -286,49 +288,50 @@ const Tests = () => {
                               </select>
                             )}
                         </td>
-                        <td className="px-4 py-3 text-sm">
+                        <td className="px-4 py-3 text-sm text-nowrap">
                           {test.testDetail.testData.name}
                         </td>
-                        <td className="px-4 py-3 text-sm">
+                        <td className="px-4 py-3 text-sm text-nowrap">
                           {test.testDetail.userData.name}
                         </td>
-                        <td className="px-4 py-3 text-sm">
+                        <td className="px-4 py-3 text-sm text-nowrap">
                           {test.testDetail.userData.phone}
                         </td>
-                        <td className={`px-4 py-3 text-sm`}>
+                        <td className={`px-4 py-3 text-sm text-nowrap`}>
                           {test.testDetail.doctorData
                             ? test.testDetail.doctorData.name
                             : "Not Assigned"}
                         </td>
 
-                        <td className="px-4 py-3 text-sm">
+                        <td className="px-4 py-3 text-sm text-nowrap">
                           {humanReadableDate(test.addeddate)}
                         </td>
-                        <td className="px-4 py-3 text-sm">
+                        <td className="px-4 py-3 text-sm text-nowrap">
                           {test.appointmentdate
                             ? humanReadableDate(test.appointmentdate)
                             : "Not Scheduled"}
                         </td>
                         <td className="px-4 py-3 text-sm modify justify-end flex gap-2">
-                          {test.status !== "completed" && (
-                            <button
-                              className={`btn btn-sm btn-circle hover:btn-outline tooltip flex ${
-                                test.appointmentdate
-                                  ? "tooltip-warning btn-ghost"
-                                  : "tooltip-info"
-                              } items-center justify-center`}
-                              aria-label="Schedule"
-                              data-tip={`${
-                                test.appointmentdate ? "Re" : ""
-                              }Schedule Date`}
-                              onClick={() => {
-                                setSelected(test);
-                                setIsSchedule(true);
-                              }}
-                            >
-                              <CalendarTimeIcon className="w-4 h-4 button" />
-                            </button>
-                          )}
+                          {test.status !== "completed" &&
+                            test.status !== "cancelled" && (
+                              <button
+                                className={`btn btn-sm btn-circle hover:btn-outline tooltip flex ${
+                                  test.appointmentdate
+                                    ? "tooltip-warning btn-ghost"
+                                    : "tooltip-info"
+                                } items-center justify-center`}
+                                aria-label="Schedule"
+                                data-tip={`${
+                                  test.appointmentdate ? "Re" : ""
+                                }Schedule Date`}
+                                onClick={() => {
+                                  setSelected(test);
+                                  setIsSchedule(true);
+                                }}
+                              >
+                                <CalendarTimeIcon className="w-4 h-4 button" />
+                              </button>
+                            )}
 
                           {test.status !== "completed" &&
                             test.status !== "cancelled" && (
@@ -349,14 +352,16 @@ const Tests = () => {
                                 <StethoscopeIcon className="w-4 h-4 button" />
                               </button>
                             )}
-                          <button
-                            className="btn ml-4 btn-sm btn-circle btn-ghost hover:btn-outline tooltip flex tooltip-error items-center justify-center"
-                            aria-label="Delete"
-                            onClick={() => handleDeleteClick(test)}
-                            data-tip="Delete"
-                          >
-                            <TrashXIcon className="w-4 h-4 button" />
-                          </button>
+                          {user?.role === "admin" && (
+                            <button
+                              className="btn ml-4 btn-sm btn-circle btn-ghost hover:btn-outline tooltip flex tooltip-error items-center justify-center"
+                              aria-label="Delete"
+                              onClick={() => handleDeleteClick(test)}
+                              data-tip="Delete"
+                            >
+                              <TrashXIcon className="w-4 h-4 button" />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}

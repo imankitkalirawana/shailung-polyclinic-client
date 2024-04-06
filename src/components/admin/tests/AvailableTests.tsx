@@ -125,8 +125,9 @@ const AvailableTests = () => {
                               <td className="px-4 py-3">
                                 <div className="flex items-center text-sm">
                                   <div>
-                                    <p className="font-semibold">{test.name}</p>
-                                    <p className="text-xs"></p>
+                                    <p className="font-semibold text-nowrap">
+                                      {test.name}
+                                    </p>
                                   </div>
                                 </div>
                               </td>
@@ -136,17 +137,17 @@ const AvailableTests = () => {
                               >
                                 {test.description}
                               </td>
-                              <td className="px-4 py-3 text-sm">
+                              <td className="px-4 py-3 text-sm text-nowrap">
                                 NPR{" "}
                                 {test.price
                                   .toString()
                                   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                               </td>
-                              <td className="px-4 py-3 text-sm">
+                              <td className="px-4 py-3 text-sm text-nowrap">
                                 {test.duration}
                               </td>
 
-                              <td className="px-4 py-3 text-sm">
+                              <td className="px-4 py-3 text-sm text-nowrap">
                                 {humanReadableDate(test.updatedat)}
                               </td>
                               <td className="px-4 py-3 text-sm modify">
