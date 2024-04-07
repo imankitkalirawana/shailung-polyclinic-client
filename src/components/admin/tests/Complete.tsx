@@ -187,18 +187,16 @@ const Complete = () => {
     },
   });
 
-  console.log(formik.values.userid);
-
   const uploadReport = async (values: any) => {
     await axios
-      .post(`${API_BASE_URL}/api/report`, values, {
+      .put(`${API_BASE_URL}/api/test/done/${id}`, null, {
         headers: {
           Authorization: `${localStorage.getItem("token")}`,
         },
       })
       .then(async () => {
-        await axios
-          .put(`${API_BASE_URL}/api/test/done/${id}`, {
+        axios
+          .post(`${API_BASE_URL}/api/report`, values, {
             headers: {
               Authorization: `${localStorage.getItem("token")}`,
             },

@@ -16,6 +16,7 @@ import NotFound from "../../NotFound";
 import { toast } from "sonner";
 import { getAllDoctors, getAllTests } from "../../../functions/get";
 import { isLoggedIn } from "../../../utils/auth";
+import * as XLSX from "xlsx";
 
 interface Test {
   _id: string;
@@ -112,19 +113,18 @@ const Tests = () => {
     }
   };
 
-  // change status to overdue if appointment date is passed
   useEffect(() => {
     tests.forEach(async (test) => {
       if (
         test.appointmentdate &&
-        new Date(test.appointmentdate) < new Date() &&
+        new Date(test.appointmentdate).getDate() < new Date().getDate() &&
         test.status !== "completed" &&
-        test.status !== "overdue"
+        test.status !== "overdue" &&
+        test.status !== "cancelled"
       ) {
         await testStatus(test._id, "overdue");
         fetchAllTests();
       }
-      // set the test status to completed if the test.isDone is true
       if (test.isDone && test.status !== "completed") {
         await testStatus(test._id, "completed");
         fetchAllTests();
@@ -168,6 +168,21 @@ const Tests = () => {
     }
   };
 
+  const exportToExcel = async () => {
+    const filename = "tests";
+    const response = await axios.get(`${API_BASE_URL}/api/test/export`, {
+      headers: {
+        Authorization: `${localStorage.getItem("token")}`,
+      },
+    });
+    const data = response.data;
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Tests");
+    XLSX.writeFile(wb, `${filename}.xlsx`);
+  };
+
   return (
     <>
       <div className="container mx-auto p-4">
@@ -177,11 +192,7 @@ const Tests = () => {
             <div className="flex gap-2 flex-row-reverse">
               <button
                 className="btn btn-outline btn-sm hover:btn-primary"
-                onClick={() =>
-                  toast.message("Not yet available", {
-                    description: "This feature is not yet available",
-                  })
-                }
+                onClick={() => exportToExcel()}
               >
                 Export to Excel
               </button>
@@ -322,7 +333,10 @@ const Tests = () => {
                                 } items-center justify-center`}
                                 aria-label="Schedule"
                                 data-tip={`${
-                                  test.appointmentdate ? "Re" : ""
+                                  test.appointmentdate ||
+                                  test.status === "overdue"
+                                    ? "Re"
+                                    : ""
                                 }Schedule Date`}
                                 onClick={() => {
                                   setSelected(test);
@@ -353,14 +367,17 @@ const Tests = () => {
                               </button>
                             )}
                           {user?.role === "admin" && (
-                            <button
-                              className="btn ml-4 btn-sm btn-circle btn-ghost hover:btn-outline tooltip flex tooltip-error items-center justify-center"
-                              aria-label="Delete"
-                              onClick={() => handleDeleteClick(test)}
-                              data-tip="Delete"
-                            >
-                              <TrashXIcon className="w-4 h-4 button" />
-                            </button>
+                            <>
+                              <div className="divider divider-horizontal mx-0"></div>
+                              <button
+                                className="btn btn-sm btn-circle btn-ghost hover:btn-outline tooltip flex tooltip-error items-center justify-center"
+                                aria-label="Delete"
+                                onClick={() => handleDeleteClick(test)}
+                                data-tip="Delete"
+                              >
+                                <TrashXIcon className="w-4 h-4 button" />
+                              </button>
+                            </>
                           )}
                         </td>
                       </tr>

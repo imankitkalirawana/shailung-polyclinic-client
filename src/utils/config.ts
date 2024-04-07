@@ -31,7 +31,7 @@ export const TestStatus = [
         value: "booked",
         label: "Booked",
         description: "Test is booked",
-        color: "badge-neutral",
+        color: "",
         level: 1
     },
     {
@@ -73,7 +73,7 @@ export const TestStatus = [
         value: "overdue",
         label: "Overdue",
         description: "Test is overdue",
-        color: "bg-orange-600",
+        color: "bg-pink-600",
         level: 6
     }
 ]

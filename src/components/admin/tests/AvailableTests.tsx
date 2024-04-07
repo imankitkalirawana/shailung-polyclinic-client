@@ -14,6 +14,8 @@ import {
 } from "../../icons/Icons";
 import { useFormik } from "formik";
 import NotFound from "../../NotFound";
+import { getAllAvailableTests } from "../../../functions/get";
+import { isLoggedIn } from "../../../utils/auth";
 
 interface Test {
   _id: string;
@@ -33,6 +35,7 @@ interface Test {
 }
 
 const AvailableTests = () => {
+  const { user } = isLoggedIn();
   const offset = 10;
   const [initialItem, setInitialItem] = useState(0);
   const [finalItem, setFinalItem] = useState(offset);
@@ -57,9 +60,7 @@ const AvailableTests = () => {
   useEffect(() => {
     const fetchTests = async () => {
       try {
-        const response = await axios.get(
-          `${API_BASE_URL}/api/available-test/all`
-        );
+        const response = await getAllAvailableTests();
         setTests(response.data);
       } catch (error: any) {
         toast.error(error.response.statusText);
@@ -74,9 +75,11 @@ const AvailableTests = () => {
         <div className="w-full overflow-hidden card shadow-xs">
           <div className="flex justify-between items-center">
             <h2 className="my-6 text-2xl font-semibold">Available Tests</h2>
-            <label htmlFor="add_test" className="btn btn-primary btn-sm">
-              <span>New Test</span>
-            </label>
+            {user?.role === "admin" && (
+              <label htmlFor="add_test" className="btn btn-primary btn-sm">
+                <span>New Test</span>
+              </label>
+            )}
           </div>
           {tests.length > 0 ? (
             <>
@@ -91,8 +94,10 @@ const AvailableTests = () => {
                           <th className="px-4 py-3">Description</th>
                           <th className="px-4 py-3">Price</th>
                           <th className="px-4 py-3">Duration</th>
-                          <th className="px-4 py-3">Date</th>
-                          <th className="px-4 py-3">Modify</th>
+                          <th className="px-4 py-3">Updated On</th>
+                          {user?.role === "admin" && (
+                            <th className="px-4 py-3">Modify</th>
+                          )}
                         </tr>
                       </thead>
                       <tbody className="bg-primary/10 divide-y">
@@ -138,7 +143,6 @@ const AvailableTests = () => {
                                 {test.description}
                               </td>
                               <td className="px-4 py-3 text-sm text-nowrap">
-                                NPR{" "}
                                 {test.price
                                   .toString()
                                   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -146,30 +150,34 @@ const AvailableTests = () => {
                               <td className="px-4 py-3 text-sm text-nowrap">
                                 {test.duration}
                               </td>
-
                               <td className="px-4 py-3 text-sm text-nowrap">
                                 {humanReadableDate(test.updatedat)}
                               </td>
-                              <td className="px-4 py-3 text-sm modify">
-                                <Link
-                                  to={`/dashboard/tests/available-tests/${test._id}/edit`}
-                                  className="btn btn-sm btn-circle btn-ghost"
-                                  aria-label="Edit"
-                                >
-                                  <EditIcon className="w-4 h-4 button" />
-                                </Link>
-                                <button
-                                  className="btn btn-sm btn-circle btn-ghost hover:btn-outline"
-                                  aria-label="Delete"
-                                  onClick={() => handleDeleteClick(test)}
-                                >
-                                  <TrashXIcon className="w-4 h-4 button" />
-                                </button>
-                              </td>
+                              {user?.role === "admin" && (
+                                <td className="px-4 py-3 text-sm modify">
+                                  <Link
+                                    to={`/dashboard/tests/available-tests/${test._id}/edit`}
+                                    className="btn btn-sm btn-circle btn-ghost"
+                                    aria-label="Edit"
+                                  >
+                                    <EditIcon className="w-4 h-4 button" />
+                                  </Link>
+                                  <button
+                                    className="btn btn-sm btn-circle btn-ghost hover:btn-outline"
+                                    aria-label="Delete"
+                                    onClick={() => handleDeleteClick(test)}
+                                  >
+                                    <TrashXIcon className="w-4 h-4 button" />
+                                  </button>
+                                </td>
+                              )}
                             </tr>
                           ))}
                         <tr className="bg-primary/20">
-                          <td className="px-4 py-3 text-sm" colSpan={6}>
+                          <td
+                            className="px-4 py-3 text-sm"
+                            colSpan={user?.role === "admin" ? 6 : 5}
+                          >
                             Showing {initialItem + 1}-{finalItem} of{" "}
                             {tests.length}
                           </td>

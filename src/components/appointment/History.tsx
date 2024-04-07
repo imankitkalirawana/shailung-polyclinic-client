@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { SearchIcon } from "../icons/Icons";
 import { isLoggedIn } from "../../utils/auth";
+import { testStatus } from "../admin/tests/Tests";
 
 interface Test {
   _id: string;
@@ -31,6 +32,7 @@ const History = () => {
   const { loggedIn } = isLoggedIn();
   const [tests, setTests] = useState<Test[]>([]);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [scheduleModal, setScheduleModal] = useState(false);
   const [selected, setSelected] = useState<Test | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   if (!loggedIn) {
@@ -38,8 +40,8 @@ const History = () => {
   }
 
   const handleDeleteClick = (test: Test) => {
-    setSelected(test);
-    setDeleteModal(true);
+    // setSelected(test);
+    // setDeleteModal(true);
   };
 
   useEffect(() => {
@@ -76,7 +78,8 @@ const History = () => {
       test.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
       humanReadableDate(test.appointmentdate)
         .toLowerCase()
-        .includes(searchQuery.toLowerCase())
+        .includes(searchQuery.toLowerCase()) ||
+      test._id.toLowerCase().includes(searchQuery.toLowerCase())
     ) {
       return true;
     }
@@ -95,83 +98,164 @@ const History = () => {
           </div>
         </div>
         <div className="mt-10">
-          {/* search input */}
-          <div className="relative w-full max-w-md mb-4">
+          <div role="tablist" className="tabs tabs-boxed bg-transparent">
             <input
-              type="text"
-              className="input input-bordered ml-1 w-full"
-              placeholder="Search by name, doctor, date, status"
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-              }}
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="Tests"
+              defaultChecked
             />
-            <SearchIcon className="absolute top-3 right-4 w-6 h-6 text-primary" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {tests.length > 0
-              ? tests
-                  .filter((test) => {
-                    return handleSearch(test);
-                  })
-                  .map((test) => (
-                    <div
-                      className={`h-56 ${
-                        test.status === "cancelled"
-                          ? "from-error/20 to-error/30"
-                          : "from-base-300/80 to-base-300"
-                      } bg-gradient-to-br  rounded-xl relative shadow-2xl`}
-                    >
-                      <div className="w-full p-8">
-                        <div className="flex justify-between">
-                          <div>
-                            <p className="font-light text-xs">Name</p>
-                            <p className="font-medium">
-                              {test.testDetail.userData.name}
-                            </p>
-                          </div>
-                          <div className="badge badge-primary">
-                            {test.testDetail.testData.name}
-                          </div>
-                        </div>
+            <div
+              role="tabpanel"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+            >
+              <div className="relative w-full max-w-md mb-4">
+                <input
+                  type="text"
+                  className="input input-bordered ml-1 w-full"
+                  placeholder="Search by name, doctor, date, status"
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                  }}
+                />
+                <SearchIcon className="absolute top-3 right-4 w-6 h-6 text-primary" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {tests.length > 0
+                  ? tests
+                      .filter((test) => {
+                        return handleSearch(test);
+                      })
+                      .map((test) => (
+                        <div
+                          className={`h-56 ${
+                            test.status === "cancelled"
+                              ? "from-error/20 to-error/30"
+                              : test.status === "completed"
+                              ? "from-success/20 to-success/30"
+                              : test.status === "overdue"
+                              ? "from-pink-300 to-pink-400"
+                              : "from-base-300/80 to-base-300"
+                          } bg-gradient-to-br  rounded-xl relative shadow-2xl`}
+                          key={test._id}
+                        >
+                          <div className="w-full p-8">
+                            <div className="flex justify-between">
+                              <div>
+                                <p className="font-light text-xs">Name</p>
+                                <p className="font-medium">
+                                  {test.testDetail.userData.name}
+                                </p>
+                              </div>
+                              <div className="badge badge-primary">
+                                {test.testDetail.testData.name}
+                              </div>
+                            </div>
 
-                        <div className="mt-4">
-                          <p className="font-light text-xs">Doctor</p>
-                          <p className="font-medium tracking-more-wider">
-                            {test.testDetail.doctorData
-                              ? test.testDetail.doctorData.name
-                              : "Not Assigned"}
-                          </p>
-                        </div>
-                        <div className="pt-6">
-                          <div className="flex justify-between">
-                            <p className="font-light text-xs">On</p>
-                            <p
-                              className={`badge tooltip tooltip-left ${
-                                TestStatus.find(
-                                  (status) => status.value === test.status
-                                )?.color
-                              }`}
-                              data-tip={test.status}
-                              onClick={() => {
-                                if (
-                                  test.status !== "cancelled" &&
-                                  test.status !== "completed"
-                                ) {
-                                  handleDeleteClick(test);
-                                }
-                              }}
-                            ></p>
+                            <div className="mt-4">
+                              <p className="font-light text-xs">Doctor</p>
+                              <p className="font-medium tracking-more-wider">
+                                {test.testDetail.doctorData
+                                  ? test.testDetail.doctorData.name
+                                  : "Not Assigned"}
+                              </p>
+                            </div>
+                            <div className="pt-6">
+                              <div className="flex justify-between">
+                                <p className="font-light text-xs">On</p>
+                                <div className="dropdown">
+                                  <p
+                                    role="button"
+                                    tabIndex={0}
+                                    className={`badge tooltip tooltip-left ${
+                                      TestStatus.find(
+                                        (status) => status.value === test.status
+                                      )?.color
+                                    }`}
+                                    data-tip={test.status}
+                                    onClick={() => {
+                                      if (test.status === "overdue") {
+                                        setScheduleModal(true);
+                                        setSelected(test);
+                                      } else if (
+                                        test.status !== "cancelled" &&
+                                        test.status !== "completed"
+                                      ) {
+                                        handleDeleteClick(test);
+                                      } else {
+                                        toast.error(
+                                          "Appointment is already completed or cancelled"
+                                        );
+                                      }
+                                    }}
+                                  ></p>
+                                  {test.status != "completed" &&
+                                    test.status !== "overdue" &&
+                                    test.status !== "cancelled" && (
+                                      <select
+                                        tabIndex={0}
+                                        className="dropdown-content z-[1] menu p-2 select select-bordered shadow bg-base-100 rounded-box w-52"
+                                        value={""}
+                                        onChange={(e) => {
+                                          if (e.target.value === "reschedule") {
+                                            setScheduleModal(true);
+                                            setSelected(test);
+                                          } else if (
+                                            e.target.value === "cancelled"
+                                          ) {
+                                            setDeleteModal(true);
+                                            setSelected(test);
+                                          }
+                                        }}
+                                      >
+                                        <option value="" disabled>
+                                          Select Action
+                                        </option>
+                                        <option value="reschedule">
+                                          Reschedule
+                                        </option>
+                                        <option value="cancelled">
+                                          Cancel
+                                        </option>
+                                      </select>
+                                    )}
+                                </div>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <p className="font-light text-xs">
+                                  {test.appointmentdate
+                                    ? humanReadableDate(test.appointmentdate)
+                                    : "Not Scheduled Yet"}
+                                </p>
+                                {test.status === "completed" && (
+                                  <button className="btn btn-xs btn-success">
+                                    Download
+                                  </button>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          <p className="font-light text-xs">
-                            {test.appointmentdate
-                              ? humanReadableDate(test.appointmentdate)
-                              : "Not Scheduled Yet"}
-                          </p>
                         </div>
-                      </div>
-                    </div>
-                  ))
-              : null}
+                      ))
+                  : null}
+              </div>
+            </div>
+
+            <input
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="Reports"
+            />
+            <div
+              role="tabpanel"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+            >
+              <Reports />
+            </div>
           </div>
         </div>
       </div>
@@ -188,6 +272,16 @@ const History = () => {
             message: `Are you sure you want to cancel ${selected.testDetail.userData.name}'s ${selected.testDetail.testData.name} appointment?`,
             button: "Cancel Appointment",
           }}
+        />
+      )}
+      {scheduleModal && selected && (
+        <ScheduleModal
+          test={selected}
+          onClose={() => {
+            setScheduleModal(false);
+            setSelected(null);
+          }}
+          setTests={setTests}
         />
       )}
     </>
@@ -264,6 +358,86 @@ const DeleteModal = ({
         </div>
       </div>
     </>
+  );
+};
+
+interface ScheduleModalProps {
+  test: Test;
+  onClose: () => void;
+  setTests: any;
+}
+
+const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
+  const [date, setDate] = useState<string>("");
+  const handleSchedule = async () => {
+    try {
+      if (test.status === "overdue") {
+        await testStatus(test._id, "confirmed");
+      }
+      await axios.put(
+        `${API_BASE_URL}/api/test/schedule/${test._id}`,
+        {
+          appointmentdate: date,
+        },
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    } finally {
+      const response = await axios.get(`${API_BASE_URL}/api/test/my`, {
+        headers: {
+          Authorization: `${localStorage.getItem("token")}`,
+        },
+      });
+      const data = response.data;
+      setTests(data.reverse());
+      setTests(data);
+      onClose();
+    }
+  };
+  return (
+    <div className="modal modal-open backdrop-blur-sm" role="dialog">
+      <div className="modal-box max-w-sm">
+        <h3 className="font-bold text-lg text-center">
+          Schedule {test.testDetail.userData.name}'s{" "}
+          {test.testDetail.testData.name}
+        </h3>
+        <p className="py-4">
+          <input
+            type="date"
+            className="input input-bordered w-full"
+            placeholder="Select Date"
+            min={new Date().toISOString().split("T")[0]}
+            onChange={(e) => {
+              setDate(e.target.value);
+            }}
+          />
+        </p>
+        <div className="modal-action flex">
+          <button
+            className="btn btn-info flex-1"
+            onClick={() => handleSchedule()}
+          >
+            Schedule
+          </button>
+          <button className="btn flex-1" onClick={onClose}>
+            Close!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Reports = () => {
+  return (
+    <div>
+      <h1>Reports</h1>
+    </div>
   );
 };
 

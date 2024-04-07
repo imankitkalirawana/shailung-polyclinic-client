@@ -59,16 +59,17 @@ const Users = () => {
 
   useEffect(() => {
     const fetchData = async (userType: any) => {
-      const users = await getAllUsers("all");
-      if (userType === "employee") {
-        setUsers(
-          users.filter(
-            (user: any) => user.role === "admin" || user.role === "member"
-          )
-        );
-      } else if (userType === "user" || user?.role === "member") {
-        setUsers(users.filter((user: any) => user.role === "user"));
+      if (userType === "employee" && user?.role === "admin") {
+        const users = await getAllUsers("employee");
+        setUsers(users);
+      } else if (userType === "employee" && user?.role !== "user") {
+        const users = await getAllUsers("user");
+        setUsers(users);
+      } else if (userType === "user") {
+        const users = await getAllUsers("user");
+        setUsers(users);
       } else {
+        const users = await getAllUsers("all");
         setUsers(users);
       }
     };

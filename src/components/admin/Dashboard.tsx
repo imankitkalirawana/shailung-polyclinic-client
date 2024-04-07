@@ -112,7 +112,7 @@ const Dashboard = () => {
         const tests = await getAllTests();
         setTests(tests.data);
         const availabletests = await getAllAvailableTests();
-        setAvailableTests(availabletests);
+        setAvailableTests(availabletests.data);
         const count = await countAll();
         setCountData(count);
       } catch (error) {
@@ -163,7 +163,19 @@ const Dashboard = () => {
               </div>
               <div>
                 <p className="mb-2 text-sm font-medium">Total users</p>
-                <p className="text-lg font-semibold">{users.length - 1 || 0}</p>
+                <p className="text-lg font-semibold">{users.length || 0}</p>
+              </div>
+            </Link>
+            <Link
+              to="/dashboard/users?type=employee"
+              className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
+            >
+              <div className="p-3 mr-4 rounded-full bg-primary text-base-100">
+                <CellIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="mb-2 text-sm font-medium">Total Tests</p>
+                <p className="text-lg font-semibold">{tests.length || 0}</p>
               </div>
             </Link>
             <Link
@@ -180,18 +192,7 @@ const Dashboard = () => {
                 </p>
               </div>
             </Link>
-            <Link
-              to="/dashboard/users?type=employee"
-              className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
-            >
-              <div className="p-3 mr-4 rounded-full bg-primary text-base-100">
-                <CellIcon className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="mb-2 text-sm font-medium">Total Tests</p>
-                <p className="text-lg font-semibold">{tests.length || 0}</p>
-              </div>
-            </Link>
+
             <Link
               to="/dashboard/tests/available-tests"
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"

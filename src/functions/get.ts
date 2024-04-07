@@ -56,8 +56,7 @@ export const getAllAvailableTests = async () => {
             Authorization: `${localStorage.getItem("token")}`,
         },
     });
-    const data = response.data;
-    return data;
+    return response;
 }
 export const getWebsite = async () => {
     const response = await axios.get(`${API_BASE_URL}/api/website`);
