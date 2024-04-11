@@ -143,7 +143,7 @@ const User = () => {
                   <img
                     src={
                       formik.values.photo
-                        ? `${API_BASE_URL}/api/upload/${formik.values.photo}`
+                        ? `${API_BASE_URL}/api/upload/single/${formik.values.photo}`
                         : "https://ui-avatars.com/api/?name=" +
                           formik.values.name
                     }

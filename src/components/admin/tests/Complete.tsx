@@ -52,6 +52,7 @@ const Complete = () => {
   const [test, setTest] = useState<Test | null>(null);
   const [files, setFiles] = useState<FileList | null>(null);
   const [isUplaoded, setIsUploaded] = useState<boolean>(false);
+  const [processing, setProcessing] = useState<boolean>(false);
 
   useEffect(() => {
     if (test?.isDone) {
@@ -158,6 +159,7 @@ const Complete = () => {
       reportFile: [""],
     },
     onSubmit: async (values) => {
+      setProcessing(true);
       try {
         if (files) {
           const filenames = Array.from(files).map(
@@ -167,22 +169,18 @@ const Complete = () => {
                 .pop()}`
           );
           values.reportFile = filenames;
-          toast.promise(
-            UploadMultipleFiles(files, filenames).then(() => {
-              uploadReport(values);
-            }),
-            {
-              loading: "Uploading Report",
-              success: "Report uploaded successfully",
-              error: "Failed to upload report",
-            }
-          );
+          UploadMultipleFiles(files, filenames).then(() => {
+            uploadReport(values);
+          });
         } else {
           await uploadReport(values);
         }
+        toast.success("Report uploaded successfully");
       } catch (error) {
         toast.error("Failed to upload report");
         console.error(error);
+      } finally {
+        setProcessing(false);
       }
     },
   });
@@ -211,7 +209,6 @@ const Complete = () => {
             )
             .then(() => {
               setIsUploaded(true);
-              toast.success("Report uploaded successfully");
               navigate("/dashboard/tests");
             });
         });
@@ -647,9 +644,13 @@ const Complete = () => {
                 <button
                   type="submit"
                   className="btn btn-primary w-full"
-                  disabled={isUplaoded}
+                  disabled={isUplaoded || processing}
                 >
-                  Upload Report
+                  {processing ? (
+                    <span className="loading loading-dots loading-sm"></span>
+                  ) : (
+                    "Upload Report"
+                  )}
                 </button>
               </div>
             </div>

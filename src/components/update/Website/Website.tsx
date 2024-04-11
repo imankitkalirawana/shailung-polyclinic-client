@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { ViewTeam } from "./ViewTeam";
 import { data } from "../../../utils/data";
 import { Helmet } from "react-helmet-async";
+import ViewSign from "./ViewSign";
 
 // get domain name from url
 
@@ -134,6 +135,10 @@ const Website = () => {
         <div className="divider my-12"></div>
         <div className="my-8">
           <ViewTeam />
+        </div>
+        <div className="divider"></div>
+        <div className="my-8">
+          <ViewSign />
         </div>
       </div>
     </>

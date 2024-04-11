@@ -372,7 +372,6 @@ const TestCard = ({ tests }: TestCardProps) => {
   const offset = 5;
   const [initialItem, setInitialItem] = useState(0);
   const [finalItem, setFinalItem] = useState(offset);
-  const navigate = useNavigate();
 
   return (
     <>

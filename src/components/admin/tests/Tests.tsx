@@ -484,7 +484,9 @@ interface DeleteModalProps {
 }
 
 const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
+  const [processing, setProcessing] = useState(false);
   const handleDelete = async () => {
+    setProcessing(true);
     try {
       await axios.delete(`${API_BASE_URL}/api/test/${test._id}`, {
         headers: {
@@ -507,6 +509,7 @@ const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
       console.log(err);
       toast.error("Failed to delete test");
     }
+    setProcessing(false);
   };
 
   return (
@@ -525,10 +528,19 @@ const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
             <button
               className="btn btn-error flex-1"
               onClick={() => handleDelete()}
+              disabled={processing}
             >
-              Delete
+              {processing ? (
+                <span className="loading loading-dots loading-sm"></span>
+              ) : (
+                "Delete"
+              )}
             </button>
-            <button className="btn flex-1" onClick={onClose}>
+            <button
+              className="btn flex-1"
+              onClick={onClose}
+              disabled={processing}
+            >
               Close!
             </button>
           </div>
@@ -546,7 +558,9 @@ interface ScheduleModalProps {
 
 const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
   const [date, setDate] = useState<string>("");
+  const [processing, setProcessing] = useState(false);
   const handleSchedule = async () => {
+    setProcessing(true);
     try {
       if (test.status === "overdue") {
         await testStatus(test._id, "confirmed");
@@ -562,13 +576,18 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
           },
         }
       );
+      toast.message("Appointment scheduled successfully", {
+        description: `On ${date}`,
+      });
     } catch (err) {
+      toast.error("Failed to schedule appointment");
       console.log(err);
     } finally {
       const response = await getAllTests();
       const data = response.data;
       setTests(data);
       onClose();
+      setProcessing(false);
     }
   };
 
@@ -595,10 +614,19 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
             <button
               className="btn btn-info flex-1"
               onClick={() => handleSchedule()}
+              disabled={processing}
             >
-              Schedule
+              {processing ? (
+                <span className="loading loading-dots loading-sm"></span>
+              ) : (
+                "Schedule"
+              )}
             </button>
-            <button className="btn flex-1" onClick={onClose}>
+            <button
+              className="btn flex-1"
+              onClick={onClose}
+              disabled={processing}
+            >
               Close!
             </button>
           </div>
@@ -616,6 +644,7 @@ interface AssignModalProps {
 
 const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
   const [doctors, setDoctors] = useState<any[]>([]);
+  const [processing, setProcessing] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<string>("");
   useEffect(() => {
     const fetchAllDoctors = async () => {
@@ -636,6 +665,7 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
   };
 
   const handleAssign = async () => {
+    setProcessing(true);
     try {
       await axios.put(
         `${API_BASE_URL}/api/test/assign/${test._id}`,
@@ -648,11 +678,14 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
           },
         }
       );
+      toast.success("Doctor assigned successfully");
     } catch (err) {
       console.log(err);
+      toast.error("Failed to assign doctor");
     } finally {
       fetchTests();
       onClose();
+      setProcessing(false);
     }
   };
 
@@ -693,10 +726,19 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
             <button
               className="btn btn-primary flex-1"
               onClick={() => handleAssign()}
+              disabled={processing}
             >
-              Assign
+              {processing ? (
+                <span className="loading loading-dots loading-sm"></span>
+              ) : (
+                "Assign"
+              )}
             </button>
-            <button className="btn flex-1" onClick={onClose}>
+            <button
+              className="btn flex-1"
+              onClick={onClose}
+              disabled={processing}
+            >
               Close!
             </button>
           </div>

@@ -75,7 +75,7 @@ const ViewUser = () => {
                 className="object-cover w-full h-full rounded-full"
                 src={
                   getUser.photo
-                    ? `${API_BASE_URL}/api/upload/${getUser.photo}`
+                    ? `${API_BASE_URL}/api/upload/single/${getUser.photo}`
                     : "https://ui-avatars.com/api/?name=" + getUser.name
                 }
                 alt={getUser.name}

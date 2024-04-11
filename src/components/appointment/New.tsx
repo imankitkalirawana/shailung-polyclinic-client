@@ -111,7 +111,9 @@ const New = () => {
             }
           )
           .then(() => {
+            setIsConfirm(false);
             setIsModal(true);
+
             formik.resetForm();
           })
           .catch((error) => {
@@ -426,15 +428,10 @@ const New = () => {
                       onClick={() => setIsConfirm(true)}
                       disabled={
                         formik.values.testid === "" ||
-                        formik.values.testfor === "" ||
-                        submitting
+                        formik.values.testfor === ""
                       }
                     >
-                      {submitting ? (
-                        <span className="loading loading-dots loading-sm"></span>
-                      ) : (
-                        "Book Appointment "
-                      )}
+                      Book Appointment
                     </button>
                   </div>
                 </>
@@ -448,6 +445,7 @@ const New = () => {
         <ConfirmModal
           onClose={() => setIsConfirm(false)}
           onConfirm={formik.handleSubmit}
+          isLoading={submitting}
         />
       )}
     </>
@@ -490,10 +488,15 @@ const SubmittedModal: React.FC<ModalProps> = ({ onClose }) => {
 interface ConfirmModalProps {
   onClose: () => void;
   onConfirm: () => void;
+  isLoading?: boolean;
 }
 
 // confirm modal
-const ConfirmModal: React.FC<ConfirmModalProps> = ({ onClose, onConfirm }) => {
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  onClose,
+  onConfirm,
+  isLoading,
+}) => {
   return (
     <>
       <div className="modal modal-open backdrop-blur-md" role="dialog">
@@ -509,10 +512,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({ onClose, onConfirm }) => {
               className="btn btn-primary flex-1"
               onClick={() => {
                 onConfirm();
-                onClose();
               }}
+              disabled={isLoading}
             >
-              Confirm
+              {isLoading ? (
+                <span className="loading loading-dots loading-sm"></span>
+              ) : (
+                "Confirm"
+              )}
             </button>
             <button className="btn flex-1" onClick={onClose}>
               Cancel

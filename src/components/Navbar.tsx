@@ -154,7 +154,7 @@ const Navbar = () => {
               <div className="avatar placeholder" tabIndex={0} role="button">
                 <div className="w-10 rounded-full">
                   <img
-                    src={`${API_BASE_URL}/api/upload/${formik.values.photo}`}
+                    src={`${API_BASE_URL}/api/upload/single/${formik.values.photo}`}
                     alt="profile"
                     title="profile"
                     width={40}

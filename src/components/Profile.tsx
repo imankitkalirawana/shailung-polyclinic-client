@@ -185,7 +185,7 @@ const Profile = () => {
                     src={
                       formik.values.previewPhoto
                         ? formik.values.previewPhoto
-                        : `${API_BASE_URL}/api/upload/${formik.values.photo}`
+                        : `${API_BASE_URL}/api/upload/single/${formik.values.photo}`
                     }
                     className="h-12 w-12 rounded-full object-cover"
                     alt={formik.values.name}
