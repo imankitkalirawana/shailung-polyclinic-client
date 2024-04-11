@@ -8,12 +8,15 @@ import { Link } from "react-router-dom";
 import { SearchIcon } from "../icons/Icons";
 import { isLoggedIn } from "../../utils/auth";
 import { testStatus } from "../admin/tests/Tests";
+import NotFound from "../NotFound";
+import { Helmet } from "react-helmet-async";
 
 interface Test {
   _id: string;
   status: string;
   addeddate: string;
   appointmentdate: string;
+  reportId: string;
   testDetail: {
     userData: {
       name: string;
@@ -39,7 +42,7 @@ const History = () => {
     window.location.href = "/auth/login";
   }
 
-  const handleDeleteClick = (test: Test) => {
+  const handleDeleteClick = () => {
     // setSelected(test);
     // setDeleteModal(true);
   };
@@ -88,174 +91,169 @@ const History = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Appointment History - Shailung Polyclinic</title>
+        <meta
+          name="description"
+          content="View your appointment history at Shailung Polyclinic in Itahari, Nepal."
+        />
+        <meta
+          name="keywords"
+          content="appointment, history, shailung, polyclinic, itahari, nepal, test, report, schedule, cancel"
+        />
+        <link
+          rel="canonical"
+          href="https://report.shailungpolyclinic.com/appointment/history"
+        />
+      </Helmet>
       <div className="container mx-auto max-w-6xl p-4 my-24">
         <div className="flex justify-between items-center">
-          <h2 className="my-6 text-2xl font-semibold">Appointment History</h2>
+          <h1 className="my-6 text-2xl font-semibold">
+            Your Appointment History
+          </h1>
           <div className="flex gap-2 flex-row-reverse">
             <Link to="/appointment/new" className="btn btn-primary btn-sm">
               New Appointment
             </Link>
           </div>
         </div>
-        <div className="mt-10">
-          <div role="tablist" className="tabs tabs-boxed bg-transparent">
+        <div role="tablist" className="tabs tabs-boxed bg-transparent">
+          <div className="relative w-full max-w-md mb-4">
             <input
-              type="radio"
-              name="my_tabs_2"
-              role="tab"
-              className="tab"
-              aria-label="Tests"
-              defaultChecked
+              type="text"
+              className="input input-bordered ml-1 w-full"
+              placeholder="Search by name, doctor, date, status"
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+              }}
             />
-            <div
-              role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
-            >
-              <div className="relative w-full max-w-md mb-4">
-                <input
-                  type="text"
-                  className="input input-bordered ml-1 w-full"
-                  placeholder="Search by name, doctor, date, status"
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                  }}
-                />
-                <SearchIcon className="absolute top-3 right-4 w-6 h-6 text-primary" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {tests.length > 0
-                  ? tests
-                      .filter((test) => {
-                        return handleSearch(test);
-                      })
-                      .map((test) => (
-                        <div
-                          className={`h-56 ${
-                            test.status === "cancelled"
-                              ? "from-error/20 to-error/30"
-                              : test.status === "completed"
-                              ? "from-success/20 to-success/30"
-                              : test.status === "overdue"
-                              ? "from-pink-300 to-pink-400"
-                              : "from-base-300/80 to-base-300"
-                          } bg-gradient-to-br  rounded-xl relative shadow-2xl`}
-                          key={test._id}
-                        >
-                          <div className="w-full p-8">
-                            <div className="flex justify-between">
-                              <div>
-                                <p className="font-light text-xs">Name</p>
-                                <p className="font-medium">
-                                  {test.testDetail.userData.name}
-                                </p>
-                              </div>
-                              <div className="badge badge-primary">
-                                {test.testDetail.testData.name}
-                              </div>
-                            </div>
+            <SearchIcon className="absolute top-3 right-4 w-6 h-6 text-primary" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tests.length > 0 ? (
+              tests
+                .filter((test) => {
+                  return handleSearch(test);
+                })
+                .map((test) => (
+                  <div
+                    className={`h-56 ${
+                      test.status === "cancelled"
+                        ? "from-error/20 to-error/30"
+                        : test.status === "completed"
+                        ? "from-success/20 to-success/30"
+                        : test.status === "overdue"
+                        ? "from-pink-300 to-pink-400"
+                        : "from-base-300/80 to-base-300"
+                    } bg-gradient-to-br  rounded-xl relative shadow-2xl`}
+                    key={test._id}
+                  >
+                    <div className="w-full p-8">
+                      <div className="flex justify-between">
+                        <div>
+                          <p className="font-light text-xs">Name</p>
+                          <p className="font-medium">
+                            {test.testDetail.userData.name}
+                          </p>
+                        </div>
+                        <div className="badge badge-primary">
+                          {test.testDetail.testData.name}
+                        </div>
+                      </div>
 
-                            <div className="mt-4">
-                              <p className="font-light text-xs">Doctor</p>
-                              <p className="font-medium tracking-more-wider">
-                                {test.testDetail.doctorData
-                                  ? test.testDetail.doctorData.name
-                                  : "Not Assigned"}
-                              </p>
-                            </div>
-                            <div className="pt-6">
-                              <div className="flex justify-between">
-                                <p className="font-light text-xs">On</p>
-                                <div className="dropdown">
-                                  <p
-                                    role="button"
+                      <div className="mt-4">
+                        <p className="font-light text-xs">Doctor</p>
+                        <p className="font-medium tracking-more-wider">
+                          {test.testDetail.doctorData
+                            ? test.testDetail.doctorData.name
+                            : "Not Assigned"}
+                        </p>
+                      </div>
+                      <div className="pt-6">
+                        <div className="flex justify-between">
+                          <p className="font-light text-xs">On</p>
+                          <div className="flex items-center justify-center gap-2">
+                            {test.status === "completed" && (
+                              <Link
+                                to={`/report/${test.reportId}/download`}
+                                className="btn btn-xs mb-1 btn-success"
+                              >
+                                View Report
+                              </Link>
+                            )}
+                            <div className="dropdown">
+                              <p
+                                role="button"
+                                tabIndex={0}
+                                className={`badge tooltip tooltip-left ${
+                                  TestStatus.find(
+                                    (status) => status.value === test.status
+                                  )?.color
+                                }`}
+                                data-tip={test.status}
+                                onClick={() => {
+                                  if (test.status === "overdue") {
+                                    setScheduleModal(true);
+                                    setSelected(test);
+                                  } else if (
+                                    test.status !== "cancelled" &&
+                                    test.status !== "completed"
+                                  ) {
+                                    handleDeleteClick();
+                                  } else {
+                                    toast.error(
+                                      "Appointment is already completed or cancelled"
+                                    );
+                                  }
+                                }}
+                              ></p>
+                              {test.status != "completed" &&
+                                test.status !== "overdue" &&
+                                test.status !== "cancelled" && (
+                                  <select
                                     tabIndex={0}
-                                    className={`badge tooltip tooltip-left ${
-                                      TestStatus.find(
-                                        (status) => status.value === test.status
-                                      )?.color
-                                    }`}
-                                    data-tip={test.status}
-                                    onClick={() => {
-                                      if (test.status === "overdue") {
+                                    className="dropdown-content z-[1] menu p-2 select select-bordered shadow bg-base-100 rounded-box w-52"
+                                    value={""}
+                                    onChange={(e) => {
+                                      if (e.target.value === "reschedule") {
                                         setScheduleModal(true);
                                         setSelected(test);
                                       } else if (
-                                        test.status !== "cancelled" &&
-                                        test.status !== "completed"
+                                        e.target.value === "cancelled"
                                       ) {
-                                        handleDeleteClick(test);
-                                      } else {
-                                        toast.error(
-                                          "Appointment is already completed or cancelled"
-                                        );
+                                        setDeleteModal(true);
+                                        setSelected(test);
                                       }
                                     }}
-                                  ></p>
-                                  {test.status != "completed" &&
-                                    test.status !== "overdue" &&
-                                    test.status !== "cancelled" && (
-                                      <select
-                                        tabIndex={0}
-                                        className="dropdown-content z-[1] menu p-2 select select-bordered shadow bg-base-100 rounded-box w-52"
-                                        value={""}
-                                        onChange={(e) => {
-                                          if (e.target.value === "reschedule") {
-                                            setScheduleModal(true);
-                                            setSelected(test);
-                                          } else if (
-                                            e.target.value === "cancelled"
-                                          ) {
-                                            setDeleteModal(true);
-                                            setSelected(test);
-                                          }
-                                        }}
-                                      >
-                                        <option value="" disabled>
-                                          Select Action
-                                        </option>
-                                        <option value="reschedule">
-                                          Reschedule
-                                        </option>
-                                        <option value="cancelled">
-                                          Cancel
-                                        </option>
-                                      </select>
-                                    )}
-                                </div>
-                              </div>
-                              <div className="flex justify-between items-center">
-                                <p className="font-light text-xs">
-                                  {test.appointmentdate
-                                    ? humanReadableDate(test.appointmentdate)
-                                    : "Not Scheduled Yet"}
-                                </p>
-                                {test.status === "completed" && (
-                                  <button className="btn btn-xs btn-success">
-                                    Download
-                                  </button>
+                                  >
+                                    <option value="" disabled>
+                                      Select Action
+                                    </option>
+                                    <option value="reschedule">
+                                      Reschedule
+                                    </option>
+                                    <option value="cancelled">Cancel</option>
+                                  </select>
                                 )}
-                              </div>
                             </div>
                           </div>
                         </div>
-                      ))
-                  : null}
+                        <div className="flex justify-between items-center">
+                          <p className="font-light text-xs">
+                            {test.appointmentdate
+                              ? humanReadableDate(test.appointmentdate)
+                              : "Not Scheduled Yet"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+            ) : (
+              <div className="col-span-full">
+                <NotFound message="No Appointments Found" />
               </div>
-            </div>
-
-            <input
-              type="radio"
-              name="my_tabs_2"
-              role="tab"
-              className="tab"
-              aria-label="Reports"
-            />
-            <div
-              role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
-            >
-              <Reports />
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -385,6 +383,7 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
           },
         }
       );
+      toast.success("Appointment Scheduled Successfully");
     } catch (err) {
       console.log(err);
     } finally {
@@ -436,7 +435,7 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
 const Reports = () => {
   return (
     <div>
-      <h1>Reports</h1>
+      <h2>Reports</h2>
     </div>
   );
 };

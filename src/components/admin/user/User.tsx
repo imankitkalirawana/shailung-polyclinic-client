@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { isLoggedIn } from "../../../utils/auth";
 import NotFound from "../../NotFound";
+import { Helmet } from "react-helmet-async";
 
 const User = () => {
   const navigate = useNavigate();
@@ -85,6 +86,21 @@ const User = () => {
   };
   return (
     <>
+      <Helmet>
+        <title>Manage {`${formik.values.name}`} - Shailung Polyclinic</title>
+        <meta
+          name="description"
+          content={`Manage ${formik.values.name}'s information on Shailung Polyclinic in Itahari, Nepal`}
+        />
+        <meta
+          name="keywords"
+          content="Shailung Polyclinic, Shailung, Polyclinic, Hospital, Clinic, Health, Health Care, Medical, Medical Care, Itahari, Nepal, User, User Information, User Details, User Profile, User Profile Information, User Profile Details, User Profile Information Details, User Profile Information Details Page, User Profile Information Details Page of Shailung Polyclinic, User Profile Information Details Page of Shailung Polyclinic in Itahari, User Profile Information Details Page of Shailung Polyclinic in Itahari, Nepal, Shailung Polyclinic User Profile Information Details Page, Shailung Polyclinic User Profile Information Details Page in Itahari, Shailung Polyclinic User Profile Information Details Page in Itahari, Nepal"
+        />
+        <link
+          rel="canonical"
+          href={`https://report.shailungpolyclinic.com/admin/user/${id}/edit`}
+        />
+      </Helmet>
       <div className="col-span-full lg:col-span-9">
         <form className="px-4 sm:px-0" onSubmit={formik.handleSubmit}>
           <div>
@@ -131,8 +147,12 @@ const User = () => {
                         : "https://ui-avatars.com/api/?name=" +
                           formik.values.name
                     }
-                    className="h-12 w-12 rounded-full"
+                    className="h-12 w-12 rounded-full aspect-square object-cover"
                     alt={formik.values.name}
+                    title="profile"
+                    width={40}
+                    height={40}
+                    loading="eager"
                   />
                   <label
                     htmlFor="photo"
@@ -174,9 +194,9 @@ const User = () => {
             </div>
             <div className="divider"></div>
             <div className="pb-12">
-              <h2 className="text-base font-semibold leading-7 text-base-content">
+              <h1 className="text-base font-semibold leading-7 text-base-content">
                 Personal Information
-              </h2>
+              </h1>
               <p className="mt-1 text-sm leading-6 text-base-neutral">
                 Use a permanent address where you can receive mail.
               </p>

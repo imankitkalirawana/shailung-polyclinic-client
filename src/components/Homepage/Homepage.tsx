@@ -3,21 +3,13 @@ import Banner from "./Banner";
 import Contact from "./Contact";
 import Features from "./Features";
 import Footer from "./Footer";
-// import Pricing from "./Pricing";
 import Team from "./Team";
 import axios from "axios";
 import { API_BASE_URL } from "../../utils/config";
 
 const Homepage = () => {
   const [websiteData, setWebsiteData] = useState({
-    title: "",
-    banner: [],
-    features: [],
     team: [],
-    social: [],
-    featuresTitle: "",
-    featuresDescription: "",
-    featuresImage: "",
   });
 
   useEffect(() => {
@@ -28,12 +20,11 @@ const Homepage = () => {
 
   return (
     <>
-      <Banner banner={websiteData?.banner} />
+      <Banner />
       <Features />
-      {/* <Pricing /> */}
       <Team team={websiteData?.team} />
       <Contact />
-      <Footer title={websiteData.title} />
+      <Footer />
     </>
   );
 };

@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { humanReadableDate } from "./Users";
 import { EditIcon } from "../../icons/Icons";
 import { isLoggedIn } from "../../../utils/auth";
+import { Helmet } from "react-helmet-async";
 
 const ViewUser = () => {
   const { id }: any = useParams();
@@ -32,12 +33,27 @@ const ViewUser = () => {
   }, []);
   return (
     <>
+      <Helmet>
+        <title>{`${getUser.name}`} - Shailung Polyclinic</title>
+        <meta
+          name="description"
+          content={`View ${getUser.name}'s information on Shailung Polyclinic in Itahari, Nepal`}
+        />
+        <meta
+          name="keywords"
+          content="Shailung Polyclinic, Shailung, Polyclinic, Hospital, Clinic, Health, Health Care, Medical, Medical Care, Itahari, Nepal, User, User Information, User Details, User Profile, User Profile Information, User Profile Details, User Profile Information Details, User Profile Information Details Page, User Profile Information Details Page of Shailung Polyclinic, User Profile Information Details Page of Shailung Polyclinic in Itahari, User Profile Information Details Page of Shailung Polyclinic in Itahari, Nepal, Shailung Polyclinic User Profile Information Details Page, Shailung Polyclinic User Profile Information Details Page in Itahari, Shailung Polyclinic User Profile Information Details Page in Itahari, Nepal"
+        />
+        <link
+          rel="canonical"
+          href={`https://report.shailungpolyclinic.com/admin/user/${id}`}
+        />
+      </Helmet>
       <div>
         <div className="flex justify-between items-center">
           <div className="px-4 sm:px-0">
-            <h3 className="text-base font-semibold leading-7">
+            <h1 className="text-base font-semibold leading-7">
               User Information
-            </h3>
+            </h1>
             <p className="mt-1 max-w-2xl text-sm leading-6">
               Personal details and application.
             </p>
@@ -63,7 +79,10 @@ const ViewUser = () => {
                     : "https://ui-avatars.com/api/?name=" + getUser.name
                 }
                 alt={getUser.name}
-                loading="lazy"
+                title="profile"
+                width={40}
+                height={40}
+                loading="eager"
               />
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

@@ -3,9 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
 import { PDFExport } from "@progress/kendo-react-pdf";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { getUserWithId } from "../../../functions/get";
+import { DownloadIcon, SmartHomeIcon } from "../../icons/Icons";
 
 interface Report {
+  _id: string;
   name: string;
   fatherName: string;
   age: number;
@@ -32,6 +35,7 @@ const Download = () => {
   const { reportId }: any = useParams();
   const [report, setReport] = useState<Report | null>(null);
   const pdfExportComponent = useRef(null);
+  const [doctor, setDoctor] = useState<any>(null);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -45,6 +49,9 @@ const Download = () => {
           }
         );
         setReport(data);
+        await getUserWithId(data.doctor).then((res) => {
+          setDoctor(res.data);
+        });
       } catch (error) {
         toast.error("Failed to fetch report");
         console.error(error);
@@ -55,223 +62,271 @@ const Download = () => {
   const handleExportWithComponent = () => {
     if (pdfExportComponent.current) {
       (pdfExportComponent.current as any).save();
+      if (report?.reportFile?.length && report.reportFile[0] !== "") {
+        getFiles(report.reportFile);
+      }
+
+      toast.success("Downloading Report...");
+    } else {
+      toast.error("Failed to download report");
     }
   };
 
+  const getFiles = async (filenames: string[]) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/api/upload/download`,
+        {
+          filenames,
+        },
+        {
+          responseType: "blob", // Specify responseType as 'blob' to handle binary data
+        }
+      );
+
+      // Create a Blob object from the response data
+      const blob = new Blob([response.data], { type: "application/zip" });
+
+      // Create a temporary URL for the Blob object
+      const url = window.URL.createObjectURL(blob);
+
+      // Create a link element to trigger the download
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "files.zip");
+
+      // Append the link to the document body and trigger the download
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup: Remove the link and revoke the temporary URL
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading files:", error);
+      // Handle error
+    }
+  };
   return (
     <>
       <div className="max-w-6xl mx-auto my-24">
-        <button className="btn btn-primary" onClick={handleExportWithComponent}>
-          Download
-        </button>
-        <div className="mx-auto mt-12">
-          <PDFExport ref={pdfExportComponent}>
+        <div className="text-sm breadcrumbs">
+          <ul>
+            <li>
+              <Link to={"/"} className="btn btn-sm btn-circle btn-ghost -mr-2">
+                <SmartHomeIcon className="w-4 h-4" />
+              </Link>{" "}
+            </li>
+            <li>
+              <Link to="/appointment/history">Reports</Link>
+            </li>
+            <li>{reportId}</li>
+          </ul>
+        </div>
+        <div className="mx-auto mt-12 overflow-scroll">
+          <PDFExport
+            ref={pdfExportComponent}
+            fileName={report?.name + "-" + report?.reportDate + "-Report"}
+          >
             <div
-              className="relative py-8 mx-auto px-12 flex flex-col justify-between border-8"
+              className="relative mx-auto flex flex-col justify-between"
               style={{ width: "21cm", height: "29.7cm" }}
               data-theme="light"
             >
-              <div>
-                <header className="space-y-1 flex justify-between items-center">
-                  <div className="space-y-1">
-                    <h1 className="text-2xl font-bold tracking-tight text-[#23326b] uppercase">
-                      Shailung Polyclinic
-                    </h1>
-                    <p className="text-sm leading-none font-normal text-[#bd7e39] uppercase">
-                      AND DIAGNOSTIC CENTRE PVT. LTD.
-                    </p>
-                  </div>
-                  <div className="space-y-2 text-right">
-                    <h2 className="text-lg font-bold tracking-tight">
-                      Itahari-6, Sunsari
-                    </h2>
-                    <p className="text-sm leading-none">
-                      shailungpdc@gmail.com
-                    </p>
-                    <p className="text-sm leading-none">+977-25-585541</p>
-                  </div>
-                </header>
-                <div className="divider"></div>
-                <main>
-                  <div className="space-y-4">
-                    <div className="flex gap-4 justify-between">
-                      <div className="space-y-2">
-                        <div className="space-y-1">
-                          <h3 className="text-lg text-nowrap font-semibold leading-none">
-                            {report?.name}
+              <div className="w-full h-full">
+                <div className="flex flex-col justify-between h-full">
+                  <header className="flex flex-col px-6 py-4 text-white bg-[#2c4c7f] justify-between items-start border-b-8 border-b-[#f08555]">
+                    <span className="tracking-tighter text-sm">
+                      Gov. Reg. No. 66087/066/067
+                    </span>
+                    <div className="flex justify-between items-start w-full">
+                      <img
+                        src="/logo.png"
+                        alt=""
+                        className="mix-blend-lighten w-24 h-24"
+                      />
+                      <div className="flex flex-col">
+                        <div className="uppercase">
+                          <h1 className="text-4xl font-bold tracking-tighter">
+                            Shailung Polyclinic
+                          </h1>
+                          <h3 className="text-2xl">
+                            AND DIAGNOSTIC CENTRE PVT. LTD.
                           </h3>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <p className="text-sm font-normal text-nowrap leading-none">
-                              Age: {report?.age} Years
-                            </p>
-                            <p className="text-sm font-normal text-nowrap capitalize leading-none">
-                              Gender: {report?.gender}
-                            </p>
+                        <div className="divider my-0.5 border-[#f08555] border-b-4"></div>
+                        <div className="flex flex-col text-lg items-center">
+                          <span>
+                            Itahari-6, Sunsari, Phone : +977-25-585541
+                          </span>
+                          <span>Email: shailungpdc@gmail.com</span>
+                        </div>
+                      </div>
+                      <div>
+                        <img
+                          src="/microscope.png"
+                          className="w-24 h-24"
+                          alt=""
+                        />
+                      </div>
+                    </div>
+                  </header>
+                  <main className="px-8 mt-4">
+                    <div className="space-y-4 font-serif flex flex-col gap-4">
+                      <div className="flex justify-between">
+                        <div className="flex gap-4">
+                          <div className="flex flex-col">
+                            <span>Name :</span>
+                            <span>Address :</span>
+                            <span>Doctor :</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span>{report?.name}</span>
+                            <span>{report?.address}</span>
+                            <span>{doctor?.name}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-4">
+                          <div className="flex flex-col">
+                            <span>Age/Sex :</span>
+                            <span>Report Date :</span>
+                            <span>Report ID :</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="capitalize">
+                              {report?.age + " Yrs/" + report?.gender}
+                            </span>
+                            <span>{report?.reportDate}</span>
+                            <span>{report?._id}</span>
                           </div>
                         </div>
                       </div>
-                      <div className="divider-horizontal divider"></div>
                       <div className="space-y-2">
                         <div className="space-y-1">
-                          <h3 className="text-lg mb-2 font-semibold text-nowrap leading-none">
-                            By Dr. Shailung
+                          <h3 className="text-lg text-center font-semibold leading-none">
+                            {report?.testname}
                           </h3>
-                          <p className="text-sm font-normal text-nowrap leading-none">
-                            Address: Itahari-6, Sunsari
-                          </p>
-                          <p className="text-sm font-normal text-nowrap leading-none">
-                            Phone: 025-585541
-                          </p>
-                          <p className="text-sm font-normal text-nowrap leading-none">
-                            Email: xyz@gmail.com
-                          </p>
+                        </div>
+                        <div className="flex flex-col">
+                          <div className="-m-1.5 overflow-x-auto">
+                            <div className="p-1.5 min-w-full inline-block align-middle">
+                              <div className="overflow-hidden">
+                                <table className="min-w-full divide-y divide-black">
+                                  <thead>
+                                    <tr className=" bg-slate-500">
+                                      <th
+                                        scope="col"
+                                        className="px-6 py-1 text-start text-xs font-bold uppercase"
+                                      >
+                                        Investigation
+                                      </th>
+                                      <th
+                                        scope="col"
+                                        className="px-6 py-1 text-start text-xs font-bold uppercase"
+                                      >
+                                        Result
+                                      </th>
+                                      <th
+                                        scope="col"
+                                        className="px-6 py-1 text-start text-xs font-bold uppercase"
+                                      >
+                                        Ref. Value
+                                      </th>
+                                      <th
+                                        scope="col"
+                                        className="px-6 py-1 text-end text-xs font-bold uppercase"
+                                      >
+                                        Unit
+                                      </th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className="divide-y divide-black">
+                                    {report?.reportRows.map((row, index) => (
+                                      <tr key={index}>
+                                        <td className="px-6 py-2 whitespace-nowrap text-sm font-medium">
+                                          {row.title}
+                                        </td>
+                                        <td className="px-6 py-2 whitespace-nowrap text-sm">
+                                          {row.value || "-"}
+                                        </td>
+                                        <td className="px-6 py-2 whitespace-nowrap text-sm">
+                                          {row.reference}
+                                        </td>
+                                        <td className="px-6 py-2 whitespace-nowrap text-end text-sm font-medium">
+                                          {row.unit}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="divider-horizontal divider"></div>
-
-                      <div className="text-end flex flex-col text-xs ">
-                        <span className="font-semibold">Registered On:</span>
-                        <span className="">10 June, 2023</span>
-                        <span className="font-semibold">Collected On:</span>
-                        <span className="">10 June, 2023</span>
-                        <span className="font-semibold">Reported On:</span>
-                        <span className="">10 June, 2023</span>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="space-y-1">
-                        <h3 className="text-lg text-center font-semibold leading-none">
-                          Lab Test Results
-                        </h3>
-                      </div>
-                      <div className="flex flex-col">
-                        <div className="-m-1.5 overflow-x-auto">
-                          <div className="p-1.5 min-w-full inline-block align-middle">
-                            <div className="overflow-hidden">
-                              <table className="min-w-full divide-y">
-                                <thead>
-                                  <tr className="">
-                                    <th
-                                      scope="col"
-                                      className="px-6 py-3 text-start text-xs font-bold uppercase"
-                                    >
-                                      Investigation
-                                    </th>
-                                    <th
-                                      scope="col"
-                                      className="px-6 py-3 text-start text-xs font-bold uppercase"
-                                    >
-                                      Result
-                                    </th>
-                                    <th
-                                      scope="col"
-                                      className="px-6 py-3 text-start text-xs font-bold uppercase"
-                                    >
-                                      Ref. Value
-                                    </th>
-                                    <th
-                                      scope="col"
-                                      className="px-6 py-3 text-end text-xs font-bold uppercase"
-                                    >
-                                      Unit
-                                    </th>
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y">
-                                  <tr>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                      John Brown
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                      45
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                      New York No. 1 Lake Park
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                                      helo
-                                    </td>
-                                  </tr>
-
-                                  <tr>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                      Jim Green
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                      27
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                      London No. 1 Lake Park
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                                      <button
-                                        type="button"
-                                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
-                                      >
-                                        Delete
-                                      </button>
-                                    </td>
-                                  </tr>
-
-                                  <tr>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                      Joe Black
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                      31
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                      Sidney No. 1 Lake Park
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                                      <button
-                                        type="button"
-                                        className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400"
-                                      >
-                                        Delete
-                                      </button>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
+                      <div className="space-y-2">
+                        <div className="space-y-1">
+                          <h3 className="text-sm font-semibold leading-none">
+                            Comments
+                          </h3>
+                          <ul className="l list-disc">
+                            <li className="text-xs font-normal">
+                              If Clinically Suspected. Please Repeat Assay After
+                              Weeks.
+                            </li>
+                            <li className="text-xs font-normal">
+                              Done on Automated Chemiluminescence ANALYER
+                            </li>
+                          </ul>
+                        </div>
+                        <div className="space-y-2">
+                          <h3 className="text-xs font-semibold">
+                            * = Value Rechecked
+                          </h3>
+                          <div className="flex justify-evenly text-center">
+                            <div>
+                              <span className="text-xs">
+                                .......................
+                              </span>
+                              <p className="text-xs font-semibold">
+                                Mr. Niklesh K. Mandal <br />
+                                Medical Laboratory Technologist <br />
+                                Reg No.A-265 H.Dia Lab
+                              </p>
+                            </div>
+                            <div>
+                              <span className="text-xs">
+                                .......................
+                              </span>
+                              <p className="text-xs font-semibold">
+                                Mr. Aalash Bhagat <br />
+                                Medical Laboratory Technician <br />
+                                Reg No.B-8369 MILT
+                              </p>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <div className="space-y-1">
-                        <h3 className="text-lg font-semibold leading-none">
-                          Summary
-                        </h3>
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-sm leading-snug">
-                          The test results indicate normal levels of hemoglobin
-                          and glucose. Cholesterol levels are slightly elevated,
-                          suggesting the need for dietary changes and regular
-                          exercise.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </main>
+                  </main>
+                  <footer className="bg-[#2c4c7f] text-white text-center py-2 border-t-8 border-t-[#f08555]">
+                    <h2>
+                      Keep the reports carefully and bring them during your next
+                      visit.
+                    </h2>
+                  </footer>
+                </div>
               </div>
-              <footer className="flex items-center justify-between">
-                <div className="text-xs leading-none">
-                  <p className="leading-none">Medical Diagnostics Inc.</p>
-                  <p className="leading-none">123 Health St, Mediville</p>
-                  <p className="leading-none">www.medi.com</p>
-                </div>
-                <div className="text-right text-xs leading-none">
-                  <p className="leading-none">Report Date: 12th March 2023</p>
-                  <p className="leading-none">Accession: 2023001923</p>
-                </div>
-              </footer>
             </div>
           </PDFExport>
+        </div>
+        <div className="flex justify-center items-center mt-8">
+          <button
+            className="btn btn-primary"
+            onClick={handleExportWithComponent}
+          >
+            <DownloadIcon className="w-4 h-4" /> Download
+          </button>
         </div>
       </div>
     </>

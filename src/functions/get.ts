@@ -20,6 +20,15 @@ export const getLoggedUser = async () => {
     return response;
 }
 
+export const getUserWithId = async (id: string) => {
+    const response = await axios.get(`${API_BASE_URL}/api/user/profile/${id}`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    return response;
+}
+
 export const getAllDoctors = async () => {
     const response = await axios.get(`${API_BASE_URL}/api/user/doctors`, {
         headers: {
@@ -28,8 +37,8 @@ export const getAllDoctors = async () => {
     });
     const data = response.data;
     return data;
-
 }
+
 
 export const getAllTests = async () => {
     const response = await axios.get(`${API_BASE_URL}/api/test/all`, {
@@ -62,5 +71,14 @@ export const getWebsite = async () => {
     const response = await axios.get(`${API_BASE_URL}/api/website`);
     const data = response.data;
     return data;
+}
+
+export const getAllReports = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/report/`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    return response;
 }
 

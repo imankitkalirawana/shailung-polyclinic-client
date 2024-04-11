@@ -5,6 +5,8 @@ import { API_BASE_URL } from "../../utils/config";
 import { useFormik } from "formik";
 import { toast } from "sonner";
 import * as Yup from "yup";
+import { Helmet } from "react-helmet-async";
+
 
 interface Country {
   name: string;
@@ -55,7 +57,7 @@ const Login = () => {
       phone: "",
       dbOtp: "",
       otp: "",
-      country: "+91",
+      country: "+977",
     },
     validationSchema: validationSchema,
 
@@ -139,6 +141,21 @@ const Login = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Login - Shailung Polyclinic</title>
+        <meta
+          name="description"
+          content="Login to your account to access your reports, appointments and more."
+        />
+        <meta
+          name="keywords"
+          content="login, shailung polyclinic, reports, appointments, healthcare, hospital, clinic"
+        />
+        <link
+          rel="canonical"
+          href={`https://report.shailungpolyclinic.com/auth/login`}
+        />
+      </Helmet>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
@@ -237,9 +254,10 @@ const Login = () => {
                     <select
                       id="country"
                       name="country"
-                      className="select select-bordered max-w-20 join-item"
+                      className="select select-bordered max-w-24 join-item"
                       onChange={formik.handleChange}
                       value={formik.values.country}
+                      disabled={isOtpSent}
                     >
                       <option disabled>Select Country Code</option>
                       {countryData.map((country, index) => (
@@ -251,7 +269,7 @@ const Login = () => {
                     <input
                       id="phone"
                       name="phone"
-                      type="text"
+                      type="number"
                       autoComplete="phone"
                       placeholder="9876543210"
                       className={`input input-bordered w-full join-item ${
@@ -259,10 +277,16 @@ const Login = () => {
                           ? "input-error"
                           : ""
                       }`}
-                      onChange={formik.handleChange}
+                      onChange={(e) => {
+                        const phoneValue = e.target.value
+                          .trim()
+                          .replace(/\s/g, "");
+                        formik.setFieldValue("phone", phoneValue);
+                      }}
                       value={formik.values.phone}
                       disabled={isOtpSent}
                       maxLength={10}
+                      min={0}
                     />
                   </div>
                   <label className="label">
@@ -297,7 +321,7 @@ const Login = () => {
                     <input
                       id="otp"
                       name="otp"
-                      type="text"
+                      type="number"
                       required
                       className={`input input-bordered w-full ${
                         formik.errors.otp && formik.touched.otp

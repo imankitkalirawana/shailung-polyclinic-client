@@ -79,7 +79,7 @@ const Contact = () => {
                 <span className="label-text">Email</span>
               </label>
               <input
-                type="from"
+                type="email"
                 name="from"
                 id="from"
                 autoComplete="email"

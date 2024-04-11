@@ -1,90 +1,38 @@
-import { API_BASE_URL } from "../../../utils/config";
-import axios from "axios";
-import { toast } from "sonner";
 import { isLoggedIn } from "../../../utils/auth";
-import { useEffect, useState } from "react";
-import { useFormik } from "formik";
-import { ViewFeatures } from "./ViewFeatures";
-import { ViewBanner } from "./ViewBanner";
+import { useEffect } from "react";
 import { ViewTeam } from "./ViewTeam";
-import { UploadSingleFile, DeleteFile } from "../../../utils/FileHandling";
+import { data } from "../../../utils/data";
+import { Helmet } from "react-helmet-async";
 
 // get domain name from url
 
 const Website = () => {
-  const [processing, setProcessing] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
   const { loggedIn, user } = isLoggedIn();
   useEffect(() => {
-    axios.get(`${API_BASE_URL}/api/website`).then((response) => {
-      formik.setValues(response.data);
-    });
     if (!loggedIn || user?.role !== "admin") {
       window.location.href = "/auth/login";
     }
   }, []);
 
-  const formik = useFormik({
-    initialValues: {
-      title: "",
-      description: "",
-      email: "",
-      phone: "",
-      address: "",
-      logo: "logo-default.webp",
-      banner: [],
-      features: [],
-      team: [],
-      social: [],
-      logoPreview: "",
-    },
-    onSubmit: async (values) => {
-      try {
-        setProcessing(true);
-        if (file) {
-          if (formik.values.logo !== "logo-default.webp") {
-            await DeleteFile(formik.values.logo);
-          }
-          const filename = file.name;
-          await UploadSingleFile(file, filename);
-          values.logo = filename;
-        }
-        await axios.put(`${API_BASE_URL}/api/website`, values, {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        });
-        toast.success("Website updated successfully");
-      } catch (error: any) {
-        toast.error(error.response.statusText);
-      } finally {
-        setProcessing(false);
-      }
-    },
-  });
-
-  // console.log(file?.name);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setFile(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        const imageData = reader.result as string;
-        formik.setValues({
-          ...formik.values,
-          logoPreview: imageData,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   return (
     <>
+      <Helmet>
+        <title>Website - Shailung Polyclinic</title>
+        <meta
+          name="description"
+          content="Get an inside look at the Shailung Polyclinic's website information and team members."
+        />
+        <meta
+          name="keywords"
+          content="Shailung Polyclinic, Website, Information, Team, Members, Address, Phone, Email, Description"
+        />
+        <link
+          rel="canonical"
+          href="https://report.shailungpolyclinic.com/dashboard/website"
+        />
+      </Helmet>
       <div>
-        <form onSubmit={formik.handleSubmit}>
+        <form>
           <div>
             <div role="alert" className="alert mb-4">
               <svg
@@ -100,16 +48,16 @@ const Website = () => {
                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 ></path>
               </svg>
-              <span>Changing website data might affect SEO.</span>
+              <span className="text-sm">
+                Changing website data is disabled due to the SEO but you can
+                still update your team.
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-base font-semibold leading-7 text-base-content">
+                <h1 className="text-base font-semibold leading-7 text-base-content">
                   Website Information
-                </h2>
-                <p className="mt-1 text-sm leading-6 text-base-neutral">
-                  Update your website information.
-                </p>
+                </h1>
               </div>
             </div>
 
@@ -122,9 +70,9 @@ const Website = () => {
                   id="website-title"
                   name="title"
                   type="text"
-                  value={formik.values.title}
-                  onChange={formik.handleChange}
+                  value={data.websiteData.title}
                   className="input input-bordered w-full"
+                  disabled
                 />
               </div>
               <div className="sm:col-span-3">
@@ -135,9 +83,9 @@ const Website = () => {
                   id="website-email"
                   name="email"
                   type="text"
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
+                  value={data.websiteData.email}
                   className="input input-bordered w-full"
+                  disabled
                 />
               </div>
               <div className="sm:col-span-3">
@@ -148,10 +96,9 @@ const Website = () => {
                   id="website-phone"
                   name="phone"
                   type="text"
-                  value={formik.values.phone}
-                  onChange={formik.handleChange}
+                  value={data.websiteData.phone}
                   className="input input-bordered w-full"
-                  placeholder="e.g. +1234567890"
+                  disabled
                 />
               </div>
               <div className="sm:col-span-3">
@@ -162,9 +109,9 @@ const Website = () => {
                   id="website-description"
                   name="description"
                   type="text"
-                  value={formik.values.description}
-                  onChange={formik.handleChange}
+                  value={data.websiteData.description}
                   className="input input-bordered w-full"
+                  disabled
                 />
               </div>
               <div className="sm:col-span-full">
@@ -175,88 +122,15 @@ const Website = () => {
                   id="website-address"
                   name="address"
                   type="text"
-                  value={formik.values.address}
-                  onChange={formik.handleChange}
+                  value={data.websiteData.address}
                   className="input input-bordered w-full"
+                  disabled
                 />
-              </div>
-
-              <div className="sm:col-span-3">
-                <label htmlFor="logo" className="label">
-                  <span className="label-text">Logo</span>
-                </label>
-                <div className="flex gap-4 items-center flex-col-reverse">
-                  <label
-                    htmlFor="logo"
-                    className="flex flex-col bg-base-300 border-neutral border-2 items-center p-1 w-full text-center border-dashed cursor-pointer rounded-xl"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="w-8 h-8"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
-                      />
-                    </svg>
-                    <h2 className="mt-1 font-medium tracking-wide">
-                      Logo File
-                    </h2>
-                    <p className="mt-2 text-xs tracking-wide">
-                      Upload or darg & drop your file SVG, PNG, JPG or GIF. (Max
-                      2MB)
-                    </p>
-                    <input
-                      id="logo"
-                      name="logo"
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={(e) => handleFileChange(e)}
-                    />
-                  </label>
-                  <img
-                    src={
-                      formik.values.logoPreview ||
-                      `${API_BASE_URL}/api/upload/${formik.values.logo}`
-                    }
-                    className="w-24 h-24 rounded-full mr-4 aspect-square"
-                    alt=""
-                  />
-                </div>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 justify-end mt-12">
-            <a href="/dashboard" className="btn btn-sm">
-              Cancel
-            </a>
-            <button
-              className="btn btn-primary btn-sm"
-              type="submit"
-              disabled={processing}
-            >
-              {processing ? (
-                <span className="loading loading-spinner loading-sm"></span>
-              ) : (
-                "Update"
-              )}
-            </button>
-          </div>
         </form>
-        <div className="divider my-12"></div>
-        <div className="my-8">
-          <ViewBanner />
-        </div>
-        <div className="divider my-12"></div>
-        <div className="my-8">
-          <ViewFeatures />
-        </div>
+
         <div className="divider my-12"></div>
         <div className="my-8">
           <ViewTeam />

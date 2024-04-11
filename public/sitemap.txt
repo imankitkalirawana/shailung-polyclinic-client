@@ -1,0 +1,4 @@
+https://report.shailungpolyclinic.com/
+https://report.shailungpolyclinic.com/auth/login
+https://report.shailungpolyclinic.com/appointment/new
+https://report.shailungpolyclinic.com/appointment/history

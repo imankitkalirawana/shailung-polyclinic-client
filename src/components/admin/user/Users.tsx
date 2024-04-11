@@ -185,13 +185,13 @@ const Users = () => {
       <div className="container mx-auto p-4">
         <div className="w-full card shadow-xs">
           <div className="flex justify-between items-center">
-            <h2 className="my-6 text-2xl font-semibold">
+            <h1 className="my-6 text-2xl font-semibold">
               {userType === "employee"
                 ? "Employees"
                 : userType === "user"
                 ? "Users"
                 : "All Users"}
-            </h2>
+            </h1>
             <div className="flex gap-2 flex-row-reverse">
               <label htmlFor="add_user" className="btn btn-primary btn-sm">
                 <span>Add User</span>
@@ -278,7 +278,6 @@ const Users = () => {
                     .filter((user) => {
                       return handleSearch(user);
                     })
-                    .reverse()
                     .slice(initialItem, finalItem)
                     .map(
                       (user, index) =>
@@ -305,19 +304,6 @@ const Users = () => {
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center text-sm">
-                                <div className="relative hidden w-8 h-8 mr-3 rounded-full md:block">
-                                  <img
-                                    className="object-cover w-full h-full rounded-full"
-                                    src={
-                                      user.photo
-                                        ? `${API_BASE_URL}/api/upload/${user.photo}`
-                                        : "https://ui-avatars.com/api/?name=" +
-                                          user.name
-                                    }
-                                    alt={user.name}
-                                    loading="lazy"
-                                  />
-                                </div>
                                 <div>
                                   <p className="font-semibold text-nowrap">
                                     {user.name}

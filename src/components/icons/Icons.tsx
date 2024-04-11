@@ -243,6 +243,26 @@ export function ExportTableIcon(props: any) {
   );
 }
 
+export function DownloadIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="44"
+      height="44"
+      viewBox="0 0 24 24"
+      strokeWidth="1.5"
+      stroke="currentColor"
+      fill="none"
+    >
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M19 18a3.5 3.5 0 0 0 0 -7h-1a5 4.5 0 0 0 -11 -2a4.6 4.4 0 0 0 -2.1 8.4" />
+      <path d="M12 13l0 9" />
+      <path d="M9 19l3 3l3 -3" />
+    </svg>
+  );
+}
+
 export function AppWindowIcon(props: any) {
   return (
     <svg
@@ -341,13 +361,13 @@ export function FaceErrorIcon(props: any) {
       strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-      <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
-      <path d="M4 16v2a2 2 0 0 0 2 2h2" />
-      <path d="M16 4h2a2 2 0 0 1 2 2v2" />
-      <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
-      <path d="M9 10h.01" />
-      <path d="M15 10h.01" />
-      <path d="M9.5 15.05a3.5 3.5 0 0 1 5 0" />
+      <path d="M4 8v-2a2 2 0 0 1 2 -2h2" className="stroke-error" />
+      <path d="M4 16v2a2 2 0 0 0 2 2h2" className="stroke-warning" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v2" className="stroke-info" />
+      <path d="M16 20h2a2 2 0 0 0 2 -2v-2" className="stroke-success" />
+      <path d="M9 10h.01" className="stroke-primary" />
+      <path d="M15 10h.01" className="stroke-primary" />
+      <path d="M9.5 15.05a3.5 3.5 0 0 1 5 0" className="stroke-primary" />
     </svg>
   );
 }

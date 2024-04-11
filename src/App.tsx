@@ -26,6 +26,8 @@ import New from "./components/appointment/New";
 import History from "./components/appointment/History";
 import Complete from "./components/admin/tests/Complete";
 import Download from "./components/admin/tests/Download";
+import { Helmet } from "react-helmet-async";
+import Reports from "./components/admin/report/Reports";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -37,6 +39,18 @@ const MainLayout = ({ children }: any) => (
 function App() {
   return (
     <>
+      <Helmet>
+        <title>Home - Shailung Polyclinic</title>
+        <meta
+          name="description"
+          content="Shailung Polyclinic is a medical facility that provides various health services to the people of Nepal."
+        />
+        <meta
+          name="keywords"
+          content="Shailung Polyclinic, Healthcare, Clinic, Consultation, Diagnostics, Treatments, Doctors, Staff, Care"
+        />
+        <link rel="canonical" href="https://report.shailungpolyclinic.com/" />
+      </Helmet>
       <Router>
         <Routes>
           <Route
@@ -55,11 +69,9 @@ function App() {
                     <Route path="tests/" element={<Outlet />}>
                       <Route path="" element={<Tests />} />
                       <Route path="complete/:id" element={<Complete />} />
-                      {/* <Route
-                        path="complete/:id/:reportId/download"
-                        element={<Download />}
-                      /> */}
                     </Route>
+                    {/* reports */}
+                    <Route path="reports" element={<Reports />} />
 
                     <Route
                       path="tests/available-tests"

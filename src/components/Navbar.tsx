@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../utils/auth";
 import { useFormik } from "formik";
-import { getWebsite } from "../functions/get";
+import { data } from "../utils/data";
 
 const themes = ["light", "dark"];
 
@@ -20,23 +20,11 @@ const Navbar = () => {
   const formik = useFormik({
     initialValues: {
       photo: "profile-default.webp",
-      logo: "logo-default.webp",
-      title: "",
     },
     onSubmit: async () => {},
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      const website = await getWebsite();
-
-      formik.setValues((prevValues) => ({
-        ...prevValues,
-        title: website.title,
-        logo: website.logo,
-      }));
-    };
-    fetchData();
     const fetchUser = async () => {
       await axios
         .get(`${API_BASE_URL}/api/user/profile`, {
@@ -113,11 +101,15 @@ const Navbar = () => {
         <div className="navbar-center">
           <Link to={"/"} className="btn btn-ghost text-xl">
             <img
-              src={`${API_BASE_URL}/api/upload/${formik.values.logo}`}
-              alt=""
-              className="w-10 aspect-square"
+              src={data.websiteData.logo}
+              alt="logo"
+              className="w-10 aspect-square rounded-full"
+              title="logo"
+              width={40}
+              height={40}
+              loading="eager"
             />
-            {formik.values.title}
+            {data.websiteData.title}
           </Link>
         </div>
         <div className="navbar-end gap-4 mr-4">
@@ -163,6 +155,11 @@ const Navbar = () => {
                 <div className="w-10 rounded-full">
                   <img
                     src={`${API_BASE_URL}/api/upload/${formik.values.photo}`}
+                    alt="profile"
+                    title="profile"
+                    width={40}
+                    height={40}
+                    loading="eager"
                   />
                 </div>
               </div>

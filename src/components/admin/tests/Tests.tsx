@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { getAllDoctors, getAllTests } from "../../../functions/get";
 import { isLoggedIn } from "../../../utils/auth";
 import * as XLSX from "xlsx";
+import { Helmet } from "react-helmet-async";
 
 interface Test {
   _id: string;
@@ -28,6 +29,7 @@ interface Test {
   updatedat: string;
   addeddate: string;
   appointmentdate: string;
+  reportId: string;
   testDetail: {
     testData: {
       _id: string;
@@ -185,10 +187,25 @@ const Tests = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Tests - Shailung Polyclinic</title>
+        <meta
+          name="description"
+          content="View all tests and their status. You can also assign doctors, schedule appointments and update status of tests."
+        />
+        <meta
+          name="keywords"
+          content="tests, test, status, assign, doctor, schedule, appointment, update, view, view tests, assign doctor, schedule appointment, update status"
+        />
+        <link
+          rel="canonical"
+          href={`https://report.shailungpolyclinic.com/admin/tests`}
+        />
+      </Helmet>
       <div className="container mx-auto p-4">
         <div className="w-full card shadow-xs">
           <div className="flex justify-between items-center">
-            <h2 className="my-6 text-2xl font-semibold">Tests</h2>
+            <h1 className="my-6 text-2xl font-semibold">Tests</h1>
             <div className="flex gap-2 flex-row-reverse">
               <button
                 className="btn btn-outline btn-sm hover:btn-primary"
@@ -468,20 +485,32 @@ interface DeleteModalProps {
 
 const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
   const handleDelete = async () => {
-    await axios.delete(`${API_BASE_URL}/api/test/${test._id}`, {
-      headers: {
-        Authorization: `${localStorage.getItem("token")}`,
-      },
-    });
-    setTests((prev: Test[]) => {
-      return prev.filter((prevTest) => prevTest._id !== test._id);
-    });
-    onClose();
+    try {
+      await axios.delete(`${API_BASE_URL}/api/test/${test._id}`, {
+        headers: {
+          Authorization: `${localStorage.getItem("token")}`,
+        },
+      });
+      if (test.status === "completed" && test.reportId) {
+        await axios.delete(`${API_BASE_URL}/api/report/${test.reportId}`, {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        });
+      }
+      setTests((prev: Test[]) => {
+        return prev.filter((prevTest) => prevTest._id !== test._id);
+      });
+      toast.success("Test deleted successfully");
+      onClose();
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete test");
+    }
   };
 
   return (
     <>
-      <input type="checkbox" id="delete_test" className="modal-toggle" />
       <div className="modal modal-open backdrop-blur-sm" role="dialog">
         <div className="modal-box max-w-sm">
           <h3 className="font-bold text-lg text-center">

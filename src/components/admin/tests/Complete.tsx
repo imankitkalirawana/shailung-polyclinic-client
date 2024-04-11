@@ -7,6 +7,7 @@ import { isLoggedIn } from "../../../utils/auth";
 import { useFormik } from "formik";
 import { UploadMultipleFiles } from "../../../utils/FileHandling";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface Test {
   _id: string;
@@ -45,6 +46,7 @@ interface Test {
 const Complete = () => {
   const { loggedIn } = isLoggedIn();
   const { id }: any = useParams();
+  const navigate = useNavigate();
 
   const [doctors, setDoctors] = useState<any[]>([]);
   const [test, setTest] = useState<Test | null>(null);
@@ -136,7 +138,6 @@ const Complete = () => {
       fatherName: "",
       age: 0,
       gender: "",
-      dob: "",
       phone: "",
       email: "",
       address: "",
@@ -146,6 +147,7 @@ const Complete = () => {
       doctor: "",
       testid: "",
       userid: "",
+      status: "positive",
       reportRows: Array.from({ length: 1 }, () => ({
         title: "",
         value: "",
@@ -165,7 +167,7 @@ const Complete = () => {
                 .pop()}`
           );
           values.reportFile = filenames;
-          await toast.promise(
+          toast.promise(
             UploadMultipleFiles(files, filenames).then(() => {
               uploadReport(values);
             }),
@@ -176,9 +178,7 @@ const Complete = () => {
             }
           );
         } else {
-          await uploadReport(values).then(() => {
-            toast.success("Report uploaded successfully");
-          });
+          await uploadReport(values);
         }
       } catch (error) {
         toast.error("Failed to upload report");
@@ -188,25 +188,36 @@ const Complete = () => {
   });
 
   const uploadReport = async (values: any) => {
-    await axios
-      .put(`${API_BASE_URL}/api/test/done/${id}`, null, {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
-      })
-      .then(async () => {
-        axios
-          .post(`${API_BASE_URL}/api/report`, values, {
-            headers: {
-              Authorization: `${localStorage.getItem("token")}`,
-            },
-          })
-          .then(() => {
-            toast.success("Test completed successfully");
-          });
-        // setReportId(response.data._id);
-        setIsUploaded(true);
-      });
+    try {
+      axios
+        .post(`${API_BASE_URL}/api/report`, values, {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        })
+        .then((res) => {
+          console.log(res.data._id);
+          axios
+            .put(
+              `${API_BASE_URL}/api/test/done/${id}`,
+              {
+                reportId: res.data._id,
+              },
+              {
+                headers: {
+                  Authorization: `${localStorage.getItem("token")}`,
+                },
+              }
+            )
+            .then(() => {
+              setIsUploaded(true);
+              toast.success("Report uploaded successfully");
+              navigate("/dashboard/tests");
+            });
+        });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const addNewRow = () => {
@@ -310,23 +321,6 @@ const Complete = () => {
                   <option value="female">Female</option>
                   <option value="other">Other</option>
                 </select>
-              </div>
-
-              <div className="col-span-full md:col-span-2">
-                <label className="label" htmlFor="email">
-                  <span className="label-text">Date of Birth</span>
-                </label>
-                <div className="relative w-full mb-4">
-                  <input
-                    type="date"
-                    className="input input-bordered ml-1 w-full"
-                    name="dob"
-                    id="dob"
-                    required
-                    onChange={formik.handleChange}
-                    value={formik.values.dob}
-                  />
-                </div>
               </div>
 
               {/* Phone */}
@@ -443,6 +437,25 @@ const Complete = () => {
                       {doctor.name}
                     </option>
                   ))}
+                </select>
+              </div>
+              <div className="col-span-full md:col-span-2">
+                <label className="label" htmlFor="status">
+                  <span className="label-text">Report Status</span>
+                </label>
+                <select
+                  name="status"
+                  id="status"
+                  className="select select-bordered w-full"
+                  required
+                  onChange={formik.handleChange}
+                  value={formik.values.status}
+                >
+                  <option value="" disabled>
+                    Select Status
+                  </option>
+                  <option value="positive">Positive</option>
+                  <option value="negative">Negative</option>
                 </select>
               </div>
               <div className="col-span-full md:col-span-2">

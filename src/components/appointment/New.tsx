@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import DoctorSVG from "../icons/DoctorSVG";
 import { HistoryIcon, SquareCrossIcon } from "../icons/Icons";
 import { useEffect, useState } from "react";
@@ -7,6 +7,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../utils/config";
 import { isLoggedIn } from "../../utils/auth";
+import { Helmet } from "react-helmet-async";
 
 interface Tests {
   _id: number;
@@ -27,7 +28,7 @@ interface User {
 
 const New = () => {
   const { loggedIn } = isLoggedIn();
-
+  const navigate = useNavigate();
   const [tests, setTests] = useState<Tests[]>([]);
   const [user, setUser] = useState<User>({} as User);
   const [selectedTest, setSelectedTest] = useState<Tests>({} as Tests);
@@ -64,6 +65,12 @@ const New = () => {
           phone: data.phone,
           email: data.email,
         });
+        if (data.name === "" || data.phone === "" || data.age === 0) {
+          toast.error("Please update your profile to continue", {
+            id: "update-profile",
+          });
+          navigate("/profile");
+        }
       } catch (error) {
         toast.error("Failed to fetch user");
         console.error(error);
@@ -122,7 +129,6 @@ const New = () => {
 
   const handleTestFor = (e: React.ChangeEvent<HTMLSelectElement>) => {
     formik.setFieldValue("testfor", e.target.value);
-    // reset form values except phonenumber and testfor value on change
     formik.setValues({
       testfor: e.target.value,
       testid: "",
@@ -149,10 +155,25 @@ const New = () => {
 
   return (
     <>
+      <Helmet>
+        <title>New Appointment - Shailung Polyclinic</title>
+        <meta
+          name="description"
+          content="Book an appointment for a test at Shailung Polyclinic in Itahari, Nepal"
+        />
+        <meta
+          name="keywords"
+          content="appointment, book, test, shailung polyclinic, itahari, nepal, health, medical, clinic"
+        />
+        <link
+          rel="canonical"
+          href="https://report.shailungpolyclinic.com/appointment/new"
+        />
+      </Helmet>
       <div className="container mx-auto p-4 my-24">
         <div className="w-full card shadow-xs">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">New Appointment</h2>
+            <h1 className="text-lg font-semibold">Book an Test Appointment</h1>
             <div className="flex gap-2 flex-row-reverse">
               <Link
                 to={"/appointment/history"}

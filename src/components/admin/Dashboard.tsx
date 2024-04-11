@@ -14,6 +14,7 @@ import { isLoggedIn } from "../../utils/auth";
 import {
   countAll,
   getAllAvailableTests,
+  getAllReports,
   getAllTests,
   getAllUsers,
 } from "../../functions/get";
@@ -76,6 +77,22 @@ interface AvailableTest {
   updatedat: string;
 }
 
+interface Report {
+  _id: string;
+  name: string;
+  doctor: string;
+  age: number;
+  gender: string;
+  dob: string;
+  phone: string;
+  email: string;
+  address: string;
+  testname: string;
+  reportType: string;
+  reportDate: string;
+  status: string;
+}
+
 const humanReadableDate = (date: string) => {
   return new Date(date).toLocaleDateString("en-US", {
     day: "numeric",
@@ -92,6 +109,7 @@ const Dashboard = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [tests, setTests] = useState<Test[]>([]);
   const [availabletests, setAvailableTests] = useState<AvailableTest[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
 
   useEffect(() => {
     if (!loggedIn) {
@@ -113,6 +131,8 @@ const Dashboard = () => {
         setTests(tests.data);
         const availabletests = await getAllAvailableTests();
         setAvailableTests(availabletests.data);
+        const reports = await getAllReports();
+        setReports(reports.data);
         const count = await countAll();
         setCountData(count);
       } catch (error) {
@@ -127,11 +147,12 @@ const Dashboard = () => {
       <main>
         <div className="container grid">
           <div className="mb-4">
-            <h2 className="text-base font-semibold leading-7 text-base-content">
-              Dashboard
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-base-neutral">
+            <h1 className="text-base font-semibold leading-7 text-base-content capitalize">
               Welcome back, {user?.username}
+            </h1>
+            <p className="mt-1 text-sm leading-6 text-base-neutral">
+              Get an inside look at the Shailung Polyclinic's admin dashboard
+              for managing tests, appointments, and more.
             </p>
           </div>
           {user?.role === "admin" && (
@@ -213,6 +234,8 @@ const Dashboard = () => {
           <TestCard tests={tests} />
           <div className="divider"></div>
           <AvailableTestCard tests={availabletests} />
+          <div className="divider"></div>
+          <ReportCard reports={reports} />
         </div>
       </main>
     </>
@@ -374,26 +397,17 @@ const TestCard = ({ tests }: TestCardProps) => {
               <>
                 <thead>
                   <tr className="text-xs font-semibold tracking-wide text-left uppercase border-b bg-primary/20">
-                    <th className="px-4 py-3 hover:bg-primary/10">Status</th>
-                    <th className="px-4 py-3 hover:bg-primary/10">Test</th>
-                    <th className="px-4 py-3 hover:bg-primary/10">Patient</th>
-                    <th className="px-4 py-3 hover:bg-primary/10">
-                      Patient Phone
-                    </th>
-                    <th className="px-4 py-3 hover:bg-primary/10">Doctor</th>
-                    <th className="px-4 py-3 hover:bg-primary/10">Added On</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Test</th>
+                    <th className="px-4 py-3">Patient</th>
+                    <th className="px-4 py-3">Patient Phone</th>
+                    <th className="px-4 py-3">Doctor</th>
+                    <th className="px-4 py-3">Added On</th>
                   </tr>
                 </thead>
                 <tbody className="bg-primary/10 divide-y">
                   {tests.slice(initialItem, finalItem).map((test, index) => (
-                    <tr
-                      key={index}
-                      className="cursor-pointer hover:bg-primary/5"
-                      role="button"
-                      onClick={() => {
-                        navigate(`/dashboard/test/${test._id}`);
-                      }}
-                    >
+                    <tr key={index}>
                       <td className="px-4 py-3 text-sm">
                         <span
                           className={`badge tooltip tooltip-right ${
@@ -614,6 +628,122 @@ export const AvailableTestCard = ({ tests }: AvailableTestCardProps) => {
               <tbody className="bg-primary/10 divide-y">
                 <tr>
                   <td className="px-4 py-3 text-sm">No tests available!</td>
+                </tr>
+              </tbody>
+            )}
+          </table>
+        </div>
+      </div>
+    </>
+  );
+};
+
+// report CardProps
+interface ReportCardProps {
+  reports: Report[];
+}
+
+export const ReportCard = ({ reports }: ReportCardProps) => {
+  const offset = 5;
+  const [initialItem, setInitialItem] = useState(0);
+  const [finalItem, setFinalItem] = useState(offset);
+  const navigate = useNavigate();
+
+  return (
+    <>
+      <div className="w-full overflow-hidden card shadow-xs">
+        <div className="flex justify-between items-center">
+          <h2 className="my-6 text-2xl font-semibold">Reports</h2>
+          <Link
+            to="/dashboard/reports"
+            className="btn btn-outline hover:btn-primary btn-sm"
+          >
+            <span>View all</span>
+          </Link>
+        </div>
+
+        <div className={`w-full overflow-x-auto card`}>
+          <table className="w-full whitespace-no-wrap">
+            {reports.length > 0 ? (
+              <>
+                <thead>
+                  <tr className="text-xs font-semibold tracking-wide text-left uppercase border-b bg-primary/20">
+                    <th className="px-4 py-3">TestName</th>
+                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3">Phone</th>
+                    <th className="px-4 py-3">Address</th>
+                    <th className="px-4 py-3">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-primary/10 divide-y">
+                  {reports
+                    .reverse()
+                    .slice(initialItem, finalItem)
+                    .map((report, index) => (
+                      <tr
+                        key={index}
+                        className="cursor-pointer hover:bg-primary/5"
+                        role="button"
+                        onClick={() => {
+                          navigate(`/report/${report._id}/download`);
+                        }}
+                      >
+                        <td className="px-4 py-3 text-sm">
+                          <span
+                            className={`badge tooltip tooltip-right badge-${
+                              report.status === "positive" ? "success" : "error"
+                            }`}
+                            data-tip={
+                              report.status === "positive"
+                                ? "Positive"
+                                : "Negative"
+                            }
+                          ></span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center text-sm">
+                            <div>
+                              <p className="font-semibold text-nowrap">
+                                {report.name}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-3 text-sm">{report.phone}</td>
+                        <td className="px-4 py-3 text-sm text-nowrap">
+                          {report.address}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-nowrap">
+                          {humanReadableDate(report.reportDate)}
+                        </td>
+                      </tr>
+                    ))}
+                  <tr className="bg-primary/20">
+                    <td className="px-4 py-3 text-sm" colSpan={4}>
+                      Showing {initialItem + 1}-{finalItem} of {reports.length}
+                    </td>
+                    <td className="px-4 py-3 text-sm flex justify-end">
+                      <button
+                        className="btn btn-sm btn-ghost btn-circle"
+                        aria-label="Previous"
+                        onClick={() => {
+                          if (initialItem > 0) {
+                            setInitialItem(initialItem - offset);
+                            setFinalItem(finalItem - offset);
+                          }
+                        }}
+                      >
+                        <LeftAngle className="w-4 h-4 fill-current" />
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </>
+            ) : (
+              <tbody className="bg-primary/10 divide-y">
+                <tr>
+                  <td className="px-4 py-3 text-sm">No reports available!</td>
                 </tr>
               </tbody>
             )}

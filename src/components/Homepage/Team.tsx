@@ -19,7 +19,15 @@ const Team = ({ team }: Props) => {
           <div className="h-96 carousel carousel-vertical rounded-box sm:hidden mt-8 w-64">
             {team.slice(0, 4).map((teamMember, index) => (
               <div className="carousel-item h-full" key={index}>
-                <img className="object-cover" src={teamMember?.image} />
+                <img
+                  className="object-cover"
+                  src={teamMember?.image}
+                  alt={teamMember.name}
+                  title={teamMember.name}
+                  loading="lazy"
+                  width={256}
+                  height={256}
+                />
               </div>
             ))}
           </div>
@@ -30,8 +38,11 @@ const Team = ({ team }: Props) => {
                 <img
                   className="object-cover object-center w-full h-48 mx-auto rounded-lg"
                   src={teamMember?.image || "/public/default-team.jpg"}
-                  alt="avatar"
                   loading="lazy"
+                  alt={teamMember.name}
+                  title={teamMember.name}
+                  width={256}
+                  height={256}
                 />
                 <div className="mt-2">
                   <h3 className="text-lg font-medium">
