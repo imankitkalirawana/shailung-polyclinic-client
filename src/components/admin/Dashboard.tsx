@@ -127,7 +127,7 @@ const Dashboard = () => {
           const users = await getAllUsers("user");
           setUsers(users);
         }
-        const tests = await getAllTests();
+        const tests = await getAllTests("all");
         setTests(tests.data);
         const availabletests = await getAllAvailableTests();
         setAvailableTests(availabletests.data);
@@ -188,7 +188,7 @@ const Dashboard = () => {
               </div>
             </Link>
             <Link
-              to="/dashboard/users?type=employee"
+              to="/dashboard/tests?status=all"
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
             >
               <div className="p-3 mr-4 rounded-full bg-primary text-base-100">
@@ -200,7 +200,7 @@ const Dashboard = () => {
               </div>
             </Link>
             <Link
-              to={"/dashboard/tests"}
+              to={"/dashboard/tests?status=completed"}
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
             >
               <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
@@ -379,7 +379,7 @@ const TestCard = ({ tests }: TestCardProps) => {
         <div className="flex justify-between items-center">
           <h2 className="my-6 text-2xl font-semibold">Tests</h2>
           <Link
-            to="/dashboard/tests"
+            to="/dashboard/tests?status=all"
             className="btn btn-outline hover:btn-primary btn-sm"
           >
             <span>View all</span>

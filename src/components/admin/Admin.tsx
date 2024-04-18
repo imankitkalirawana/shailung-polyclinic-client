@@ -1,8 +1,8 @@
 import { isLoggedIn } from "../../utils/auth";
 import Breadcrumbs from "../Breadcrumbs";
 import { Outlet } from "react-router-dom";
-import NotFound from "../NotFound";
 import { Helmet } from "react-helmet-async";
+import UserDashboard from "../Homepage/UserDashboard";
 
 const Admin = () => {
   const { loggedIn, user } = isLoggedIn();
@@ -11,7 +11,7 @@ const Admin = () => {
   } else if (loggedIn && user?.role !== "admin" && user?.role !== "member") {
     return (
       <div className="my-24" onLoad={() => {}}>
-        <NotFound message="You are not allowed to access this page" />
+        <UserDashboard />
       </div>
     );
   }

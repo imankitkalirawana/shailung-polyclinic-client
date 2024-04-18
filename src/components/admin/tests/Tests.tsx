@@ -7,7 +7,7 @@ import {
   StethoscopeIcon,
   TrashXIcon,
 } from "../../icons/Icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { humanReadableDate } from "../user/Users";
@@ -18,6 +18,7 @@ import { getAllDoctors, getAllTests } from "../../../functions/get";
 import { isLoggedIn } from "../../../utils/auth";
 import * as XLSX from "xlsx";
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 
 interface Test {
   _id: string;
@@ -85,6 +86,8 @@ const Tests = () => {
   const [isAssign, setIsAssign] = useState(false);
   const [isSchedule, setIsSchedule] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const queryStatus = searchParams.get("status");
 
   const handleDeleteClick = (test: Test) => {
     setSelected(test);
@@ -117,9 +120,11 @@ const Tests = () => {
 
   useEffect(() => {
     tests.forEach(async (test) => {
+      const appointmentDate = new Date(test.appointmentdate);
+      appointmentDate.setHours(appointmentDate.getHours() + 18);
       if (
         test.appointmentdate &&
-        new Date(test.appointmentdate).getDate() < new Date().getDate() &&
+        appointmentDate < new Date() &&
         test.status !== "completed" &&
         test.status !== "overdue" &&
         test.status !== "cancelled"
@@ -136,9 +141,9 @@ const Tests = () => {
 
   useEffect(() => {
     fetchAllTests();
-  }, []);
+  }, [queryStatus]);
   const fetchAllTests = async () => {
-    const response = await getAllTests();
+    const response = await getAllTests(queryStatus);
     const data = response.data;
     setTests(data);
   };
@@ -185,6 +190,8 @@ const Tests = () => {
     XLSX.writeFile(wb, `${filename}.xlsx`);
   };
 
+  // handle sorting
+
   return (
     <>
       <Helmet>
@@ -215,15 +222,39 @@ const Tests = () => {
               </button>
             </div>
           </div>
+          <div className="flex gap-4 my-8 overflow-x-scroll">
+            <Link
+              className={`btn btn-sm ${
+                queryStatus === "all" ? "btn-primary" : "btn-outline"
+              }`}
+              to={`/dashboard/tests?status=all`}
+            >
+              All
+            </Link>
+            {TestStatus.sort((a, b) => (a.value > b.value ? 1 : -1)).map(
+              (status, index) => (
+                <Link
+                  key={index}
+                  className={`btn btn-sm  ${
+                    queryStatus === status.value ? "btn-primary" : "btn-outline"
+                  }`}
+                  to={`/dashboard/tests?status=${status.value}`}
+                >
+                  {status.label}
+                </Link>
+              )
+            )}
+          </div>
           <div className="relative w-full max-w-md mb-4">
             <input
               type="text"
               className="input input-bordered ml-1 w-full"
-              placeholder="Search by name, phone, test, status"
+              placeholder={`Search by name, phone, test`}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
               }}
             />
+
             <button className="absolute top-0 -right-1 rounded-l-none btn btn-primary">
               <SearchIcon className="w-5 h-5" />
             </button>
@@ -233,18 +264,14 @@ const Tests = () => {
             <div className={`w-full card overflow-x-auto overflow-y-hidden`}>
               <table className="w-full whitespace-no-wrap">
                 <thead>
-                  <tr className="text-xs font-semibold tracking-wide uppercase text-left border-b bg-primary/20 cursor-pointer">
-                    <th className="px-4 py-3 hover:bg-primary/10">Status</th>
-                    <th className="px-4 py-3 hover:bg-primary/10">Test</th>
-                    <th className="px-4 py-3 hover:bg-primary/10">Patient</th>
-                    <th className="px-4 py-3 hover:bg-primary/10">
-                      Patient Number
-                    </th>
-                    <th className="px-4 py-3 hover:bg-primary/10">Doctor</th>
-                    <th className="px-4 py-3 hover:bg-primary/10">Added On</th>
-                    <th className="px-4 py-3 hover:bg-primary/10">
-                      Appointment Date
-                    </th>
+                  <tr className="text-xs font-semibold tracking-wide uppercase text-left border-b bg-primary/20">
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Test</th>
+                    <th className="px-4 py-3">Patient</th>
+                    <th className="px-4 py-3">Patient Number</th>
+                    <th className="px-4 py-3">Doctor</th>
+                    <th className="px-4 py-3">Added On</th>
+                    <th className="px-4 py-3">Appointment Date</th>
                     <th className="px-4 py-3">Actions</th>
                   </tr>
                 </thead>
@@ -256,15 +283,8 @@ const Tests = () => {
                     .reverse()
                     .slice(initialItem, finalItem)
                     .map((test, index) => (
-                      <tr
-                        key={index}
-                        className={`cursor-pointer hover:bg-primary/5  ${
-                          !test.testDetail.doctorData &&
-                          "bg-info/10 hover:bg-info/20"
-                        }`}
-                        role="button"
-                      >
-                        <td className="px-4 py-3 text-sm dropdown">
+                      <tr key={index}>
+                        <td className="px-4 py-3 pt-5 text-sm h-full dropdown">
                           <span
                             role="button"
                             tabIndex={0}
@@ -557,6 +577,9 @@ interface ScheduleModalProps {
 }
 
 const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
+  const [searchParams] = useSearchParams();
+  const queryStatus = searchParams.get("status");
+
   const [date, setDate] = useState<string>("");
   const [processing, setProcessing] = useState(false);
   const handleSchedule = async () => {
@@ -583,7 +606,7 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
       toast.error("Failed to schedule appointment");
       console.log(err);
     } finally {
-      const response = await getAllTests();
+      const response = await getAllTests(queryStatus);
       const data = response.data;
       setTests(data);
       onClose();

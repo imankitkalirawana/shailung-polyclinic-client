@@ -19,6 +19,7 @@ interface Test {
   updatedat: string;
   addeddate: string;
   appointmentdate: string;
+  addedby: string;
   testDetail: {
     testData: {
       _id: string;
@@ -62,6 +63,12 @@ const Complete = () => {
   }, [test]);
 
   useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+    formik.setValues((previousData) => ({
+      ...previousData,
+      addedby: userData.user.email,
+    }));
+
     const fetchTests = async () => {
       try {
         await axios
@@ -148,6 +155,7 @@ const Complete = () => {
       doctor: "",
       testid: "",
       userid: "",
+      addedby: "",
       status: "positive",
       reportRows: Array.from({ length: 1 }, () => ({
         title: "",

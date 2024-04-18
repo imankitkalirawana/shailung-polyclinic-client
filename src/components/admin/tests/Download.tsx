@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
 import { PDFExport } from "@progress/kendo-react-pdf";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import { getUserWithId } from "../../../functions/get";
 import { DownloadIcon, SmartHomeIcon } from "../../icons/Icons";
+import { isLoggedIn } from "../../../utils/auth";
 
 interface Report {
   _id: string;
@@ -39,12 +40,22 @@ interface reportDetails {
 }
 
 const Download = () => {
+  const { loggedIn } = isLoggedIn();
+  const location = useLocation();
   const { reportId }: any = useParams();
   const [report, setReport] = useState<Report | null>(null);
   const pdfExportComponent = useRef(null);
   const [doctor, setDoctor] = useState<any>(null);
   const [reportDetails, setReportDetails] = useState<reportDetails[]>([]);
   const [loading, setLoading] = useState(true);
+  const currentLocation = location.pathname;
+
+  useEffect(() => {
+    if (!loggedIn) {
+      toast.error("You need to login to view this page");
+      window.location.href = `/auth/login?redirect=${currentLocation}`;
+    }
+  }, []);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -114,7 +125,10 @@ const Download = () => {
         <div className="text-sm breadcrumbs">
           <ul>
             <li>
-              <Link to={"/"} className="btn btn-sm btn-circle btn-ghost -mr-2">
+              <Link
+                to={"/dashboard"}
+                className="btn btn-sm btn-circle btn-ghost -mr-2"
+              >
                 <SmartHomeIcon className="w-4 h-4" />
               </Link>{" "}
             </li>

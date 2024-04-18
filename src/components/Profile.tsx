@@ -16,6 +16,7 @@ const Profile = () => {
   // const [user, setUser] = useState<User>({} as User);
   const [isDeleting, setIsDeleting] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [email, setEmail] = useState("");
 
   const formik = useFormik({
     initialValues: {
@@ -29,6 +30,7 @@ const Profile = () => {
       photo: "profile-default.webp",
       previewPhoto: "",
       age: 0,
+      password: "",
     },
     onSubmit: async (values) => {
       try {
@@ -50,6 +52,7 @@ const Profile = () => {
           }
         );
         toast.success(res.data.message);
+        fetchUser();
       } catch (error: any) {
         console.log(error);
         toast.error(error.message);
@@ -65,28 +68,29 @@ const Profile = () => {
 
   useEffect(() => {
     // fetch user data
-    const fetchUser = async () => {
-      try {
-        const res = await getLoggedUser();
-        formik.setValues({
-          ...formik.values,
-          name: res.data.name,
-          username: res.data.username,
-          email: res.data.email,
-          phone: res.data.phone,
-          bio: res.data.bio,
-          address: res.data.address,
-          photo: res.data.photo,
-          age: res.data.age,
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
+
     fetchUser();
   }, []);
-
-  console.log();
+  const fetchUser = async () => {
+    try {
+      const res = await getLoggedUser();
+      setEmail(res.data.email);
+      formik.setValues({
+        ...formik.values,
+        name: res.data.name,
+        username: res.data.username,
+        email: res.data.email,
+        phone: res.data.phone,
+        bio: res.data.bio,
+        address: res.data.address,
+        photo: res.data.photo,
+        age: res.data.age,
+        password: res.data.password,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -122,6 +126,19 @@ const Profile = () => {
     }
   };
 
+  const forgotPassword = () => {
+    axios
+      .post(`${API_BASE_URL}/api/user/forgot-password`, {
+        email: formik.values.email,
+      })
+      .then((response) => {
+        toast.success(response.data.message);
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  };
+
   return (
     <>
       <Helmet>
@@ -148,6 +165,33 @@ const Profile = () => {
             <p className="mt-1 text-sm leading-6 text-base-neutral">
               Update your profile information.
             </p>
+            {formik.values.email.includes("change.this") && (
+              <div
+                role="alert"
+                className="alert mt-4 bg-error/20 col-span-full"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  className="stroke-error shrink-0 w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <span>
+                  You need to update your email address to recieve
+                  notifications.{" "}
+                  <a href="#email-section" className="link link-error">
+                    Update Now
+                  </a>
+                </span>
+              </div>
+            )}
 
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
               <div className="sm:col-span-6 md:w-[50%]">
@@ -260,7 +304,10 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <div className="col-span-6 sm:col-span-3">
+                <div
+                  className="col-span-6 sm:col-span-3 scroll-m-52"
+                  id="email-section"
+                >
                   <label htmlFor="email" className="label">
                     <span className="label-text">Email address</span>
                   </label>
@@ -270,7 +317,11 @@ const Profile = () => {
                       name="email"
                       type="email"
                       autoComplete="email"
-                      className="input input-bordered w-full"
+                      className={`input input-bordered w-full ${
+                        formik.values.email.includes("change.this")
+                          ? "input-error"
+                          : ""
+                      }`}
                       onChange={formik.handleChange}
                       value={formik.values.email}
                       required
@@ -339,6 +390,15 @@ const Profile = () => {
               <label htmlFor="delete_modal">Delete Account</label>
             </button>
             <div className="flex gap-2">
+              {!email.includes("change.this") && (
+                <button
+                  className="btn btn-outline btn-sm"
+                  onClick={forgotPassword}
+                  type="button"
+                >
+                  {formik.values.password ? "Forgot" : "Generate"} Password
+                </button>
+              )}
               <button type="submit" className="btn btn-primary btn-sm">
                 Update
               </button>
@@ -389,7 +449,7 @@ const Profile = () => {
           </div>
         </form>
         <div className="divider my-12"></div>
-        {formik.values.email && <Security />}
+        {formik.values.password && <Security />}
       </div>
     </>
   );

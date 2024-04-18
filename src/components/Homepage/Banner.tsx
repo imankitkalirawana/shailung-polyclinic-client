@@ -18,7 +18,7 @@ const Banner = () => {
                 Book an Appointment
               </Link>
               <a href="/appointment/history" className="btn btn-ghost">
-                View History <span aria-hidden="true">→</span>
+                View Reports <span aria-hidden="true">→</span>
               </a>
             </div>
           </div>

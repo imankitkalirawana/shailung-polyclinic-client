@@ -6,7 +6,7 @@ const Footer = () => {
     <>
       <footer className="mx-auto max-w-6xl p-4">
         <div className="container flex flex-col items-center justify-between px-6 py-8 mx-auto lg:flex-row">
-          <Link to="/" className="1 text-xl font-bold btn btn-ghost">
+          <Link to="/dashboard" className="1 text-xl font-bold btn btn-ghost">
             {data.websiteData.title}
           </Link>
 

@@ -589,37 +589,6 @@ const AddUser = () => {
                 </select>
               </div>
 
-              <label
-                htmlFor="photo"
-                className="flex items-center px-3 py-3 mx-auto mt-6 text-center border-2 input input-bordered border-dashed cursor-pointer"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                  />
-                </svg>
-
-                <h2 className="mx-3">Profile Photo</h2>
-
-                <input
-                  id="photo"
-                  type="file"
-                  name="photo"
-                  className="hidden"
-                  onChange={formik.handleChange}
-                  value={formik.values.photo}
-                />
-              </label>
-
               <div className="mt-4">
                 <label htmlFor="username" className="label">
                   <span className="label-text">Username</span>

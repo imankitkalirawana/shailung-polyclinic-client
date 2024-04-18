@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import * as Yup from "yup";
 import { Helmet } from "react-helmet-async";
 
-
 interface Country {
   name: string;
   dial_code: string;
@@ -16,20 +15,13 @@ interface Country {
 
 const Login = () => {
   const navigate = useNavigate();
+  // const
   const [isLogging, setIsLogging] = useState(false);
   const [isOfficial, setIsOfficial] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [countryData, setCountryData] = useState<Country[]>([]);
   // const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [isOtpResent, setIsOtpResent] = useState(0);
-
-  useEffect(() => {
-    if (isOtpResent >= 3) {
-      toast.error("You have exceeded the limit of OTP resend");
-      setIsOtpSent(false);
-      setIsOtpResent(0);
-    }
-  }, []);
 
   const validationSchema = Yup.object().shape({
     email: (isOfficial
@@ -65,18 +57,23 @@ const Login = () => {
       try {
         setIsLogging(true);
         if (isOfficial) {
-          await axios
-            .post(`${API_BASE_URL}/api/user/login`, values)
-            .then((res) => {
-              const { data } = res;
-              if (data) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("userData", JSON.stringify(data));
-                localStorage.setItem("userId", data.user._id);
-                window.location.href = "/";
-              }
-              //   formik.resetForm();
-            });
+          try {
+            await axios
+              .post(`${API_BASE_URL}/api/user/login`, values)
+              .then((res) => {
+                const { data } = res;
+                if (data) {
+                  localStorage.setItem("token", data.token);
+                  localStorage.setItem("userData", JSON.stringify(data));
+                  localStorage.setItem("userId", data.user._id);
+                  window.location.href = "/dashboard";
+                }
+                //   formik.resetForm();
+              });
+          } catch (e) {
+            console.log(e);
+            toast.error("Invalid Email or Password");
+          }
         } else {
           if (isOtpSent) {
             if (values.otp == values.dbOtp) {
@@ -90,7 +87,7 @@ const Login = () => {
                     localStorage.setItem("token", data.token);
                     localStorage.setItem("userData", JSON.stringify(data));
                     localStorage.setItem("userId", data.user._id);
-                    window.location.href = "/";
+                    window.location.href = "/dashboard";
                   }
                   //   formik.resetForm();
                 });
@@ -115,11 +112,21 @@ const Login = () => {
       const res = await axios.post(`${API_BASE_URL}/api/user/generate-otp`, {
         phone: formik.values.phone,
       });
-      setIsOtpSent(true);
-      setIsOtpResent(isOtpResent + 1);
+
       formik.values.dbOtp = res.data.otp;
       console.log(res.data.otp);
+      const api_key = "26614D70EA4E26";
+      const contact = formik.values.phone;
+      // const from = "SHAILUNG POLYCLINIC";
+      const message = `Your OTP for Shailung Polyclinic is ${formik.values.dbOtp}`;
+      // const api_url = `https://samayasms.com.np/smsapi/index.php?key=${api_key}&campaign=XXXXXX&routeid=XXXXXX&type=text&contacts=${contact}&senderid=${from}&msg=${message}`;
+      const api_url = `https://samayasms.com.np/smsapi/index?key=${api_key}&routeid=116&contacts=${contact}&senderid=SMSBit&msg=${message}&responsetype=json`;
+      setIsOtpSent(true);
+      setIsOtpResent(isOtpResent + 1);
       toast.success("OTP Sent Successfully");
+      const response = await axios.get(api_url);
+      console.log(response.data);
+      // console.log(formik.values.dbOtp);
     } catch (e) {
       console.log(e);
     } finally {
@@ -137,7 +144,10 @@ const Login = () => {
       }
     };
     fetchCountryCode();
-  }, []);
+    if (isOtpResent > 3) {
+      toast.error("You have exceeded the limit of OTP resend");
+    }
+  }, [isOtpResent]);
 
   return (
     <>
@@ -159,7 +169,7 @@ const Login = () => {
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <img
-            className="mx-auto h-10 w-auto"
+            className="mx-auto h-24 w-auto"
             src="/logo.webp"
             alt="Shailung Polyclinic"
           />
@@ -257,7 +267,7 @@ const Login = () => {
                       className="select select-bordered max-w-24 join-item"
                       onChange={formik.handleChange}
                       value={formik.values.country}
-                      disabled={isOtpSent}
+                      disabled
                     >
                       <option disabled>Select Country Code</option>
                       {countryData.map((country, index) => (
@@ -271,7 +281,6 @@ const Login = () => {
                       name="phone"
                       type="number"
                       autoComplete="phone"
-                      placeholder="9876543210"
                       className={`input input-bordered w-full join-item ${
                         formik.errors.phone && formik.touched.phone
                           ? "input-error"
@@ -338,14 +347,22 @@ const Login = () => {
                           {formik.errors.otp}
                         </span>
                       )}
-                      <span
+                      <button
                         className="label-text-alt link"
                         onClick={() => {
-                          generateOtp();
+                          if (isOtpResent < 3) {
+                            generateOtp();
+                          } else {
+                            toast.error(
+                              "You have exceeded the limit of OTP resend"
+                            );
+                          }
                         }}
+                        type="button"
+                        disabled={isLogging || isOtpResent > 3}
                       >
                         Resend OTP
-                      </span>
+                      </button>
                     </label>
                   </div>
                 )}

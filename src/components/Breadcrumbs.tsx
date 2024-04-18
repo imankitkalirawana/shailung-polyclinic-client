@@ -16,7 +16,10 @@ const Breadcrumbs = () => {
       <div className="text-sm breadcrumbs select-none items-center cursor-default flex mb-4">
         <ul>
           <li>
-            <Link to={"/"} className="btn btn-sm btn-circle btn-ghost -mr-2">
+            <Link
+              to={"/dashboard"}
+              className="btn btn-sm btn-circle btn-ghost -mr-2"
+            >
               <SmartHomeIcon className="w-4 h-4" />
             </Link>
           </li>

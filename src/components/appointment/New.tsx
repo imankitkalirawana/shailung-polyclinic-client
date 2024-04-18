@@ -361,10 +361,8 @@ const New = () => {
                       min={new Date().toISOString().split("T")[0]}
                       onChange={formik.handleChange}
                       value={formik.values.appointmentdate}
+                      required
                     />
-                    <label className="label">
-                      <span className="label-text-alt">(Optional)</span>
-                    </label>
                   </div>
                   <div className="form-control col-span-2">
                     <label className="label">

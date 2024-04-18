@@ -9,10 +9,11 @@ import {
 import { humanReadableDate } from "../user/Users";
 import NotFound from "../../NotFound";
 import { getAllReports } from "../../../functions/get";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
+import { isLoggedIn } from "../../../utils/auth";
 
 interface Report {
   _id: string;
@@ -28,9 +29,12 @@ interface Report {
   testid: string;
   reportDate: string;
   status: string;
+  addedby: string;
 }
 
 const Reports = () => {
+  const { loggedIn, user } = isLoggedIn();
+  const location = useLocation();
   const [reports, setReports] = useState<Report[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const offset = 10;
@@ -38,6 +42,13 @@ const Reports = () => {
   const [finalItem, setFinalItem] = useState<number>(offset);
   const [selected, setSelected] = useState<Report | null>(null);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
+  const currentUrl = location.pathname;
+
+  useEffect(() => {
+    if (!loggedIn) {
+      window.location.href = `/auth/login?redirect=${currentUrl}`;
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,15 +75,7 @@ const Reports = () => {
       <div className="container mx-auto p-4">
         <div className="w-full card shadow-xs">
           <div className="flex justify-between items-center">
-            <h1 className="my-6 text-2xl font-semibold">Tests</h1>
-            <div className="flex gap-2 flex-row-reverse">
-              <button
-                className="btn btn-outline btn-sm hover:btn-primary"
-                // onClick={() => exportToExcel()}
-              >
-                Export to Excel
-              </button>
-            </div>
+            <h1 className="my-6 text-2xl font-semibold">Reports</h1>
           </div>
           <div className="relative w-full max-w-md mb-4">
             <input
@@ -98,6 +101,9 @@ const Reports = () => {
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Phone</th>
                     <th className="px-4 py-3">Address</th>
+                    {user?.role === "admin" && (
+                      <th className="px-4 py-3">Added By</th>
+                    )}
                     <th className="px-4 py-3">Date</th>
                     <th className="px-4 py-3">Actions</th>
                   </tr>
@@ -130,7 +136,13 @@ const Reports = () => {
                         <td className="px-4 py-3 text-sm">{report.testname}</td>
                         <td className="px-4 py-3 text-sm">{report.name}</td>
                         <td className="px-4 py-3 text-sm">{report.phone}</td>
+
                         <td className="px-4 py-3 text-sm">{report.address}</td>
+                        {user?.role === "admin" && (
+                          <td className="px-4 py-3 text-sm">
+                            {report.addedby}
+                          </td>
+                        )}
                         <td className="px-4 py-3 text-sm">
                           {humanReadableDate(report.reportDate)}
                         </td>
@@ -157,7 +169,10 @@ const Reports = () => {
                       </tr>
                     ))}
                   <tr className="bg-primary/20">
-                    <td className="px-4 py-3 text-sm" colSpan={6}>
+                    <td
+                      className="px-4 py-3 text-sm"
+                      colSpan={user?.role === "admin" ? 7 : 6}
+                    >
                       Showing {initialItem + 1}-{finalItem} of{" "}
                       {
                         reports.filter((report) => {
