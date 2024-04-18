@@ -100,7 +100,6 @@ const Reports = () => {
                     <th className="px-4 py-3">Test Name</th>
                     <th className="px-4 py-3">Name</th>
                     <th className="px-4 py-3">Phone</th>
-                    <th className="px-4 py-3">Address</th>
                     {user?.role === "admin" && (
                       <th className="px-4 py-3">Added By</th>
                     )}
@@ -121,7 +120,7 @@ const Reports = () => {
                         className={`cursor-pointer hover:bg-primary/5`}
                         role="button"
                       >
-                        <td className="px-4 py-3 text-sm">
+                        <td className="px-4 py-3 text-sm text-nowrap">
                           <span
                             className={`badge tooltip tooltip-right badge-${
                               report.status === "positive" ? "success" : "error"
@@ -133,17 +132,21 @@ const Reports = () => {
                             }
                           ></span>
                         </td>
-                        <td className="px-4 py-3 text-sm">{report.testname}</td>
-                        <td className="px-4 py-3 text-sm">{report.name}</td>
-                        <td className="px-4 py-3 text-sm">{report.phone}</td>
-
-                        <td className="px-4 py-3 text-sm">{report.address}</td>
+                        <td className="px-4 py-3 text-sm text-nowrap">
+                          {report.testname}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-nowrap">
+                          {report.name}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-nowrap">
+                          {report.phone}
+                        </td>
                         {user?.role === "admin" && (
-                          <td className="px-4 py-3 text-sm">
+                          <td className="px-4 py-3 text-sm text-nowrap">
                             {report.addedby}
                           </td>
                         )}
-                        <td className="px-4 py-3 text-sm">
+                        <td className="px-4 py-3 text-sm text-nowrap">
                           {humanReadableDate(report.reportDate)}
                         </td>
                         <td className="px-4 py-3 text-sm flex items-center justify-center">
@@ -171,7 +174,7 @@ const Reports = () => {
                   <tr className="bg-primary/20">
                     <td
                       className="px-4 py-3 text-sm"
-                      colSpan={user?.role === "admin" ? 7 : 6}
+                      colSpan={user?.role === "admin" ? 6 : 5}
                     >
                       Showing {initialItem + 1}-{finalItem} of{" "}
                       {
@@ -234,7 +237,9 @@ interface DeleteModalProps {
 }
 
 const DeleteModal = ({ report, onClose, setReports }: DeleteModalProps) => {
+  const [loading, setLoading] = useState<boolean>(false);
   const handleDelete = async () => {
+    setLoading(true);
     try {
       await axios.delete(`${API_BASE_URL}/api/report/${report._id}`, {
         headers: {
@@ -263,6 +268,8 @@ const DeleteModal = ({ report, onClose, setReports }: DeleteModalProps) => {
       console.error("Error deleting report:", error);
       // Handle error gracefully, e.g., display a toast message or log it
       toast.error("Failed to delete report");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -280,8 +287,13 @@ const DeleteModal = ({ report, onClose, setReports }: DeleteModalProps) => {
           <button
             className="btn btn-error flex-1"
             onClick={() => handleDelete()}
+            disabled={loading}
           >
-            Delete
+            {loading ? (
+              <span className="loading loading-dots loading-sm"></span>
+            ) : (
+              "Delete"
+            )}
           </button>
           <button className="btn flex-1" onClick={onClose}>
             Close!

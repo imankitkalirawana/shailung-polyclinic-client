@@ -32,7 +32,7 @@ const Admin = () => {
           href="https://report.shailungpolyclinic.com/dashboard"
         />
       </Helmet>
-      <div className="my-24 max-w-6xl mx-auto p-4">
+      <div className="my-24 max-w-7xl mx-auto p-4">
         <Breadcrumbs />
         <Outlet />
       </div>

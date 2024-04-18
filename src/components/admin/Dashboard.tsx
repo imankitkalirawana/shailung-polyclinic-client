@@ -5,6 +5,7 @@ import {
   CellIcon,
   LeftAngle,
   MicroscopeIcon,
+  ReportIcon,
   RightAngle,
   UsersIcon,
 } from "../icons/Icons";
@@ -215,27 +216,27 @@ const Dashboard = () => {
             </Link>
 
             <Link
-              to="/dashboard/tests/available-tests"
+              to="/dashboard/reports"
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
             >
               <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
-                <AtomIcon className="w-5 h-5" />
+                <ReportIcon className="w-5 h-5" />
               </div>
               <div>
-                <p className="mb-2 text-sm font-medium">Available Tests</p>
+                <p className="mb-2 text-sm font-medium">Reports</p>
                 <p className="text-lg font-semibold">
-                  {countData.availableTestCount || 0}
+                  {countData.reports || 0}
                 </p>
               </div>
             </Link>
           </div>
-          <UserCard users={users} />
-          <div className="divider"></div>
           <TestCard tests={tests} />
+          <div className="divider"></div>
+          <ReportCard reports={reports} />
           <div className="divider"></div>
           <AvailableTestCard tests={availabletests} />
           <div className="divider"></div>
-          <ReportCard reports={reports} />
+          <UserCard users={users} />
         </div>
       </main>
     </>
@@ -734,6 +735,18 @@ export const ReportCard = ({ reports }: ReportCardProps) => {
                         }}
                       >
                         <LeftAngle className="w-4 h-4 fill-current" />
+                      </button>
+                      <button
+                        className="btn btn-sm btn-ghost btn-circle"
+                        aria-label="Next"
+                        onClick={() => {
+                          if (finalItem < reports.length) {
+                            setInitialItem(initialItem + offset);
+                            setFinalItem(finalItem + offset);
+                          }
+                        }}
+                      >
+                        <RightAngle className="w-4 h-4 fill-current" />
                       </button>
                     </td>
                   </tr>
