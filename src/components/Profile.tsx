@@ -29,7 +29,7 @@ const Profile = () => {
       confirmusername: "",
       photo: "profile-default.webp",
       previewPhoto: "",
-      age: 0,
+      dob: "",
       password: "",
     },
     onSubmit: async (values) => {
@@ -84,7 +84,7 @@ const Profile = () => {
         bio: res.data.bio,
         address: res.data.address,
         photo: res.data.photo,
-        age: res.data.age,
+        dob: res.data.dob,
         password: res.data.password,
       });
     } catch (error) {
@@ -365,18 +365,17 @@ const Profile = () => {
                   </div>
                 </div>
                 <div className="col-span-6 sm:col-span-3 lg:col-span-3">
-                  <label htmlFor="age" className="label">
-                    <span className="label-text">Age</span>
+                  <label htmlFor="dob" className="label">
+                    <span className="label-text">Date of Birth</span>
                   </label>
                   <div className="mt-2">
                     <input
-                      id="age"
-                      name="age"
-                      type="number"
-                      autoComplete="age"
+                      id="dob"
+                      name="dob"
+                      type="date"
                       className="input input-bordered w-full"
                       onChange={formik.handleChange}
-                      value={formik.values.age}
+                      value={formik.values.dob}
                       required
                     />
                   </div>

@@ -140,6 +140,9 @@ const Tests = () => {
   }, [tests]);
 
   useEffect(() => {
+    if (queryStatus == null) {
+      window.location.href = "/dashboard/tests?status=all";
+    }
     fetchAllTests();
   }, [queryStatus]);
   const fetchAllTests = async () => {
@@ -212,8 +215,14 @@ const Tests = () => {
       <div className="container mx-auto p-4">
         <div className="w-full card shadow-xs">
           <div className="flex justify-between items-center">
-            <h1 className="my-6 text-2xl font-semibold">Tests</h1>
+            <h1 className="text-2xl font-semibold">Tests</h1>
             <div className="flex gap-2 flex-row-reverse">
+              <Link
+                to="/dashboard/tests/appointment"
+                className="btn btn-primary btn-sm"
+              >
+                New Test
+              </Link>
               <button
                 className="btn btn-outline btn-sm hover:btn-primary"
                 onClick={() => exportToExcel()}
@@ -534,8 +543,11 @@ const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
 
   return (
     <>
-      <div className="modal modal-open backdrop-blur-sm" role="dialog">
-        <div className="modal-box max-w-sm">
+      <div
+        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+        role="dialog"
+      >
+        <div className="modal-box max-w-md xs:max-w-sm mx-auto">
           <h3 className="font-bold text-lg text-center">
             Delete {test.testDetail.userData.name}'s{" "}
             {test.testDetail.testData.name}
@@ -616,8 +628,11 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
 
   return (
     <>
-      <div className="modal modal-open backdrop-blur-sm" role="dialog">
-        <div className="modal-box max-w-sm">
+      <div
+        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+        role="dialog"
+      >
+        <div className="modal-box max-w-md xs:max-w-sm mx-auto">
           <h3 className="font-bold text-lg text-center">
             Schedule {test.testDetail.userData.name}'s{" "}
             {test.testDetail.testData.name}
@@ -714,7 +729,10 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
 
   return (
     <>
-      <div className="modal modal-open backdrop-blur-sm" role="dialog">
+      <div
+        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+        role="dialog"
+      >
         <a
           href="#close"
           className="absolute top-0 right-0 m-6"
@@ -725,13 +743,13 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
         >
           &times;
         </a>
-        <div className="modal-box max-w-sm">
+        <div className="modal-box max-w-md xs:max-w-sm mx-auto">
           <h3 className="font-bold text-lg text-center">
             Assign Doctor to {test.testDetail.userData.name}'s{" "}
             {test.testDetail.testData.name}
           </h3>
-          <p className="py-4">
-            <select
+          <div className="py-4 max-h-48 overflow-y-scroll">
+            {/* <select
               className="input input-bordered w-full"
               onChange={(e) => {
                 setSelectedDoctor(e.target.value);
@@ -743,8 +761,16 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
                   {doctor.name}
                 </option>
               ))}
-            </select>
-          </p>
+            </select> */}
+            {doctors.map((doctor) => (
+              <div className="form-control">
+                <label className="label cursor-pointer flex justify-start gap-3">
+                  <input type="checkbox" defaultChecked className="checkbox" />
+                  <span className="label-text">{doctor.name}</span>
+                </label>
+              </div>
+            ))}
+          </div>
           <div className="modal-action flex">
             <button
               className="btn btn-primary flex-1"

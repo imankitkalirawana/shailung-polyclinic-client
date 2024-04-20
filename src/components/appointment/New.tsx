@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { API_BASE_URL } from "../../utils/config";
 import { isLoggedIn } from "../../utils/auth";
 import { Helmet } from "react-helmet-async";
+import { calculateAge } from "../../functions/agecalculator";
 
 interface Tests {
   _id: number;
@@ -22,7 +23,7 @@ interface User {
   name: string;
   phone: string;
   address: string;
-  age: number;
+  dob: string;
   email: string;
 }
 
@@ -30,7 +31,7 @@ const New = () => {
   const { loggedIn } = isLoggedIn();
   const navigate = useNavigate();
   const [tests, setTests] = useState<Tests[]>([]);
-  const [user, setUser] = useState<User>({} as User);
+  const [lUser, setUser] = useState<User>({} as User);
   const [selectedTest, setSelectedTest] = useState<Tests>({} as Tests);
   const [submitting, setSubmitting] = useState(false);
   const [isConfirm, setIsConfirm] = useState(false);
@@ -99,10 +100,10 @@ const New = () => {
               testfor: values.testfor,
               testid: values.testid,
               appointmentdate: values.appointmentdate,
-              phone: user.phone,
+              phone: lUser.phone,
               name: values.name,
               age: values.age,
-              email: user.email,
+              email: lUser.email,
             },
             {
               headers: {
@@ -135,10 +136,10 @@ const New = () => {
       testfor: e.target.value,
       testid: "",
       appointmentdate: "",
-      phone: user.phone,
+      phone: lUser.phone,
       name: "",
       age: 0,
-      email: user.email,
+      email: lUser.email,
     });
   };
 
@@ -252,7 +253,7 @@ const New = () => {
                       name="name"
                       className="input input-bordered"
                       placeholder="Patient Name"
-                      value={user.name}
+                      value={lUser.name}
                       disabled
                     />
                   </div>
@@ -266,24 +267,19 @@ const New = () => {
                       name="phone"
                       className="input input-bordered"
                       placeholder="Patient phone"
-                      value={user.phone}
+                      value={lUser.phone}
                       disabled
                     />
                   </div>
                   {/* patient age */}
                   <div className="form-control col-span-2 md:col-span-1">
-                    <label htmlFor="number" className="label">
+                    <label htmlFor="age" className="label">
                       <span className="label-text">Patient Age</span>
                     </label>
                     <input
                       type="number"
                       className="input input-bordered"
-                      placeholder="Patient Age"
-                      max={100}
-                      min={0}
-                      id="age"
-                      name="age"
-                      value={user.age}
+                      value={calculateAge(lUser.dob)}
                       disabled
                     />
                   </div>

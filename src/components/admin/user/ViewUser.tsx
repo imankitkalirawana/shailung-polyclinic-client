@@ -7,6 +7,7 @@ import { humanReadableDate } from "./Users";
 import { EditIcon } from "../../icons/Icons";
 import { isLoggedIn } from "../../../utils/auth";
 import { Helmet } from "react-helmet-async";
+import { calculateAge } from "../../../functions/agecalculator";
 
 const ViewUser = () => {
   const { id }: any = useParams();
@@ -106,7 +107,7 @@ const ViewUser = () => {
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Age</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.age} years
+                {getUser.dob && calculateAge(getUser.dob)} years
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

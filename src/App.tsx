@@ -28,6 +28,7 @@ import Complete from "./components/admin/tests/Complete";
 import Download from "./components/admin/tests/Download";
 import { Helmet } from "react-helmet-async";
 import Reports from "./components/admin/report/Reports";
+import NewAppointment from "./components/admin/tests/NewAppointment";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -69,6 +70,7 @@ function App() {
                     <Route path="tests/" element={<Outlet />}>
                       <Route path="" element={<Tests />} />
                       <Route path="complete/:id" element={<Complete />} />
+                      <Route path="appointment" element={<NewAppointment />} />
                     </Route>
                     {/* reports */}
                     <Route path="reports" element={<Reports />} />

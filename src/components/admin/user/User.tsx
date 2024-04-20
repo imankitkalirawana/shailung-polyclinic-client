@@ -44,7 +44,7 @@ const User = () => {
       bio: "",
       role: "",
       gender: "",
-      age: 0,
+      dob: "",
       phone: "",
       address: "",
       confirmusername: "",
@@ -235,21 +235,19 @@ const User = () => {
                     />
                   </div>
                 </div>
-                <div className="col-span-6 sm:col-span-2">
-                  <label htmlFor="age" className="label">
-                    <span className="label-text">Age</span>
+                <div className="col-span-6 sm:col-span-3 lg:col-span-3">
+                  <label htmlFor="dob" className="label">
+                    <span className="label-text">Date of Birth</span>
                   </label>
                   <div className="mt-2">
                     <input
-                      type="number"
-                      name="age"
-                      id="age"
-                      autoComplete="age"
+                      id="dob"
+                      name="dob"
+                      type="date"
                       className="input input-bordered w-full"
                       onChange={formik.handleChange}
-                      value={formik.values.age}
-                      min={0}
-                      max={100}
+                      value={formik.values.dob}
+                      required
                     />
                   </div>
                 </div>
