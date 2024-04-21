@@ -66,7 +66,7 @@ const New = () => {
           phone: data.phone,
           email: data.email,
         });
-        if (data.name === "" || data.phone === "" || data.age === 0) {
+        if (data.name === "" || data.phone === "") {
           toast.error("Please update your profile to continue", {
             id: "update-profile",
           });

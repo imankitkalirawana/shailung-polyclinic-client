@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   CalendarTimeIcon,
+  DownloadIcon,
   LeftAngle,
   RightAngle,
   SearchIcon,
@@ -89,6 +90,12 @@ const Tests = () => {
   const [searchParams] = useSearchParams();
   const queryStatus = searchParams.get("status");
 
+  useEffect(() => {
+    if (user?.role !== "admin" && user?.role !== "member") {
+      navigate("/dashboard");
+    }
+  }, [user]);
+
   const handleDeleteClick = (test: Test) => {
     setSelected(test);
     setIsDelete(true);
@@ -146,8 +153,7 @@ const Tests = () => {
     fetchAllTests();
   }, [queryStatus]);
   const fetchAllTests = async () => {
-    const response = await getAllTests(queryStatus);
-    const data = response.data;
+    const data = await getAllTests(queryStatus);
     setTests(data);
   };
 
@@ -289,7 +295,6 @@ const Tests = () => {
                     .filter((test) => {
                       return handleSearch(test);
                     })
-                    .reverse()
                     .slice(initialItem, finalItem)
                     .map((test, index) => (
                       <tr key={index}>
@@ -412,6 +417,15 @@ const Tests = () => {
                                 <StethoscopeIcon className="w-4 h-4 button" />
                               </button>
                             )}
+                          {test.status === "completed" && (
+                            <Link
+                              to={`/report/${test.reportId}/download`}
+                              className="btn btn-sm btn-circle btn-ghost flex items-center justify-center tooltip tooltip-success"
+                              data-tip="Download"
+                            >
+                              <DownloadIcon className="w-4 h-4" />
+                            </Link>
+                          )}
                           {user?.role === "admin" && (
                             <>
                               <div className="divider divider-horizontal mx-0"></div>
@@ -618,8 +632,7 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
       toast.error("Failed to schedule appointment");
       console.log(err);
     } finally {
-      const response = await getAllTests(queryStatus);
-      const data = response.data;
+      const data = await getAllTests(queryStatus);
       setTests(data);
       onClose();
       setProcessing(false);
@@ -693,7 +706,7 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
   }, []);
 
   const fetchTests = async () => {
-    const response = await axios.get(`${API_BASE_URL}/api/test/all`, {
+    const response = await axios.get(`${API_BASE_URL}/api/test/status/all`, {
       headers: {
         Authorization: `${localStorage.getItem("token")}`,
       },
@@ -749,7 +762,7 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
             {test.testDetail.testData.name}
           </h3>
           <div className="py-4 max-h-48 overflow-y-scroll">
-            {/* <select
+            <select
               className="input input-bordered w-full"
               onChange={(e) => {
                 setSelectedDoctor(e.target.value);
@@ -761,15 +774,15 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
                   {doctor.name}
                 </option>
               ))}
-            </select> */}
-            {doctors.map((doctor) => (
+            </select>
+            {/* {doctors.map((doctor) => (
               <div className="form-control">
                 <label className="label cursor-pointer flex justify-start gap-3">
                   <input type="checkbox" defaultChecked className="checkbox" />
                   <span className="label-text">{doctor.name}</span>
                 </label>
               </div>
-            ))}
+            ))} */}
           </div>
           <div className="modal-action flex">
             <button

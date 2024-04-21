@@ -1,13 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import {
   AppWindowIcon,
-  AtomIcon,
   CellIcon,
   LeftAngle,
   MicroscopeIcon,
   ReportIcon,
   RightAngle,
-  UsersIcon,
 } from "../icons/Icons";
 import { useEffect, useState } from "react";
 import { Roles, TestStatus } from "../../utils/config";
@@ -20,6 +18,7 @@ import {
   getAllUsers,
 } from "../../functions/get";
 import { toast } from "sonner";
+import { IconTestPipe } from "@tabler/icons-react";
 
 interface User {
   _id: string;
@@ -129,11 +128,11 @@ const Dashboard = () => {
           setUsers(users);
         }
         const tests = await getAllTests("all");
-        setTests(tests.data);
+        setTests(tests);
         const availabletests = await getAllAvailableTests();
-        setAvailableTests(availabletests.data);
+        setAvailableTests(availabletests);
         const reports = await getAllReports();
-        setReports(reports.data);
+        setReports(reports);
         const count = await countAll();
         setCountData(count);
       } catch (error) {
@@ -177,18 +176,6 @@ const Dashboard = () => {
           )}
           <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
             <Link
-              to={"/dashboard/users?type=user"}
-              className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
-            >
-              <div className="p-3 mr-4 bg-primary rounded-full text-base-100">
-                <UsersIcon className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="mb-2 text-sm font-medium">Total users</p>
-                <p className="text-lg font-semibold">{users.length || 0}</p>
-              </div>
-            </Link>
-            <Link
               to="/dashboard/tests?status=all"
               className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
             >
@@ -226,6 +213,20 @@ const Dashboard = () => {
                 <p className="mb-2 text-sm font-medium">Reports</p>
                 <p className="text-lg font-semibold">
                   {countData.reports || 0}
+                </p>
+              </div>
+            </Link>
+            <Link
+              to={"/dashboard/tests/available-tests"}
+              className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
+            >
+              <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
+                <IconTestPipe className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="mb-2 text-sm font-medium">Available Services</p>
+                <p className="text-lg font-semibold">
+                  {countData?.availableTestCount || 0}
                 </p>
               </div>
             </Link>
@@ -538,59 +539,56 @@ export const AvailableTestCard = ({ tests }: AvailableTestCardProps) => {
                   </tr>
                 </thead>
                 <tbody className="bg-primary/10 divide-y">
-                  {tests
-                    .reverse()
-                    .slice(initialItem, finalItem)
-                    .map((test, index) => (
-                      <tr
-                        key={index}
-                        className="cursor-pointer hover:bg-primary/5"
-                        role="button"
-                        onClick={() => {
-                          navigate(
-                            `/dashboard/tests/available-tests/${test._id}`
-                          );
-                        }}
-                      >
-                        <td className="px-4 py-3 text-sm">
-                          <span
-                            className={`badge tooltip tooltip-right badge-${
-                              test.status === "active" ? "success" : "error"
-                            }`}
-                            data-tip={
-                              test.status === "active"
-                                ? "Available"
-                                : "Not Available"
-                            }
-                          ></span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center text-sm">
-                            <div>
-                              <p className="font-semibold text-nowrap">
-                                {test.name}
-                              </p>
-                              <p className="text-xs"></p>
-                            </div>
+                  {tests.slice(initialItem, finalItem).map((test, index) => (
+                    <tr
+                      key={index}
+                      className="cursor-pointer hover:bg-primary/5"
+                      role="button"
+                      onClick={() => {
+                        navigate(
+                          `/dashboard/tests/available-tests/${test._id}`
+                        );
+                      }}
+                    >
+                      <td className="px-4 py-3 text-sm">
+                        <span
+                          className={`badge tooltip tooltip-right badge-${
+                            test.status === "active" ? "success" : "error"
+                          }`}
+                          data-tip={
+                            test.status === "active"
+                              ? "Available"
+                              : "Not Available"
+                          }
+                        ></span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center text-sm">
+                          <div>
+                            <p className="font-semibold text-nowrap">
+                              {test.name}
+                            </p>
+                            <p className="text-xs"></p>
                           </div>
-                        </td>
-                        <td className="px-4 py-3 text-sm max-w-48 text-ellipsis overflow-hidden whitespace-nowrap text-nowrap">
-                          {test.description}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-nowrap">
-                          {test.price
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-nowrap">
-                          {test.duration}
-                        </td>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm max-w-48 text-ellipsis overflow-hidden whitespace-nowrap text-nowrap">
+                        {test.description}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-nowrap">
+                        {test.price
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-nowrap">
+                        {test.duration}
+                      </td>
 
-                        <td className="px-4 py-3 text-sm text-nowrap">
-                          {humanReadableDate(test.updatedat)}
-                        </td>
-                      </tr>
-                    ))}
+                      <td className="px-4 py-3 text-sm text-nowrap">
+                        {humanReadableDate(test.updatedat)}
+                      </td>
+                    </tr>
+                  ))}
                   <tr className="bg-primary/20">
                     <td className="px-4 py-3 text-sm" colSpan={5}>
                       Showing {initialItem + 1}-{finalItem} of {tests.length}
@@ -677,7 +675,6 @@ export const ReportCard = ({ reports }: ReportCardProps) => {
                 </thead>
                 <tbody className="bg-primary/10 divide-y">
                   {reports
-                    .reverse()
                     .slice(initialItem, finalItem)
                     .map((report, index) => (
                       <tr

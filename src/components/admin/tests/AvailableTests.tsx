@@ -60,8 +60,8 @@ const AvailableTests = () => {
   useEffect(() => {
     const fetchTests = async () => {
       try {
-        const response = await getAllAvailableTests();
-        setTests(response.data);
+        const data = await getAllAvailableTests();
+        setTests(data);
       } catch (error: any) {
         toast.error(error.response.statusText);
       }
@@ -88,13 +88,18 @@ const AvailableTests = () => {
                   {tests.length > 0 ? (
                     <>
                       <thead>
-                        <tr className="text-xs font-semibold tracking-wide text-left uppercase border-b bg-primary/20">
+                        <tr
+                          className={`text-xs font-semibold tracking-wide text-left uppercase border-b bg-primary/20`}
+                        >
                           <th className="px-4 py-3">Status</th>
                           <th className="px-4 py-3">Test</th>
                           <th className="px-4 py-3">Description</th>
                           <th className="px-4 py-3">Price</th>
                           <th className="px-4 py-3">Duration</th>
-                          <th className="px-4 py-3">Updated On</th>
+                          {(user?.role === "admin" ||
+                            user?.role === "member") && (
+                            <th className="px-4 py-3">Updated On</th>
+                          )}
                           {user?.role === "admin" && (
                             <th className="px-4 py-3">Modify</th>
                           )}
@@ -103,14 +108,21 @@ const AvailableTests = () => {
                       <tbody className="bg-primary/10 divide-y">
                         {tests
                           .slice(initialItem, finalItem)
-                          .reverse()
                           .map((test, index) => (
                             <tr
                               key={index}
-                              className="cursor-pointer hover:bg-primary/5"
-                              role="button"
+                              className={`${
+                                (user?.role === "admin" ||
+                                  user?.role === "member") &&
+                                "cursor-pointer hover:bg-primary/5"
+                              }`}
                               onClick={(e) => {
-                                handleRowClick(test._id, e);
+                                if (
+                                  user?.role === "admin" ||
+                                  user?.role === "member"
+                                ) {
+                                  handleRowClick(test._id, e);
+                                }
                               }}
                             >
                               <td className="px-4 py-3 text-sm">
@@ -150,9 +162,12 @@ const AvailableTests = () => {
                               <td className="px-4 py-3 text-sm text-nowrap">
                                 {test.duration}
                               </td>
-                              <td className="px-4 py-3 text-sm text-nowrap">
-                                {humanReadableDate(test.updatedat)}
-                              </td>
+                              {(user?.role === "admin" ||
+                                user?.role === "member") && (
+                                <td className="px-4 py-3 text-sm text-nowrap">
+                                  {humanReadableDate(test.updatedat)}
+                                </td>
+                              )}
                               {user?.role === "admin" && (
                                 <td className="px-4 py-3 text-sm modify">
                                   <Link
@@ -176,7 +191,13 @@ const AvailableTests = () => {
                         <tr className="bg-primary/20">
                           <td
                             className="px-4 py-3 text-sm"
-                            colSpan={user?.role === "admin" ? 6 : 5}
+                            colSpan={
+                              user?.role === "admin"
+                                ? 6
+                                : user?.role === "member"
+                                ? 5
+                                : 4
+                            }
                           >
                             Showing {initialItem + 1}-{finalItem} of{" "}
                             {tests.length}

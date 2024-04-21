@@ -1,20 +1,18 @@
-import { isLoggedIn } from "../../utils/auth";
 import Breadcrumbs from "../Breadcrumbs";
 import { Outlet } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import UserDashboard from "../Homepage/UserDashboard";
 
 const Admin = () => {
-  const { loggedIn, user } = isLoggedIn();
-  if (!loggedIn) {
-    window.location.href = "/auth/login";
-  } else if (loggedIn && user?.role !== "admin" && user?.role !== "member") {
-    return (
-      <div className="my-24" onLoad={() => {}}>
-        <UserDashboard />
-      </div>
-    );
-  }
+  // const { loggedIn, user } = isLoggedIn();
+  // if (!loggedIn) {
+  //   window.location.href = "/auth/login";
+  // } else if (loggedIn && user?.role !== "admin" && user?.role !== "member") {
+  //   return (
+  //     <div className="my-24" onLoad={() => {}}>
+  //       <UserDashboard />
+  //     </div>
+  //   );
+  // }
   return (
     <>
       <Helmet>

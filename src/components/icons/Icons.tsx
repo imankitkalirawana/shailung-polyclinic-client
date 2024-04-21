@@ -274,7 +274,7 @@ export function ClockPause(props: any) {
       strokeWidth="1.5"
       stroke="currentColor"
       fill="none"
-      stroke-linejoin="round"
+      strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M20.942 13.018a9 9 0 1 0 -7.909 7.922" />
@@ -296,7 +296,7 @@ export function ClockCancel(props: any) {
       strokeWidth="1.5"
       stroke="currentColor"
       fill="none"
-      stroke-linejoin="round"
+      strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M20.997 12.25a9 9 0 1 0 -8.718 8.745" />
@@ -318,7 +318,7 @@ export function ClockCheck(props: any) {
       strokeWidth="1.5"
       stroke="currentColor"
       fill="none"
-      stroke-linejoin="round"
+      strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M20.942 13.021a9 9 0 1 0 -9.407 7.967" />
@@ -339,7 +339,7 @@ export function ReportIcon(props: any) {
       strokeWidth="1.5"
       stroke="currentColor"
       fill="none"
-      stroke-linejoin="round"
+      strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />

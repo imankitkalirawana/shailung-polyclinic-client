@@ -1,10 +1,11 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { EditIcon } from "../../icons/Icons";
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../../../utils/config";
 import axios from "axios";
 import { toast } from "sonner";
 import { humanReadableDate } from "../user/Users";
+import { isLoggedIn } from "../../../utils/auth";
 
 interface Test {
   name: string;
@@ -25,6 +26,14 @@ interface Test {
 
 const ViewAvailableTest = () => {
   const { id }: any = useParams();
+  const { user } = isLoggedIn();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (user?.role !== "admin" && user?.role !== "member") {
+      navigate("/dashboard");
+    }
+  }, [user]);
+
   const [test, setTest] = useState<Test>({
     name: "",
     description: "",

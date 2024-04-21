@@ -5,9 +5,16 @@ import axios from "axios";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../../utils/config";
 import { PlusIcon, XIcon } from "../../icons/Icons";
+import { isLoggedIn } from "../../../utils/auth";
 
 const EditAvailableTest = () => {
+  const { user } = isLoggedIn();
   const navigate = useNavigate();
+  useEffect(() => {
+    if (user?.role !== "admin" && user?.role !== "member") {
+      navigate("/dashboard");
+    }
+  }, [user]);
   const { id }: any = useParams();
   useEffect(() => {
     const fetchUser = async () => {

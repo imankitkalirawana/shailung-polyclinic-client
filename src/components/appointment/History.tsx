@@ -4,12 +4,13 @@ import { humanReadableDate } from "../admin/user/Users";
 import axios from "axios";
 import { API_BASE_URL } from "../../utils/config";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SearchIcon } from "../icons/Icons";
 import { isLoggedIn } from "../../utils/auth";
 import { testStatus } from "../admin/tests/Tests";
 import NotFound from "../NotFound";
 import { Helmet } from "react-helmet-async";
+import { IconPlus } from "@tabler/icons-react";
 
 interface Test {
   _id: string;
@@ -32,12 +33,13 @@ interface Test {
 }
 
 const History = () => {
-  const { loggedIn } = isLoggedIn();
+  const { loggedIn, user } = isLoggedIn();
   const [tests, setTests] = useState<Test[]>([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [scheduleModal, setScheduleModal] = useState(false);
   const [selected, setSelected] = useState<Test | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const navigate = useNavigate();
   if (!loggedIn) {
     window.location.href = "/auth/login";
   }
@@ -62,6 +64,9 @@ const History = () => {
       }
     };
     fetchTests();
+    if (user?.role === "admin" || user?.role === "member") {
+      navigate("/dashboard/reports");
+    }
   }, []);
 
   const handleSearch = (test: Test) => {
@@ -106,14 +111,24 @@ const History = () => {
           href="https://report.shailungpolyclinic.com/appointment/history"
         />
       </Helmet>
-      <div className="container mx-auto max-w-6xl p-4 my-24">
-        <div className="flex justify-between items-center">
-          <h1 className="my-6 text-2xl font-semibold">
+      <div className="container mx-auto max-w-6xl my-24">
+        <div className="flex mb-4 justify-between items-center">
+          <h1 className="my-6 sm:text-2xl w-full font-semibold">
             Your Appointment History
           </h1>
           <div className="flex gap-2 flex-row-reverse">
-            <Link to="/appointment/new" className="btn btn-primary btn-sm">
+            <Link
+              to="/appointment/new"
+              className="btn hidden sm:flex btn-primary btn-sm"
+            >
               New Appointment
+            </Link>
+            <Link
+              to="/appointment/history"
+              className="btn sm:hidden flex items-center justify-center btn-secondary btn-circle btn-sm tooltip tooltip-left tooltip-primary"
+              data-tip="New Appointment"
+            >
+              <IconPlus />
             </Link>
           </div>
         </div>
@@ -129,6 +144,12 @@ const History = () => {
             />
             <SearchIcon className="absolute top-3 right-4 w-6 h-6 text-primary" />
           </div>
+          <Link
+            to={"/appointment/new"}
+            className="btn sm:hidden btn-primary my-4"
+          >
+            New Appointment
+          </Link>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {tests.length > 0 ? (
               tests
@@ -156,7 +177,7 @@ const History = () => {
                             {test.testDetail.userData.name}
                           </p>
                         </div>
-                        <div className="badge badge-primary">
+                        <div className="badge badge-primary text-end text-nowrap overflow-hidden text-ellipsis">
                           {test.testDetail.testData.name}
                         </div>
                       </div>
@@ -181,7 +202,7 @@ const History = () => {
                                 View Report
                               </Link>
                             )}
-                            <div className="dropdown">
+                            <div className="dropdown dropdown-left">
                               <p
                                 role="button"
                                 tabIndex={0}

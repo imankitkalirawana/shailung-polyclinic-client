@@ -3,14 +3,11 @@ import { Combobox, Transition } from "@headlessui/react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   IconChevronDown,
-  IconEdit,
   IconUserEdit,
   IconUserPlus,
 } from "@tabler/icons-react";
 import { getAllUsers } from "../../../functions/get";
 import { CheckIcon } from "../../icons/Icons";
-import { API_BASE_URL } from "../../../utils/config";
-import { humanReadableDate } from "../user/Users";
 import { calculateAge } from "../../../functions/agecalculator";
 
 interface User {

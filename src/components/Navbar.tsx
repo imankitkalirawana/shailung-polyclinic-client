@@ -47,7 +47,7 @@ const Navbar = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userData");
     localStorage.removeItem("userId");
-    navigate("/dashboard");
+    navigate("/auth/login");
   };
 
   return (
@@ -85,11 +85,17 @@ const Navbar = () => {
                 </li>
               )}
               <li>
-                <Link to={"/appointment/new"}>New Appointment</Link>
+                <Link
+                  to={`${user?.role === "user" ? "/appointment/new" : "#"}`}
+                >
+                  New Appointment
+                </Link>
               </li>
-              <li>
-                <Link to="/appointment/history">Reports</Link>
-              </li>
+              {loggedIn && user?.role === "user" && (
+                <li>
+                  <Link to="/appointment/history">Reports</Link>
+                </li>
+              )}
             </ul>
           </div>
         </div>

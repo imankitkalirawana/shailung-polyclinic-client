@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/config";
 import { useFormik } from "formik";
 import { toast } from "sonner";
@@ -20,6 +20,8 @@ const Login = () => {
   const [isOfficial, setIsOfficial] = useState(false);
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [countryData, setCountryData] = useState<Country[]>([]);
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get("redirect") || "/dashboard";
   // const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [isOtpResent, setIsOtpResent] = useState(0);
 
@@ -66,7 +68,7 @@ const Login = () => {
                   localStorage.setItem("token", data.token);
                   localStorage.setItem("userData", JSON.stringify(data));
                   localStorage.setItem("userId", data.user._id);
-                  window.location.href = "/dashboard";
+                  window.location.href = redirectUrl;
                 }
                 //   formik.resetForm();
               });

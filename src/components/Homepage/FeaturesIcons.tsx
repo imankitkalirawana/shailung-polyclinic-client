@@ -106,8 +106,8 @@ export function AidsIcon(props: any) {
       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
       <g
         id="SVGRepo_tracerCarrier"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       ></g>
       <g id="SVGRepo_iconCarrier">
         <path d="m10.47 13.321-2.339 3.774 4.281 6.904 3.37-2.086z"></path>

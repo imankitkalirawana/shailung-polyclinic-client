@@ -29,6 +29,9 @@ import Download from "./components/admin/tests/Download";
 import { Helmet } from "react-helmet-async";
 import Reports from "./components/admin/report/Reports";
 import NewAppointment from "./components/admin/tests/NewAppointment";
+import AvailableServices from "./components/Homepage/AvailableServices";
+import { isLoggedIn } from "./utils/auth";
+import UserDashboard from "./components/Homepage/UserDashboard";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -38,6 +41,7 @@ const MainLayout = ({ children }: any) => (
 );
 
 function App() {
+  const { user } = isLoggedIn();
   return (
     <>
       <Helmet>
@@ -61,8 +65,21 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Homepage />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route
+                    path="/view-available-services"
+                    element={<AvailableServices />}
+                  />
                   <Route path="/dashboard/*" element={<Admin />}>
-                    <Route path="" element={<Dashboard />} />
+                    <Route
+                      path=""
+                      element={
+                        user?.role === "user" ? (
+                          <UserDashboard />
+                        ) : (
+                          <Dashboard />
+                        )
+                      }
+                    />
                     <Route path="users" element={<Users />} />
                     <Route path="users/:id" element={<ViewUser />} />
                     <Route path="users/:id/edit" element={<User />} />

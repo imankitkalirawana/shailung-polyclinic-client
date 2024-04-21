@@ -183,12 +183,12 @@ const Complete = () => {
         } else {
           await uploadReport(values);
         }
-        toast.success("Report uploaded successfully");
       } catch (error) {
         toast.error("Failed to upload report");
         console.error(error);
       } finally {
         setProcessing(false);
+        toast.success("Report uploaded successfully");
       }
     },
   });
@@ -217,7 +217,7 @@ const Complete = () => {
             )
             .then(() => {
               setIsUploaded(true);
-              navigate("/dashboard/tests");
+              navigate("/dashboard/tests?status=completed");
             });
         });
     } catch (error) {

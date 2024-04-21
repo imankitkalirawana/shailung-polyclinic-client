@@ -9,7 +9,7 @@ import {
 import { humanReadableDate } from "../user/Users";
 import NotFound from "../../NotFound";
 import { getAllReports } from "../../../functions/get";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
@@ -43,6 +43,7 @@ const Reports = () => {
   const [selected, setSelected] = useState<Report | null>(null);
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const currentUrl = location.pathname;
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!loggedIn) {
@@ -52,9 +53,8 @@ const Reports = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      await getAllReports().then((response) => {
-        setReports(response.data);
-      });
+      const data = await getAllReports();
+      setReports(data);
     };
     fetchData();
   }, []);
@@ -70,6 +70,17 @@ const Reports = () => {
     }
   };
 
+  const handleRowClick = (id: string, e: any) => {
+    if (
+      e.target.tagName === "BUTTON" ||
+      e.target.tagName === "svg" ||
+      e.target.tagName === "path"
+    ) {
+      return;
+    } else {
+      navigate(`/report/${id}/download`);
+    }
+  };
   return (
     <>
       <div className="container mx-auto p-4">
@@ -112,13 +123,15 @@ const Reports = () => {
                     .filter((report) => {
                       return handleSearch(report);
                     })
-                    .reverse()
                     .slice(initialItem, finalItem)
                     .map((report, index) => (
                       <tr
                         key={index}
                         className={`cursor-pointer hover:bg-primary/5`}
                         role="button"
+                        onClick={(e) => {
+                          handleRowClick(report._id, e);
+                        }}
                       >
                         <td className="px-4 py-3 text-sm text-nowrap">
                           <span
@@ -149,7 +162,7 @@ const Reports = () => {
                         <td className="px-4 py-3 text-sm text-nowrap">
                           {humanReadableDate(report.reportDate)}
                         </td>
-                        <td className="px-4 py-3 text-sm flex items-center justify-center">
+                        <td className="px-4 py-3 text-sm flex modify items-center justify-center">
                           <Link
                             to={`/report/${report._id}/download`}
                             className="btn btn-sm btn-circle btn-ghost flex items-center justify-center tooltip tooltip-success"
@@ -258,9 +271,8 @@ const DeleteModal = ({ report, onClose, setReports }: DeleteModalProps) => {
           },
         }
       );
-      await getAllReports().then((response) => {
-        setReports(response.data);
-      });
+      const data = await getAllReports();
+      setReports(data);
 
       onClose();
       toast.success("Report deleted successfully");

@@ -8,7 +8,7 @@ export const getAllUsers = async (role: string) => {
         },
     });
     const data = response.data;
-    return data;
+    return data.reverse();
 }
 
 export const getLoggedUser = async () => {
@@ -36,17 +36,18 @@ export const getAllDoctors = async () => {
         },
     });
     const data = response.data;
-    return data;
+    return data.reverse();
 }
 
 
 export const getAllTests = async (status: any) => {
-    const response = await axios.get(`${API_BASE_URL}/api/test/${status}`, {
+    const response = await axios.get(`${API_BASE_URL}/api/test/status/${status}`, {
         headers: {
             Authorization: `${localStorage.getItem("token")}`,
         },
     });
-    return response;
+    const data = response.data
+    return data.reverse();
 }
 
 export const countAll = async () => {
@@ -65,7 +66,8 @@ export const getAllAvailableTests = async () => {
             Authorization: `${localStorage.getItem("token")}`,
         },
     });
-    return response;
+    const data = response.data;
+    return data.reverse();
 }
 export const getWebsite = async () => {
     const response = await axios.get(`${API_BASE_URL}/api/website`);
@@ -79,6 +81,7 @@ export const getAllReports = async () => {
             Authorization: `${localStorage.getItem("token")}`,
         },
     });
-    return response;
+    const data = response.data;
+    return data.reverse();
 }
 

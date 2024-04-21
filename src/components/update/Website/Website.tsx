@@ -1,6 +1,5 @@
 import { isLoggedIn } from "../../../utils/auth";
 import { useEffect } from "react";
-import { ViewTeam } from "./ViewTeam";
 import { data } from "../../../utils/data";
 import { Helmet } from "react-helmet-async";
 import ViewSign from "./ViewSign";
@@ -132,10 +131,10 @@ const Website = () => {
           </div>
         </form>
 
-        <div className="divider my-12"></div>
+        {/* <div className="divider my-12"></div>
         <div className="my-8">
           <ViewTeam />
-        </div>
+        </div> */}
         <div className="divider"></div>
         <div className="my-8">
           <ViewSign />

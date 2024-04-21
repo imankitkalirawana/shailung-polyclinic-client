@@ -53,6 +53,7 @@ const Users = () => {
   const [finalItem, setFinalItem] = useState(offset);
   const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
   const handleDeleteClick = (user: User) => {
     setSelectedUser(user);
   };
@@ -521,7 +522,6 @@ const AddUser = () => {
   const formik = useFormik({
     initialValues: {
       name: "",
-      photo: "",
       username: "",
       email: "",
       phone: "",

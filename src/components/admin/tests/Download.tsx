@@ -155,7 +155,7 @@ const Download = () => {
                   data-theme="light"
                 >
                   <div className="w-full h-full">
-                    <div className="flex flex-col justify-between h-full">
+                    <div className="flex flex-col justify-start h-full">
                       <header className="flex flex-col px-6 py-4 text-white bg-[#2c4c7f] justify-between items-start border-b-8 border-b-[#f08555]">
                         <span className="tracking-tighter text-sm">
                           Gov. Reg. No. 66087/066/067
@@ -262,8 +262,14 @@ const Download = () => {
                                         </tr>
                                       </thead>
                                       <tbody className="divide-y divide-black">
-                                        {report?.reportRows.map(
-                                          (row, index) => (
+                                        {report?.reportRows
+                                          .filter(
+                                            (row) =>
+                                              row.value !== null &&
+                                              row.value !== undefined &&
+                                              row.value !== ""
+                                          )
+                                          .map((row, index) => (
                                             <tr key={index}>
                                               <td className="px-6 py-2 whitespace-nowrap text-sm font-medium">
                                                 {row.title}
@@ -278,8 +284,7 @@ const Download = () => {
                                                 {row.unit}
                                               </td>
                                             </tr>
-                                          )
-                                        )}
+                                          ))}
                                       </tbody>
                                     </table>
                                   </div>
@@ -328,7 +333,7 @@ const Download = () => {
                           </div>
                         </div>
                       </main>
-                      <footer className="bg-[#2c4c7f] text-white text-center py-2 border-t-8 border-t-[#f08555]">
+                      <footer className="bg-[#2c4c7f] absolute bottom-0 w-full justify-self-end text-white text-center py-2 border-t-8 border-t-[#f08555]">
                         <h2>
                           Keep the reports carefully and bring them during your
                           next visit.
@@ -339,7 +344,19 @@ const Download = () => {
                 </div>
               </PDFExport>
             </div>
-            <div className="flex justify-center items-center mt-8">
+            <div className="flex flex-col justify-center items-center mt-8">
+              {report?.reportFile &&
+                report?.reportFile[0] !== "" &&
+                report.reportFile.length > 0 && (
+                  <div className="text-xs mb-4">
+                    There{" "}
+                    {report.reportFile.length === 1
+                      ? "is 1 additional file"
+                      : `are ${report.reportFile.length} files`}{" "}
+                    available with your report.
+                  </div>
+                )}
+              <div></div>
               <button
                 className="btn btn-primary"
                 onClick={handleExportWithComponent}
