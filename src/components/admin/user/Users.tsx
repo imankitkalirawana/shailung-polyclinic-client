@@ -18,21 +18,7 @@ import NotFound from "../../NotFound";
 import { getAllUsers } from "../../../functions/get";
 import { deleteUser } from "../../../functions/delete";
 import { isLoggedIn } from "../../../utils/auth";
-
-interface User {
-  _id: string;
-  username: string;
-  name: string;
-  role: string;
-  email: string;
-  phone: string;
-  bio: string;
-  address: string;
-  updatedat: string;
-  age: number;
-  gender: string;
-  photo: string;
-}
+import { User } from "../../../interface/interface";
 
 export const humanReadableDate = (date: string) => {
   return new Date(date).toLocaleDateString("en-US", {

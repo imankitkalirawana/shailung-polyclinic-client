@@ -9,6 +9,7 @@ import { API_BASE_URL } from "../../utils/config";
 import { isLoggedIn } from "../../utils/auth";
 import { Helmet } from "react-helmet-async";
 import { calculateAge } from "../../functions/agecalculator";
+import { User } from "../../interface/interface";
 
 interface Tests {
   _id: number;
@@ -16,15 +17,6 @@ interface Tests {
   price: number;
   duration: string;
   description: string;
-}
-
-interface User {
-  _id: string;
-  name: string;
-  phone: string;
-  address: string;
-  dob: string;
-  email: string;
 }
 
 const New = () => {
@@ -89,6 +81,7 @@ const New = () => {
       name: "",
       email: "",
       age: 0,
+      addedby: "",
     },
     onSubmit: (values) => {
       try {
@@ -133,6 +126,7 @@ const New = () => {
   const handleTestFor = (e: React.ChangeEvent<HTMLSelectElement>) => {
     formik.setFieldValue("testfor", e.target.value);
     formik.setValues({
+      ...formik.values,
       testfor: e.target.value,
       testid: "",
       appointmentdate: "",
@@ -142,6 +136,8 @@ const New = () => {
       email: lUser.email,
     });
   };
+
+  console.log(formik.values);
 
   const fetchSelectedTest = async (id: string) => {
     try {

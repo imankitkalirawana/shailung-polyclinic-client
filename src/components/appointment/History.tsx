@@ -11,26 +11,7 @@ import { testStatus } from "../admin/tests/Tests";
 import NotFound from "../NotFound";
 import { Helmet } from "react-helmet-async";
 import { IconPlus } from "@tabler/icons-react";
-
-interface Test {
-  _id: string;
-  status: string;
-  addeddate: string;
-  appointmentdate: string;
-  reportId: string;
-  testDetail: {
-    userData: {
-      name: string;
-      phone: string;
-    };
-    doctorData: {
-      name: string;
-    };
-    testData: {
-      name: string;
-    };
-  };
-}
+import { Test } from "../../interface/interface";
 
 const History = () => {
   const { loggedIn, user } = isLoggedIn();

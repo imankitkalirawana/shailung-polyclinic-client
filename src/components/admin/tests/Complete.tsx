@@ -8,41 +8,7 @@ import { useFormik } from "formik";
 import { UploadMultipleFiles } from "../../../utils/FileHandling";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
-interface Test {
-  _id: string;
-  testid: string;
-  userid: string;
-  doneby: string;
-  status: string;
-  isDone: boolean;
-  updatedat: string;
-  addeddate: string;
-  appointmentdate: string;
-  addedby: string;
-  testDetail: {
-    testData: {
-      _id: string;
-      name: string;
-      price: number;
-      duration: number;
-    };
-    userData: {
-      _id: string;
-      username: string;
-      name: string;
-      email: string;
-      phone: string;
-    };
-    doctorData: {
-      _id: string;
-      username: string;
-      name: string;
-      email: string;
-      phone: string;
-    };
-  };
-}
+import { Test } from "../../../interface/interface";
 
 const Complete = () => {
   const { loggedIn } = isLoggedIn();

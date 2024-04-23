@@ -1,11 +1,12 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../utils/config";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../utils/auth";
 import { useFormik } from "formik";
 import { data } from "../utils/data";
+import { getWebsite } from "../functions/get";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const Navbar = () => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   };
+  const [websiteData, setWebsiteData] = useState<any>({});
 
   const formik = useFormik({
     initialValues: {
@@ -24,6 +26,8 @@ const Navbar = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
+      const data = await getWebsite();
+      setWebsiteData(data);
       await axios
         .get(`${API_BASE_URL}/api/user/profile`, {
           headers: {
@@ -37,6 +41,7 @@ const Navbar = () => {
           }));
         });
     };
+
     if (loggedIn) {
       fetchUser();
     }
@@ -102,7 +107,10 @@ const Navbar = () => {
         <div className="navbar-center">
           <Link to={"/dashboard"} className="btn btn-ghost text-xl">
             <img
-              src={data.websiteData.logo}
+              // src={data.websiteData.logo}
+              src={
+                `${API_BASE_URL}/api/upload/single/logo.webp` || "/logo.webp"
+              }
               alt="logo"
               className="w-10 aspect-square rounded-full"
               title="logo"
@@ -110,7 +118,7 @@ const Navbar = () => {
               height={40}
               loading="eager"
             />
-            {data.websiteData.title}
+            {websiteData.title || data.websiteData.title}
           </Link>
         </div>
         <div className="navbar-end gap-4 mr-4">

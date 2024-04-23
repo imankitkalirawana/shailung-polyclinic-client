@@ -352,6 +352,26 @@
   resolved "https://registry.npmjs.org/@pkgjs/parseargs/-/parseargs-0.11.0.tgz"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
+"@popperjs/core@^2.11.2":
+  version "2.11.8"
+  resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.11.8.tgz"
+  integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
+
+"@preline/pin-input@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/@preline/pin-input/-/pin-input-2.1.0.tgz"
+  integrity sha512-VJs21TMPSC1GplgXQqNznnWmun1s0WhrpRMpndb1F+8gTduWiBTpdFqeJbxwrKnNnVV+ABj7B1inQvCQyGwYqQ==
+
+"@preline/stepper@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/@preline/stepper/-/stepper-2.1.0.tgz"
+  integrity sha512-/6qJtJhQb3brpambbBYHPOkTmdgXE3vG3qS9zBnwfR3U7RPqzmzM/18d7eR/q1VnXhO1dvJqShAb6ibcsYJEwQ==
+
+"@preline/strong-password@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/@preline/strong-password/-/strong-password-2.1.0.tgz"
+  integrity sha512-8vXbIjvPTBj5YjqgZkRxPDNXHVoHoAHUyzOoXWtzvjiRekx4UXAx9xR9XizmOn/S5S2u1pliuuG7nfoVQJiGRw==
+
 "@progress/kendo-draggable-common@^0.2.3":
   version "0.2.3"
   resolved "https://registry.npmjs.org/@progress/kendo-draggable-common/-/kendo-draggable-common-0.2.3.tgz"
@@ -1947,6 +1967,13 @@ postcss@^8.0.0, postcss@^8.1.0, postcss@^8.2.14, postcss@^8.4.21, postcss@^8.4.2
     nanoid "^3.3.7"
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
+
+preline@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.npmjs.org/preline/-/preline-2.1.0.tgz"
+  integrity sha512-7pwrGNPVfGYUv1XHW9i49ejowIVHCDTx8JvbM43hapLi1GCjj9NnAZmTKupxaROboB4Nvp2x0ADBVKAhpmZppA==
+  dependencies:
+    "@popperjs/core" "^2.11.2"
 
 prelude-ls@^1.2.1:
   version "1.2.1"

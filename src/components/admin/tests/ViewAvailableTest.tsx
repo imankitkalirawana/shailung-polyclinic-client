@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { humanReadableDate } from "../user/Users";
 import { isLoggedIn } from "../../../utils/auth";
 
-interface Test {
+interface AvailableTest {
   name: string;
   description: string;
   price: number;
@@ -34,7 +34,7 @@ const ViewAvailableTest = () => {
     }
   }, [user]);
 
-  const [test, setTest] = useState<Test>({
+  const [test, setTest] = useState<AvailableTest>({
     name: "",
     description: "",
     price: 0,

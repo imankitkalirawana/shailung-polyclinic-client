@@ -20,41 +20,7 @@ import { isLoggedIn } from "../../../utils/auth";
 import * as XLSX from "xlsx";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
-
-interface Test {
-  _id: string;
-  testid: string;
-  userid: string;
-  doneby: string;
-  status: string;
-  isDone: boolean;
-  updatedat: string;
-  addeddate: string;
-  appointmentdate: string;
-  reportId: string;
-  testDetail: {
-    testData: {
-      _id: string;
-      name: string;
-      price: number;
-      duration: number;
-    };
-    userData: {
-      _id: string;
-      username: string;
-      name: string;
-      email: string;
-      phone: string;
-    };
-    doctorData: {
-      _id: string;
-      username: string;
-      name: string;
-      email: string;
-      phone: string;
-    };
-  };
-}
+import { Test } from "../../../interface/interface";
 
 export const testStatus = async (testId: any, status: string) => {
   try {

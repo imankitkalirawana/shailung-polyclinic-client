@@ -12,6 +12,9 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
+    "@preline/pin-input": "^2.1.0",
+    "@preline/stepper": "^2.1.0",
+    "@preline/strong-password": "^2.1.0",
     "@progress/kendo-drawing": "^1.20.0",
     "@progress/kendo-licensing": "^1.3.5",
     "@progress/kendo-react-pdf": "^7.3.0",
@@ -19,6 +22,7 @@
     "axios": "^1.6.7",
     "dotenv": "^16.4.5",
     "formik": "^2.4.5",
+    "preline": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet-async": "^2.0.4",

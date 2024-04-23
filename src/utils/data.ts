@@ -14,7 +14,5 @@ export const data = {
             title: "Welcome to Shailung Polyclinic",
             description: "Expert care, precise diagnostics. Trust Shailung Polyclinic & Diagnostics for your healthcare needs",
         },
-
     }
-
 }

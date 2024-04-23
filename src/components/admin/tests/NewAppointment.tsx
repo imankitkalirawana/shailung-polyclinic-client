@@ -9,21 +9,7 @@ import {
 import { getAllUsers } from "../../../functions/get";
 import { CheckIcon } from "../../icons/Icons";
 import { calculateAge } from "../../../functions/agecalculator";
-
-interface User {
-  _id: string;
-  name: string;
-  username: string;
-  phone: string;
-  email: string;
-  dob: string;
-  address: string;
-  role: string;
-  status: string;
-  addeddate: string;
-  updatedAt: string;
-  photo: string;
-}
+import { User } from "../../../interface/interface";
 
 const NewAppointment = () => {
   const [searchParams] = useSearchParams();

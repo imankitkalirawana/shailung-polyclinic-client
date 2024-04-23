@@ -1,8 +1,12 @@
 import { isLoggedIn } from "../../../utils/auth";
 import { useEffect } from "react";
-import { data } from "../../../utils/data";
 import { Helmet } from "react-helmet-async";
 import ViewSign from "./ViewSign";
+import { useFormik } from "formik";
+import { API_BASE_URL } from "../../../utils/config";
+import axios from "axios";
+import { toast } from "sonner";
+import { getWebsite } from "../../../functions/get";
 
 // get domain name from url
 
@@ -13,6 +17,46 @@ const Website = () => {
       window.location.href = "/auth/login";
     }
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getWebsite();
+        formik.setValues({
+          title: data.title,
+          email: data.email,
+          phone: data.phone,
+          description: data.description,
+          address: data.address,
+        });
+      } catch (error) {
+        toast.error("Error Updating Details");
+      }
+    };
+    fetchData();
+  }, []);
+
+  const formik = useFormik({
+    initialValues: {
+      title: "",
+      email: "",
+      phone: "",
+      description: "",
+      address: "",
+    },
+    onSubmit: async (values) => {
+      try {
+        await axios.put(`${API_BASE_URL}/api/website`, values, {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        });
+        toast.success("Website Information Updated");
+      } catch (error) {
+        toast.error("Error Updating Details");
+      }
+    },
+  });
 
   return (
     <>
@@ -32,27 +76,8 @@ const Website = () => {
         />
       </Helmet>
       <div>
-        <form>
+        <form onSubmit={formik.handleSubmit}>
           <div>
-            <div role="alert" className="alert mb-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="stroke-info shrink-0 w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-              <span className="text-sm">
-                Changing website data is disabled due to the SEO but you can
-                still update your team.
-              </span>
-            </div>
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-base font-semibold leading-7 text-base-content">
@@ -67,12 +92,12 @@ const Website = () => {
                   <span className="label-text">Title</span>
                 </label>
                 <input
-                  id="website-title"
+                  id="title"
                   name="title"
                   type="text"
-                  value={data.websiteData.title}
                   className="input input-bordered w-full"
-                  disabled
+                  value={formik.values.title}
+                  onChange={formik.handleChange}
                 />
               </div>
               <div className="sm:col-span-3">
@@ -83,9 +108,9 @@ const Website = () => {
                   id="website-email"
                   name="email"
                   type="text"
-                  value={data.websiteData.email}
                   className="input input-bordered w-full"
-                  disabled
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
                 />
               </div>
               <div className="sm:col-span-3">
@@ -96,9 +121,9 @@ const Website = () => {
                   id="website-phone"
                   name="phone"
                   type="text"
-                  value={data.websiteData.phone}
                   className="input input-bordered w-full"
-                  disabled
+                  value={formik.values.phone}
+                  onChange={formik.handleChange}
                 />
               </div>
               <div className="sm:col-span-3">
@@ -109,9 +134,9 @@ const Website = () => {
                   id="website-description"
                   name="description"
                   type="text"
-                  value={data.websiteData.description}
                   className="input input-bordered w-full"
-                  disabled
+                  value={formik.values.description}
+                  onChange={formik.handleChange}
                 />
               </div>
               <div className="sm:col-span-full">
@@ -122,12 +147,20 @@ const Website = () => {
                   id="website-address"
                   name="address"
                   type="text"
-                  value={data.websiteData.address}
                   className="input input-bordered w-full"
-                  disabled
+                  value={formik.values.address}
+                  onChange={formik.handleChange}
                 />
               </div>
             </div>
+          </div>
+          <div className="flex items-center gap-2 justify-end mt-12">
+            <a href="/dashboard" className="btn btn-sm">
+              Cancel
+            </a>
+            <button className="btn btn-primary btn-sm" type="submit">
+              Update
+            </button>
           </div>
         </form>
 

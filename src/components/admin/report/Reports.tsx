@@ -14,23 +14,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
 import { isLoggedIn } from "../../../utils/auth";
-
-interface Report {
-  _id: string;
-  name: string;
-  doctor: string;
-  age: number;
-  gender: string;
-  dob: string;
-  phone: string;
-  email: string;
-  address: string;
-  testname: string;
-  testid: string;
-  reportDate: string;
-  status: string;
-  addedby: string;
-}
+import { Report } from "../../../interface/interface";
 
 const Reports = () => {
   const { loggedIn, user } = isLoggedIn();
@@ -61,10 +45,14 @@ const Reports = () => {
 
   const handleSearch = (report: Report) => {
     if (
-      report.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.testname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.status.toLowerCase().includes(searchQuery.toLowerCase())
+      (report.name &&
+        report.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (report.phone &&
+        report.phone.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (report.testname &&
+        report.testname.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (report.status &&
+        report.status.toLowerCase().includes(searchQuery.toLowerCase()))
     ) {
       return report;
     }

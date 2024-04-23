@@ -32,6 +32,7 @@ import NewAppointment from "./components/admin/tests/NewAppointment";
 import AvailableServices from "./components/Homepage/AvailableServices";
 import { isLoggedIn } from "./utils/auth";
 import UserDashboard from "./components/Homepage/UserDashboard";
+import Register from "./components/auth/Register";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -124,6 +125,7 @@ function App() {
           />
           <Route path="/auth/*" element={<Outlet />}>
             <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="reset-password" element={<ResetPassword />} />
           </Route>
