@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import DoctorSVG from "../icons/DoctorSVG";
 import { HistoryIcon, SquareCrossIcon } from "../icons/Icons";
 import { useEffect, useState } from "react";
@@ -10,9 +10,11 @@ import { isLoggedIn } from "../../utils/auth";
 import { Helmet } from "react-helmet-async";
 import { calculateAge } from "../../functions/agecalculator";
 import { User } from "../../interface/interface";
+import { IconInfoCircleFilled, IconXboxXFilled } from "@tabler/icons-react";
+import { getUserWithId } from "../../functions/get";
 
 interface Tests {
-  _id: number;
+  _id: string;
   name: string;
   price: number;
   duration: string;
@@ -28,6 +30,8 @@ const New = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isConfirm, setIsConfirm] = useState(false);
   const [isModal, setIsModal] = useState(false);
+  const [searchParams] = useSearchParams();
+  const userId = searchParams.get("user");
 
   useEffect(() => {
     if (!loggedIn) {
@@ -45,7 +49,7 @@ const New = () => {
       }
     };
     fetchTests();
-    const fetchUser = async () => {
+    const fetchUserByProfile = async () => {
       try {
         const { data } = await axios.get(`${API_BASE_URL}/api/user/profile`, {
           headers: {
@@ -69,29 +73,48 @@ const New = () => {
         console.error(error);
       }
     };
-    fetchUser();
+    const fetchUserById = async () => {
+      try {
+        const { data } = await getUserWithId(userId as string);
+        setUser(data);
+        formik.setValues({
+          ...formik.values,
+          phone: data.phone,
+          email: data.email,
+          name: data.name,
+          age: calculateAge(data.dob),
+        });
+      } catch (error) {
+        toast.error("Failed to fetch user");
+        console.error(error);
+      }
+    };
+    if (userId) {
+      fetchUserById();
+    } else {
+      fetchUserByProfile();
+    }
   }, []);
 
   const formik = useFormik({
     initialValues: {
       testfor: "",
-      testid: "",
+      testids: [],
       appointmentdate: "",
       phone: "",
       name: "",
       email: "",
       age: 0,
-      addedby: "",
     },
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       try {
         setSubmitting(true);
-        axios
+        await axios
           .post(
             `${API_BASE_URL}/api/test`,
             {
               testfor: values.testfor,
-              testid: values.testid,
+              testids: values.testids,
               appointmentdate: values.appointmentdate,
               phone: lUser.phone,
               name: values.name,
@@ -128,7 +151,7 @@ const New = () => {
     formik.setValues({
       ...formik.values,
       testfor: e.target.value,
-      testid: "",
+      testids: [],
       appointmentdate: "",
       phone: lUser.phone,
       name: "",
@@ -136,8 +159,6 @@ const New = () => {
       email: lUser.email,
     });
   };
-
-  console.log(formik.values);
 
   const fetchSelectedTest = async (id: string) => {
     try {
@@ -193,52 +214,95 @@ const New = () => {
               className="grid grid-cols-2 gap-4 w-full md:max-w-[50%]"
               onSubmit={formik.handleSubmit}
             >
-              <div className="form-control col-span-2">
-                <label className="label" htmlFor="testfor">
-                  <span className="label-text">Test For</span>
-                </label>
-                <select
-                  className="select select-bordered"
-                  defaultValue={"Select Test"}
-                  name="testfor"
-                  id="testfor"
-                  onChange={handleTestFor}
-                  value={formik.values.testfor}
-                >
-                  <option value={""} disabled>
-                    Select Test
-                  </option>
-                  <option value="self">For Myself</option>
-                  <option value="family">For Family</option>
-                </select>
-              </div>
-              {formik.values.testfor === "self" && (
-                <>
-                  <div
-                    role="alert"
-                    className="alert mt-4 bg-base-300 col-span-full"
+              {!userId && (
+                <div className="form-control col-span-2">
+                  <label className="label" htmlFor="testfor">
+                    <span className="label-text">Test For</span>
+                  </label>
+                  <select
+                    className="select select-bordered"
+                    defaultValue={"Select Test"}
+                    name="testfor"
+                    id="testfor"
+                    onChange={handleTestFor}
+                    value={formik.values.testfor}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      className="stroke-info shrink-0 w-6 h-6"
+                    <option value={""} disabled>
+                      Select Test
+                    </option>
+                    <option value="self">For Myself</option>
+                    <option value="family">For Family</option>
+                  </select>
+                </div>
+              )}
+              {(formik.values.testfor === "self" || userId) && (
+                <>
+                  {!lUser.name || !calculateAge(lUser.dob || "") ? (
+                    <div
+                      role="alert"
+                      className="alert mt-4 bg-error/20 col-span-full"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
-                    <span>
-                      You can update your profile if below information is not
-                      displayed or incorrect{" "}
-                      <Link to="/profile" className="link">
-                        Update Now
-                      </Link>
-                    </span>
-                  </div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        className="stroke-error shrink-0 w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                      </svg>
+                      <span>
+                        {userId ? "User" : "You"} have incomplete profile.{" "}
+                        <Link
+                          to={
+                            userId
+                              ? `/dashboard/users/${lUser._id}/edit`
+                              : "/profile"
+                          }
+                          className="link"
+                        >
+                          Update Now
+                        </Link>
+                      </span>
+                    </div>
+                  ) : (
+                    <div
+                      role="alert"
+                      className="alert mt-4 bg-info/20 col-span-full"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        className="stroke-info shrink-0 w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                      </svg>
+                      <span>
+                        You can update your profile if below information is not
+                        displayed or incorrect.{" "}
+                        <Link
+                          to={
+                            userId
+                              ? `/dashboard/users/${lUser._id}/edit`
+                              : "/profile"
+                          }
+                          className="link"
+                        >
+                          Update Now
+                        </Link>
+                      </span>
+                    </div>
+                  )}
                   <div className="form-control col-span-2">
                     <label htmlFor="name" className="label">
                       <span className="label-text">Patient Name</span>
@@ -275,7 +339,7 @@ const New = () => {
                     <input
                       type="number"
                       className="input input-bordered"
-                      value={calculateAge(lUser.dob)}
+                      value={calculateAge(lUser.dob || "")}
                       disabled
                     />
                   </div>
@@ -337,7 +401,7 @@ const New = () => {
                 </>
               )}
 
-              {formik.values.testfor !== "" && (
+              {(formik.values.testfor !== "" || userId) && (
                 <>
                   <div className="form-control col-span-2 md:col-span-1">
                     <label className="label">
@@ -358,28 +422,42 @@ const New = () => {
                   </div>
                   <div className="form-control col-span-2">
                     <label className="label">
-                      <span className="label-text">Select Test</span>
+                      <span className="label-text">Select Tests</span>
                     </label>
-                    <select
-                      className="select select-bordered"
-                      defaultValue={"Select Test"}
-                      name="testid"
-                      id="test"
-                      onChange={(e) => {
-                        formik.handleChange(e);
-                        fetchSelectedTest(e.target.value);
-                      }}
-                      value={formik.values.testid}
-                    >
-                      <option value={""} disabled>
-                        Select Test
-                      </option>
-                      {tests.map((test) => (
-                        <option key={test._id} value={test._id}>
-                          {test.name}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="m max-h-40 overflow-y-scroll">
+                      {tests
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((test, index) => (
+                          <div
+                            className="flex items-center justify-between"
+                            key={index}
+                          >
+                            <label className="label cursor-pointer flex-row-reverse justify-end gap-4">
+                              <span className="label-text">{test.name}</span>
+                              <input
+                                type="checkbox"
+                                className="checkbox checked:checkbox-primary"
+                                name="testids"
+                                value={test._id}
+                                onChange={formik.handleChange}
+                              />
+                            </label>
+                            <button
+                              className="btn btn-sm btn-circle"
+                              type="button"
+                              onClick={() => fetchSelectedTest(test._id)}
+                            >
+                              <IconInfoCircleFilled
+                                className={`${
+                                  selectedTest._id === test._id
+                                    ? "text-info"
+                                    : "text-gray-500"
+                                } h-6 w-6`}
+                              />
+                            </button>
+                          </div>
+                        ))}
+                    </div>
                   </div>
                   {selectedTest && selectedTest.name && (
                     <div className="stats bg-base-300 col-span-full w-full">
@@ -396,7 +474,16 @@ const New = () => {
                       </div>
 
                       <div className="stat">
-                        <div className="stat-title">Current price</div>
+                        <div className="stat-title flex items-center justify-between">
+                          <span>Current price</span>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-ghost btn-circle"
+                            onClick={() => setSelectedTest({} as Tests)}
+                          >
+                            <IconXboxXFilled />
+                          </button>
+                        </div>
                         <div className="stat-value text-2xl">
                           {selectedTest.price
                             .toString()
@@ -417,8 +504,10 @@ const New = () => {
                       type="button"
                       onClick={() => setIsConfirm(true)}
                       disabled={
-                        formik.values.testid === "" ||
-                        formik.values.testfor === ""
+                        formik.values.testids.length < 1 ||
+                        formik.values.appointmentdate === "" ||
+                        formik.values.age === 0 ||
+                        formik.values.name === ""
                       }
                     >
                       Book Appointment
@@ -511,7 +600,11 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
                 "Confirm"
               )}
             </button>
-            <button className="btn flex-1" onClick={onClose}>
+            <button
+              className="btn flex-1"
+              onClick={onClose}
+              disabled={isLoading}
+            >
               Cancel
             </button>
           </div>

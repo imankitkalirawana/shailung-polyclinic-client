@@ -127,20 +127,24 @@ const Tests = () => {
     if (searchQuery === "") {
       return test;
     } else if (
-      test.testDetail.userData.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      test.testDetail.userData.phone
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      test.testDetail.testData.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
+      (test.testDetail.userData.name &&
+        test.testDetail.userData.name
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())) ||
+      (test.testDetail.userData.phone &&
+        test.testDetail.userData.phone
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())) ||
+      (test.testDetail.testData.name &&
+        test.testDetail.testData.name
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())) ||
       (test.testDetail.doctorData &&
         test.testDetail.doctorData.name
           .toLowerCase()
           .includes(searchQuery.toLowerCase())) ||
-      test.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (test.status &&
+        test.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
       test._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       humanReadableDate(test.appointmentdate)
         .toLowerCase()
@@ -678,7 +682,7 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
       },
     });
     const data = response.data;
-    setTests(data);
+    setTests(data.reverse());
   };
 
   const handleAssign = async () => {

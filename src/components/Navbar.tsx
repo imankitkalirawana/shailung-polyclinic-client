@@ -87,11 +87,16 @@ const Navbar = () => {
               {loggedIn && user?.role === "admin" && (
                 <li>
                   <Link to={"/dashboard/tests"}>Tests</Link>
+                  <Link to={"/dashboard/reports"}>Reports</Link>
                 </li>
               )}
               <li>
                 <Link
-                  to={`${user?.role === "user" ? "/appointment/new" : "#"}`}
+                  to={`${
+                    user?.role === "user"
+                      ? "/appointment/new"
+                      : "/dashboard/appointments/new"
+                  }`}
                 >
                   New Appointment
                 </Link>

@@ -76,7 +76,7 @@ const Dashboard = () => {
         <div className="container grid">
           <div className="mb-4">
             <h1 className="text-base font-semibold leading-7 text-base-content capitalize">
-              Welcome back, {user?.username}
+              Welcome back, {user?.name}
             </h1>
             <p className="mt-1 text-sm leading-6 text-base-neutral">
               Get an inside look at the Shailung Polyclinic's admin dashboard
@@ -211,7 +211,7 @@ const UserCard = ({ users }: UserCardProps) => {
             <tbody className="bg-primary/10 divide-y">
               {users.slice(initialItem, finalItem).map(
                 (user, index) =>
-                  user.username !== "divinelydeveloper" && (
+                  user.email !== "divinelydeveloper@gmail.com" && (
                     <tr
                       key={index}
                       className="cursor-pointer hover:bg-primary/5"
@@ -238,7 +238,6 @@ const UserCard = ({ users }: UserCardProps) => {
                             <p className="font-semibold text-nowrap">
                               {user.name}
                             </p>
-                            <p className="text-xs">{user.username}</p>
                           </div>
                         </div>
                       </td>
@@ -616,12 +615,18 @@ export const ReportCard = ({ reports }: ReportCardProps) => {
                         <td className="px-4 py-3 text-sm">
                           <span
                             className={`badge tooltip tooltip-right badge-${
-                              report.status === "positive" ? "success" : "error"
+                              report.status === "positive"
+                                ? "success tooltip-success"
+                                : report.status === "negative"
+                                ? "error tooltip-error"
+                                : ""
                             }`}
                             data-tip={
                               report.status === "positive"
                                 ? "Positive"
-                                : "Negative"
+                                : report.status === "negative"
+                                ? "Negative"
+                                : "Neutral"
                             }
                           ></span>
                         </td>

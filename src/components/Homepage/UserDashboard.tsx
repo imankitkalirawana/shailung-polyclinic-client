@@ -55,7 +55,7 @@ const UserDashboard = () => {
       <main className="mx-auto max-w-6xl flex flex-col">
         <div className="mb-4 flex justify-between items-center">
           <h1 className="text-base font-semibold leading-7 text-base-content">
-            Welcome back, {user?.username}
+            Welcome back, {user?.name}
           </h1>
         </div>
         <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4 mt-8">

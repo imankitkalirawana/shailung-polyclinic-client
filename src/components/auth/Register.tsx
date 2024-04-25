@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../utils/config";
@@ -7,11 +7,9 @@ import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
 const Register = () => {
-  const navigate = useNavigate();
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isOtpVerified, setIsOtpVerified] = useState(false);
-  const [searchParams] = useSearchParams();
-  const redirectUrl = searchParams.get("redirect") || "/dashboard";
+  // const redirectUrl = searchParams.get("redirect") || "/dashboard";
   const [isOtpResent, setIsOtpResent] = useState(0);
 
   const validationSchema = Yup.object().shape({
@@ -123,7 +121,7 @@ const Register = () => {
       });
 
       formik.values.dbOtp = res.data.otp;
-      console.log(res.data.otp);
+      // console.log(res.data.otp);
       const api_key = "26614D70EA4E26";
       const contact = formik.values.phone;
       // const from = "SHAILUNG POLYCLINIC";
@@ -141,8 +139,8 @@ const Register = () => {
         })
       );
       toast.success("OTP Sent Successfully");
-      // const response = await axios.get(api_url);
-      // console.log(response.data);
+      const response = await axios.get(api_url);
+      console.log(response.data);
       // console.log(formik.values.dbOtp);
     } catch (e) {
       console.log(e);
@@ -182,7 +180,6 @@ const Register = () => {
     }
     return false;
   };
-
 
   return (
     <>
@@ -367,11 +364,9 @@ const Register = () => {
                         required
                       />
                       <label className="label">
-                        {formik.errors.email && (
-                          <span className="label-text-alt text-error">
-                            {formik.errors.email}
-                          </span>
-                        )}
+                        <span className="label-text-alt text-error">
+                          {formik.errors.email}
+                        </span>
                       </label>
                     </div>
                     <div className="col-span-full">
@@ -423,7 +418,15 @@ const Register = () => {
                       formik.errors.phone !== undefined
                     }
                   >
-                    Send OTP
+                    {formik.isSubmitting ? (
+                      <span className="loading loading-dots loading-sm"></span>
+                    ) : isOtpVerified ? (
+                      "Register"
+                    ) : isOtpSent ? (
+                      "Verify OTP"
+                    ) : (
+                      "Send OTP"
+                    )}
                   </button>
                 </div>
               </form>

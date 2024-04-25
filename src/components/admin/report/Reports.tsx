@@ -124,12 +124,18 @@ const Reports = () => {
                         <td className="px-4 py-3 text-sm text-nowrap">
                           <span
                             className={`badge tooltip tooltip-right badge-${
-                              report.status === "positive" ? "success" : "error"
+                              report.status === "positive"
+                                ? "success tooltip-success"
+                                : report.status === "negative"
+                                ? "error tooltip-error"
+                                : ""
                             }`}
                             data-tip={
                               report.status === "positive"
                                 ? "Positive"
-                                : "Negative"
+                                : report.status === "negative"
+                                ? "Negative"
+                                : "Neutral"
                             }
                           ></span>
                         </td>

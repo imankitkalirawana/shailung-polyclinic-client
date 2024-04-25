@@ -17,26 +17,28 @@ const Profile = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [email, setEmail] = useState("");
+  const [forgotProcessing, setForgotProcessing] = useState(false);
+  const [updateProcessing, setUpdateProcessing] = useState(false);
 
   const formik = useFormik({
     initialValues: {
       name: "",
-      username: "",
       email: "",
       phone: "",
       bio: "",
       address: "",
-      confirmusername: "",
       photo: "profile-default.webp",
       previewPhoto: "",
       dob: "",
       password: "",
+      confirmemail: "",
     },
     onSubmit: async (values) => {
       try {
+        setUpdateProcessing(true);
         if (file) {
           await DeleteFile(values.photo);
-          const filename = `profile-${values.username}-${Date.now()}.${
+          const filename = `profile-${values.email}-${Date.now()}.${
             file.name.split(".").pop() || "jpg"
           }`;
           await UploadSingleFile(file, filename);
@@ -57,6 +59,7 @@ const Profile = () => {
         console.log(error);
         toast.error(error.message);
       }
+      setUpdateProcessing(false);
     },
   });
 
@@ -68,7 +71,6 @@ const Profile = () => {
 
   useEffect(() => {
     // fetch user data
-
     fetchUser();
   }, []);
   const fetchUser = async () => {
@@ -78,7 +80,6 @@ const Profile = () => {
       formik.setValues({
         ...formik.values,
         name: res.data.name,
-        username: res.data.username,
         email: res.data.email,
         phone: res.data.phone,
         bio: res.data.bio,
@@ -126,17 +127,24 @@ const Profile = () => {
     }
   };
 
-  const forgotPassword = () => {
-    axios
-      .post(`${API_BASE_URL}/api/user/forgot-password`, {
-        email: formik.values.email,
-      })
-      .then((response) => {
-        toast.success(response.data.message);
-      })
-      .catch((error) => {
-        toast.error(error.message);
-      });
+  const forgotPassword = async () => {
+    setForgotProcessing(true);
+    try {
+      await axios
+        .post(`${API_BASE_URL}/api/user/forgot-password`, {
+          id: formik.values.email,
+        })
+        .then((response) => {
+          toast.success(response.data.message);
+        })
+        .catch((error) => {
+          toast.error(error.message);
+        });
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.message);
+    }
+    setForgotProcessing(false);
   };
 
   return (
@@ -159,12 +167,6 @@ const Profile = () => {
       <div className="col-span-full lg:col-span-9 max-w-6xl mx-auto my-24 px-8">
         <form className="px-4 sm:px-0" onSubmit={formik.handleSubmit}>
           <div>
-            <h1 className="text-base font-semibold leading-7 text-base-content">
-              Profile Information
-            </h1>
-            <p className="mt-1 text-sm leading-6 text-base-neutral">
-              Update your profile information.
-            </p>
             {formik.values.email.includes("change.this") && (
               <div
                 role="alert"
@@ -193,31 +195,16 @@ const Profile = () => {
               </div>
             )}
 
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-6 md:w-[50%]">
-                <label htmlFor="username" className="label">
-                  <span className="label-text">Username</span>
-                </label>
-                <div className="mt-2">
-                  <div className="flex input input-bordered shadow-sm sm:max-w-md">
-                    <span className="hidden sm:flex select-none items-center pl-3 text-base-content sm:text-sm">
-                      https://{window.location.hostname}/
-                    </span>
-                    <input
-                      type="text"
-                      name="username"
-                      id="username"
-                      autoComplete="username"
-                      className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-base-content placeholder:text-base-neutral focus:ring-0 sm:text-sm sm:leading-6"
-                      onChange={formik.handleChange}
-                      value={formik.values.username}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
+            <div className="pb-12">
+              <h2 className="text-base font-semibold leading-7 text-base-content">
+                Personal Information
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-base-neutral">
+                Use a permanent address where you can receive mail.
+              </p>
 
-              <div className="col-span-full">
+              {/* profile section */}
+              <div className="col-span-full mt-8">
                 <label
                   htmlFor="photo"
                   className="block text-sm font-medium leading-6"
@@ -254,36 +241,6 @@ const Profile = () => {
                   />
                 </div>
               </div>
-
-              <div className="col-span-full">
-                <label htmlFor="bio" className="label">
-                  <span className="label-text">bio</span>
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    id="bio"
-                    name="bio"
-                    rows={3}
-                    className="textarea textarea-bordered block w-full h-28 bg-base-100 py-1.5 text-base-content shadow-sm placeholder:text-neutral focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    onChange={formik.handleChange}
-                    value={formik.values.bio}
-                  />
-                </div>
-                <div className="label">
-                  <span className="label-text-alt">
-                    Write a few sentences bio yourself.
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="divider"></div>
-            <div className="pb-12">
-              <h2 className="text-base font-semibold leading-7 text-base-content">
-                Personal Information
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-base-neutral">
-                Use a permanent address where you can receive mail.
-              </p>
 
               <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                 <div className="col-span-6 sm:col-span-3">
@@ -380,26 +337,64 @@ const Profile = () => {
                     />
                   </div>
                 </div>
+                <div className="col-span-6">
+                  <label htmlFor="bio" className="label">
+                    <span className="label-text">Bio</span>
+                  </label>
+                  <div className="mt-2">
+                    <textarea
+                      id="bio"
+                      name="bio"
+                      rows={3}
+                      className="textarea textarea-bordered block w-full h-28 bg-base-100 py-1.5 text-base-content shadow-sm placeholder:text-neutral focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      onChange={formik.handleChange}
+                      value={formik.values.bio}
+                    />
+                  </div>
+                  <div className="label">
+                    <span className="label-text-alt">
+                      Write a few sentences bio yourself.
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-2">
-            <button type="button" className="btn btn-error btn-outline btn-sm">
+          <div className="flex items-center flex-col-reverse sm:flex-row justify-between gap-2">
+            <button
+              type="button"
+              className="btn btn-error btn-outline sm:btn-sm w-full sm:w-auto"
+            >
               <label htmlFor="delete_modal">Delete Account</label>
             </button>
-            <div className="flex gap-2">
+            <div className="flex w-full sm:w-auto flex-col-reverse sm:flex-row gap-2">
               {!email.includes("change.this") && (
                 <button
-                  className="btn btn-outline btn-sm"
+                  className="btn sm:btn-sm"
                   onClick={forgotPassword}
                   type="button"
+                  disabled={forgotProcessing}
                 >
-                  {formik.values.password ? "Forgot" : "Generate"} Password
+                  {forgotProcessing ? (
+                    <span className="loading loading-dots loading-sm"></span>
+                  ) : formik.values.password ? (
+                    "Forgot Password"
+                  ) : (
+                    "Generate Password"
+                  )}{" "}
                 </button>
               )}
-              <button type="submit" className="btn btn-primary btn-sm">
-                Update
+              <button
+                type="submit"
+                className="btn btn-primary sm:btn-sm w-full sm:w-auto"
+                disabled={updateProcessing}
+              >
+                {updateProcessing ? (
+                  <span className="loading loading-dots loading-sm"></span>
+                ) : (
+                  "Update Profile"
+                )}
               </button>
             </div>
           </div>
@@ -408,24 +403,24 @@ const Profile = () => {
             <div className="modal-box max-w-96">
               <label htmlFor="city" className="label">
                 <span className="label-text">
-                  Enter <b>{formik.values.username}</b> to delete
+                  Enter <b>{formik.values.email}</b> to delete
                 </span>
               </label>
               <input
                 type="text"
                 id="delete_confirmation"
-                name="confirmusername"
+                name="confirmemail"
                 className="input input-bordered w-full placeholder:text-base-content/40"
-                placeholder={formik.values.username}
+                placeholder={formik.values.email}
                 disabled={isDeleting}
                 onChange={formik.handleChange}
-                value={formik.values.confirmusername}
+                value={formik.values.confirmemail}
               />
               <div className="flex modal-action">
                 <button
                   className="btn btn-primary flex-1"
                   disabled={
-                    formik.values.confirmusername !== formik.values.username ||
+                    formik.values.confirmemail !== formik.values.email ||
                     isDeleting
                   }
                   onClick={handleDelete}
@@ -457,6 +452,7 @@ const Profile = () => {
 export default Profile;
 
 const Security = () => {
+  const [updateProcessing, setUpdateProcessing] = useState(false);
   const formik = useFormik({
     initialValues: {
       oldPassword: "",
@@ -464,6 +460,7 @@ const Security = () => {
       confirmPassword: "",
     },
     onSubmit: async (values) => {
+      setUpdateProcessing(true);
       try {
         const res = await axios.put(
           `${API_BASE_URL}/api/user/profile/password`,
@@ -479,6 +476,7 @@ const Security = () => {
         console.log(error);
         toast.error(error.message);
       }
+      setUpdateProcessing(false);
     },
     validate: (values) => {
       const errors: any = {};
@@ -551,8 +549,16 @@ const Security = () => {
         </div>
         <div className="divider my-10"></div>
         <div className="mt-6 flex items-center justify-end gap-2">
-          <button type="submit" className="btn btn-primary btn-sm">
-            Update
+          <button
+            type="submit"
+            className="btn btn-primary sm:btn-sm w-full sm:w-auto"
+            disabled={updateProcessing}
+          >
+            {updateProcessing ? (
+              <span className="loading loading-dots loading-sm"></span>
+            ) : (
+              "Update Password"
+            )}
           </button>
         </div>
       </form>

@@ -67,8 +67,6 @@ const Users = () => {
     if (searchQuery === "") {
       return user;
     } else if (
-      (user.username &&
-        user.username.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (user.email &&
         user.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (user.phone &&
@@ -268,7 +266,7 @@ const Users = () => {
                     .slice(initialItem, finalItem)
                     .map(
                       (user, index) =>
-                        user.username !== "divinelydeveloper" && (
+                        user.email !== "divinelydeveloper@gmail.com" && (
                           <tr
                             key={index}
                             className="cursor-pointer hover:bg-primary/5"
@@ -294,9 +292,6 @@ const Users = () => {
                                 <div>
                                   <p className="font-semibold text-nowrap">
                                     {user.name}
-                                  </p>
-                                  <p className="text-xs text-nowrap">
-                                    {user.username}
                                   </p>
                                 </div>
                               </div>
@@ -478,7 +473,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
       <div className="modal modal-open backdrop-blur-sm" role="dialog">
         <div className="modal-box max-w-sm">
           <h3 className="font-bold text-lg text-center">
-            Delete <i>{user.username}</i>
+            Delete <i>{user.email}</i>
           </h3>
           <p className="py-4">
             Are you sure you want to delete this user? This action cannot be
@@ -508,7 +503,6 @@ const AddUser = () => {
   const formik = useFormik({
     initialValues: {
       name: "",
-      username: "",
       email: "",
       phone: "",
       gender: "male",
@@ -575,20 +569,6 @@ const AddUser = () => {
                 </select>
               </div>
 
-              <div className="mt-4">
-                <label htmlFor="username" className="label">
-                  <span className="label-text">Username</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  name="username"
-                  id="username"
-                  onChange={formik.handleChange}
-                  value={formik.values.username}
-                  required
-                />
-              </div>
               <div className="">
                 <label htmlFor="email" className="label">
                   <span className="label-text">Email</span>

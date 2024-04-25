@@ -206,7 +206,7 @@ const NewAppointment = () => {
                         )}
                       </dl>
                       <div className="flex justify-between items-end">
-                        <div className="form-control">
+                        {/* <div className="form-control">
                           <label className="label">
                             <span className="label-text">Date</span>
                           </label>
@@ -215,11 +215,14 @@ const NewAppointment = () => {
                             className="input input-bordered"
                             placeholder="Select Date"
                           />
-                        </div>
-                        <div className="flex justify-end p-4 sm:p-6 lg:p-8">
-                          <button className="btn btn-sm">
+                        </div> */}
+                        <div className="flex justify-end mt-4">
+                          <Link
+                            to={`/appointment/new?user=${selectedUser._id}`}
+                            className="btn btn-sm btn-primary"
+                          >
                             Create Appointment
-                          </button>
+                          </Link>
                         </div>
                       </div>
                     </div>

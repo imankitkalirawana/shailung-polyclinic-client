@@ -105,12 +105,11 @@ function App() {
                       path="tests/available-tests/:id/edit"
                       element={<EditAvailableTest />}
                     />
+                    <Route path="appointments/" element={<Outlet />}>
+                      <Route path="new" element={<NewAppointment />} />
+                    </Route>
 
                     <Route path="website" element={<Website />} />
-                    <Route
-                      path="appointments"
-                      element={<h1>Admin Appointment View</h1>}
-                    />
                   </Route>
                   <Route path="report/" element={<Outlet />}>
                     <Route path=":reportId/download" element={<Download />} />

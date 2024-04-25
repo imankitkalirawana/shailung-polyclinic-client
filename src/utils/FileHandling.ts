@@ -46,8 +46,10 @@ export const UploadMultipleFiles = async (files: FileList, filename: any[]) => {
             }
         });
         console.log("Files uploaded successfully", response);
+        return response.data;
     } catch (error) {
         console.error(error);
         toast.error("Failed to upload files");
+        return null;
     }
 }

@@ -18,7 +18,7 @@ const Login = () => {
   // const
   const [isLogging, setIsLogging] = useState(false);
   const [isOfficial, setIsOfficial] = useState(false);
-    const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false);
   const [countryData, setCountryData] = useState<Country[]>([]);
   const [searchParams] = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || "/dashboard";
@@ -126,8 +126,8 @@ const Login = () => {
       setIsOtpSent(true);
       setIsOtpResent(isOtpResent + 1);
       toast.success("OTP Sent Successfully");
-      // const response = await axios.get(api_url);
-      // console.log(response.data);
+      const response = await axios.get(api_url);
+      console.log(response.data);
       // console.log(formik.values.dbOtp);
     } catch (e) {
       console.log(e);

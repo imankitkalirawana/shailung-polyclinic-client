@@ -269,22 +269,42 @@ const Download = () => {
                                               row.value !== undefined &&
                                               row.value !== ""
                                           )
-                                          .map((row, index) => (
-                                            <tr key={index}>
-                                              <td className="px-6 py-2 whitespace-nowrap text-sm font-medium">
-                                                {row.title}
-                                              </td>
-                                              <td className="px-6 py-2 whitespace-nowrap text-sm">
-                                                {row.value || "-"}
-                                              </td>
-                                              <td className="px-6 py-2 whitespace-nowrap text-sm">
-                                                {row.reference}
-                                              </td>
-                                              <td className="px-6 py-2 whitespace-nowrap text-end text-sm font-medium">
-                                                {row.unit}
-                                              </td>
-                                            </tr>
-                                          ))}
+                                          .map((row, index) => {
+                                            const referenceValues =
+                                              row.reference.split(" - ");
+                                            const minValue = parseFloat(
+                                              referenceValues[0]
+                                            );
+                                            const maxValue = parseFloat(
+                                              referenceValues[1]
+                                            );
+                                            const isValueInRange =
+                                              parseFloat(row.value) >=
+                                                minValue &&
+                                              parseFloat(row.value) <= maxValue;
+
+                                            const valueStyle = isValueInRange
+                                              ? ""
+                                              : "font-bold";
+                                            return (
+                                              <tr key={index}>
+                                                <td className="px-6 py-2 whitespace-nowrap text-sm font-medium">
+                                                  {row.title}
+                                                </td>
+                                                <td
+                                                  className={`px-6 py-2 whitespace-nowrap text-sm ${valueStyle}`}
+                                                >
+                                                  {row.value || "-"}
+                                                </td>
+                                                <td className="px-6 py-2 whitespace-nowrap text-sm">
+                                                  {row.reference}
+                                                </td>
+                                                <td className="px-6 py-2 whitespace-nowrap text-end text-sm font-medium">
+                                                  {row.unit}
+                                                </td>
+                                              </tr>
+                                            );
+                                          })}
                                       </tbody>
                                     </table>
                                   </div>

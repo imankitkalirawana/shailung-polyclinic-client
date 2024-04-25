@@ -24,6 +24,8 @@ const Login = () => {
           localStorage.setItem("userData", JSON.stringify(data));
           localStorage.setItem("userId", data.user._id);
           toast.success("Logged in successfully");
+          // remove session storage
+          sessionStorage.removeItem("register");
           window.location.href = "/dashboard";
         }
       } catch (err: any) {

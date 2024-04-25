@@ -38,7 +38,6 @@ const User = () => {
     initialValues: {
       _id: "",
       name: "",
-      username: "",
       email: "",
       photo: "",
       bio: "",
@@ -47,7 +46,7 @@ const User = () => {
       dob: "",
       phone: "",
       address: "",
-      confirmusername: "",
+      confirmemail: "",
       isDoctor: false,
     },
     onSubmit: async (values) => {
@@ -84,6 +83,26 @@ const User = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  console.log(formik.values);
+
+  const handleDelete = async () => {
+    try {
+      const response = await axios.delete(
+        `${API_BASE_URL}/api/admin/user/${id}`,
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      toast.success(response.data.message);
+      navigate("/dashboard/users");
+    } catch (error: any) {
+      console.log(error.message);
+      toast.error(error.message);
+    }
+  };
   return (
     <>
       <Helmet>
@@ -111,27 +130,6 @@ const User = () => {
               Update user details
             </p>
             <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-6 md:w-[50%]">
-                <label htmlFor="username" className="label">
-                  <span className="label-text">Username</span>
-                </label>
-                <div className="mt-2">
-                  <div className="flex input input-bordered shadow-sm sm:max-w-md">
-                    <span className="hidden sm:flex select-none items-center pl-3 text-base-content sm:text-sm">
-                      https://{window.location.hostname}/
-                    </span>
-                    <input
-                      type="text"
-                      name="username"
-                      id="username"
-                      autoComplete="username"
-                      className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-base-content placeholder:text-base-neutral focus:ring-0 sm:text-sm sm:leading-6"
-                      onChange={formik.handleChange}
-                      value={formik.values.username}
-                    />
-                  </div>
-                </div>
-              </div>
               <div className="col-span-full">
                 <label
                   htmlFor="photo"
@@ -355,26 +353,25 @@ const User = () => {
             <div className="modal-box max-w-96">
               <label htmlFor="city" className="label">
                 <span className="label-text">
-                  Enter <b>{formik.values.username}</b> to delete
+                  Enter <b>{formik.values.email}</b> to delete
                 </span>
               </label>
               <input
                 type="text"
                 id="delete_confirmation"
-                name="confirmusername"
+                name="confirmemail"
                 className="input input-bordered w-full placeholder:text-base-content/40"
-                placeholder={formik.values.username}
+                placeholder={formik.values.email}
                 // disabled={isDeleting}
                 onChange={formik.handleChange}
-                value={formik.values.confirmusername}
+                value={formik.values.confirmemail}
               />
               <div className="flex modal-action">
                 <button
                   className="btn btn-primary flex-1"
-                  // disabled={
-                  //   formik.values.confirmusername !== formik.values.username ||
-                  //   isDeleting
-                  // }
+                  type="button"
+                  disabled={formik.values.confirmemail !== formik.values.email}
+                  onClick={handleDelete}
                 >
                   Delete
                 </button>

@@ -122,7 +122,7 @@ const Complete = () => {
       testid: "",
       userid: "",
       addedby: "",
-      status: "positive",
+      status: "neutral",
       reportRows: Array.from({ length: 1 }, () => ({
         title: "",
         value: "",
@@ -143,51 +143,41 @@ const Complete = () => {
                 .pop()}`
           );
           values.reportFile = filenames;
-          UploadMultipleFiles(files, filenames).then(() => {
-            uploadReport(values);
+          await UploadMultipleFiles(files, filenames).then(async (res) => {
+            if (res) {
+              setIsUploaded(true);
+              await uploadReport(values);
+            }
           });
         } else {
-          await uploadReport(values);
+          await uploadReport(values).then((res) => {
+            if (res) {
+              setIsUploaded(true);
+            }
+          });
         }
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        toast.success("Report uploaded successfully");
+        navigate("/dashboard/tests");
       } catch (error) {
         toast.error("Failed to upload report");
         console.error(error);
-      } finally {
-        setProcessing(false);
-        toast.success("Report uploaded successfully");
       }
+      setProcessing(false);
     },
   });
 
   const uploadReport = async (values: any) => {
     try {
-      axios
-        .post(`${API_BASE_URL}/api/report`, values, {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        })
-        .then((res) => {
-          console.log(res.data._id);
-          axios
-            .put(
-              `${API_BASE_URL}/api/test/done/${id}`,
-              {
-                reportId: res.data._id,
-              },
-              {
-                headers: {
-                  Authorization: `${localStorage.getItem("token")}`,
-                },
-              }
-            )
-            .then(() => {
-              setIsUploaded(true);
-              navigate("/dashboard/tests?status=completed");
-            });
-        });
+      const res = await axios.post(`${API_BASE_URL}/api/report`, values, {
+        headers: {
+          Authorization: `${localStorage.getItem("token")}`,
+        },
+      });
+      return res.data;
     } catch (error) {
       console.error(error);
+      return null;
     }
   };
 
@@ -425,6 +415,7 @@ const Complete = () => {
                   <option value="" disabled>
                     Select Status
                   </option>
+                  <option value="neutral">Neutral</option>
                   <option value="positive">Positive</option>
                   <option value="negative">Negative</option>
                 </select>
@@ -582,17 +573,15 @@ const Complete = () => {
                                       formik.values.reportRows[index].isDisabled
                                     }
                                   />
-                                  {formik.values.reportRows.length > 1 &&
-                                    !formik.values.reportRows[index]
-                                      .isDisabled && (
-                                      <button
-                                        type="button"
-                                        onClick={() => removeRow(index)}
-                                        className="btn btn-sm btn-ghost btn-circle opacity-0 mr-1 group-hover:opacity-100"
-                                      >
-                                        <XIcon className="w-5 h-5" />
-                                      </button>
-                                    )}
+                                  {formik.values.reportRows.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => removeRow(index)}
+                                      className="btn btn-sm btn-ghost btn-circle opacity-0 mr-1 group-hover:opacity-100"
+                                    >
+                                      <XIcon className="w-5 h-5" />
+                                    </button>
+                                  )}
                                 </td>
                               </tr>
                             ))}
@@ -613,7 +602,6 @@ const Complete = () => {
                   </div>
                 </div>
               )}
-
               <div className="col-span-full md:justify-self-end">
                 <button
                   type="submit"

@@ -9,6 +9,7 @@ export interface Test {
   addeddate: string;
   appointmentdate: string;
   reportId: string;
+  addedby: string;
   testDetail: {
     testData: {
       _id: string;
@@ -18,14 +19,12 @@ export interface Test {
     };
     userData: {
       _id: string;
-      username: string;
       name: string;
       email: string;
       phone: string;
     };
     doctorData: {
       _id: string;
-      username: string;
       name: string;
       email: string;
       phone: string;
@@ -35,7 +34,6 @@ export interface Test {
 
 export interface User {
   _id: string;
-  username: string;
   photo: string;
   name: string;
   role: string;

@@ -11,7 +11,7 @@ const ForgotPassword = () => {
   const [isSent, setIsSent] = useState(false);
   const formik = useFormik({
     initialValues: {
-      email: "",
+      id: "",
     },
     onSubmit: async (values) => {
       try {
@@ -19,7 +19,7 @@ const ForgotPassword = () => {
         const response = await axios.post(
           `${API_BASE_URL}/api/user/forgot-password/`,
           {
-            email: values.email,
+            id: values.id,
           }
         );
         console.log(response.data);
@@ -49,15 +49,15 @@ const ForgotPassword = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form>
             <div>
-              <label htmlFor="email" className="label">
-                <span className="label-text">Email</span>
+              <label htmlFor="id" className="label">
+                <span className="label-text">Email / Phone Number</span>
               </label>
               <input
-                id="email"
-                type="email"
+                id="id"
+                type="id"
                 required
                 onChange={formik.handleChange}
-                value={formik.values.email}
+                value={formik.values.id}
                 className="input input-bordered w-full"
                 disabled={isSent || isSubmitting}
               />
@@ -90,7 +90,7 @@ const ForgotPassword = () => {
                     <span>View Mail</span>
                   </>
                 ) : (
-                  "Send Email"
+                  "Send Reset Link"
                 )}
               </button>
             </div>
