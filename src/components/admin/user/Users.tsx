@@ -9,7 +9,12 @@ import {
   SearchIcon,
   TrashXIcon,
 } from "../../icons/Icons";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { toast } from "sonner";
 import { useFormik } from "formik";
 import { Roles } from "../../../utils/config";
@@ -178,9 +183,9 @@ const Users = () => {
                 : "All Users"}
             </h1>
             <div className="flex gap-2 flex-row-reverse">
-              <label htmlFor="add_user" className="btn btn-primary btn-sm">
+              <Link to={"?action=new"} className="btn btn-primary btn-sm">
                 <span>Add User</span>
-              </label>
+              </Link>
               {user?.role === "admin" && (
                 <button
                   className="btn btn-outline hover:btn-primary btn-sm btn-circle tooltip tooltip-bottom flex"
@@ -365,60 +370,6 @@ const Users = () => {
                   </tr>
                 </tbody>
               </table>
-              {/* <div
-                className={`grid px-4 py-3 text-xs font-semibold tracking-wideuppercase border-t bg-primary/20 sm:grid-cols-9`}
-              >
-                <span className="flex items-center col-span-3">
-                  Showing {initialItem + 1}-{finalItem} of{" "}
-                  {
-                    users.filter((user) => {
-                      return handleSearch(user);
-                    }).length
-                  }
-                </span>
-                <span className="col-span-2"></span>
-                <span className="flex col-span-4 mt-2 sm:mt-auto sm:justify-end">
-                  <nav aria-label="Table navigation">
-                    <ul className="inline-flex items-center">
-                      <li>
-                        <button
-                          className="btn btn-sm btn-ghost btn-circle"
-                          aria-label="Previous"
-                          onClick={() => {
-                            if (initialItem > 0) {
-                              setInitialItem(initialItem - offset);
-                              setFinalItem(finalItem - offset);
-                            }
-                          }}
-                        >
-                          <LeftAngle className="w-4 h-4 fill-current" />
-                        </button>
-                      </li>
-
-                      <li>
-                        <button
-                          className="btn btn-sm btn-ghost btn-circle"
-                          aria-label="Next"
-                          onClick={() => {
-                            if (
-                              finalItem <
-                              users.filter((user) => {
-                                return handleSearch(user);
-                              }).length -
-                                1
-                            ) {
-                              setInitialItem(initialItem + offset);
-                              setFinalItem(finalItem + offset);
-                            }
-                          }}
-                        >
-                          <RightAngle className="w-4 h-4 fill-current" />
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
-                </span>
-              </div> */}
             </div>
           ) : (
             <NotFound message="No users found" />
@@ -498,8 +449,11 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
 
 const AddUser = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isAdding, setIsAdding] = useState(false);
   const { user } = isLoggedIn();
+  const [searchParams] = useSearchParams();
+  const action = searchParams.get("action");
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -533,7 +487,12 @@ const AddUser = () => {
   return (
     <>
       <input type="checkbox" id="add_user" className="modal-toggle" />
-      <div className="modal backdrop-blur-sm" role="dialog">
+      <div
+        className={`modal ${
+          action === "new" ? "modal-open" : ""
+        } backdrop-blur-sm`}
+        role="dialog"
+      >
         <div className="modal-box max-w-md">
           <div className="container flex items-center justify-center min-h-screen px-6 mx-auto">
             <form className="w-full max-w-md" onSubmit={formik.handleSubmit}>
@@ -634,9 +593,17 @@ const AddUser = () => {
                     "Add User"
                   )}
                 </button>
-                <label htmlFor="add_user" className="btn flex-1">
+                <button
+                  className="btn flex-1"
+                  type="button"
+                  onClick={() => {
+                    const url = location.pathname;
+                    url.replace("?action=new", "");
+                    navigate(url);
+                  }}
+                >
                   Cancel!
-                </label>
+                </button>
               </div>
             </form>
           </div>

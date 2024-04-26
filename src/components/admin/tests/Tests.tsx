@@ -17,10 +17,10 @@ import NotFound from "../../NotFound";
 import { toast } from "sonner";
 import { getAllDoctors, getAllTests } from "../../../functions/get";
 import { isLoggedIn } from "../../../utils/auth";
-import * as XLSX from "xlsx";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Test } from "../../../interface/interface";
+import { useFormik } from "formik";
 
 export const testStatus = async (testId: any, status: string) => {
   try {
@@ -52,6 +52,7 @@ const Tests = () => {
   const [isDelete, setIsDelete] = useState(false);
   const [isAssign, setIsAssign] = useState(false);
   const [isSchedule, setIsSchedule] = useState(false);
+  const [isExport, setIsExport] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const queryStatus = searchParams.get("status");
@@ -148,25 +149,13 @@ const Tests = () => {
       test._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       humanReadableDate(test.appointmentdate)
         .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      humanReadableDate(test.addeddate)
+        .toLowerCase()
         .includes(searchQuery.toLowerCase())
     ) {
       return test;
     }
-  };
-
-  const exportToExcel = async () => {
-    const filename = "tests";
-    const response = await axios.get(`${API_BASE_URL}/api/test/export`, {
-      headers: {
-        Authorization: `${localStorage.getItem("token")}`,
-      },
-    });
-    const data = response.data;
-
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Tests");
-    XLSX.writeFile(wb, `${filename}.xlsx`);
   };
 
   // handle sorting
@@ -201,7 +190,8 @@ const Tests = () => {
               </Link>
               <button
                 className="btn btn-outline btn-sm hover:btn-primary"
-                onClick={() => exportToExcel()}
+                onClick={() => setIsExport(true)}
+                // onClick={exportToExcel}
               >
                 Export to Excel
               </button>
@@ -486,6 +476,149 @@ const Tests = () => {
             setTests={setTests}
           />
         ))}
+      {isExport && (
+        <ExportModal
+          tests={tests}
+          onClose={() => {
+            setIsExport(false);
+          }}
+        />
+      )}
+    </>
+  );
+};
+
+interface ExportModalProps {
+  tests: Test[];
+  onClose: () => void;
+}
+interface FormValues {
+  testIds: string[];
+}
+
+const ExportModal = ({ tests, onClose }: ExportModalProps) => {
+  const formik = useFormik<FormValues>({
+    initialValues: {
+      testIds: [],
+    },
+    onSubmit: async (values) => {
+      try {
+        const response = await axios.post(
+          `${API_BASE_URL}/api/export/tests`,
+          {
+            testIds: values.testIds,
+          },
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+            responseType: "blob",
+          }
+        );
+        console.log(response.data);
+        const blob = new Blob([response.data], {
+          type: response.headers["content-type"],
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "exported_tests.csv");
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+        // wait for 2 seconds before closing the modal
+        setTimeout(() => {
+          toast.success("Tests exported successfully", {
+            id: "exporting-tests",
+          });
+          onClose();
+        }, 2000);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+  });
+
+  return (
+    <>
+      <div
+        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+        role="dialog"
+      >
+        <div className="modal-box w-full">
+          <h3 className="font-bold text-lg text-center">Export Tests</h3>
+          <div className="py-4 max-h-48 overflow-y-scroll">
+            {/* checkbox to select all */}
+            <div className="form-control">
+              <label className="label cursor-pointer">
+                <span className="label-text">Select All</span>
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  name="selectAll"
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      formik.setFieldValue(
+                        "testIds",
+                        tests.map((test) => test._id)
+                      );
+                    } else {
+                      formik.setFieldValue("testIds", []);
+                    }
+                  }}
+                  checked={formik.values.testIds.length === tests.length}
+                />
+              </label>
+            </div>
+            {tests
+              .sort((a, b) =>
+                a.testDetail.userData.name.localeCompare(
+                  b.testDetail.userData.name
+                )
+              )
+              .map((test, index) => (
+                <div className="form-control" key={index}>
+                  <label className="label cursor-pointer">
+                    <span className="label-text">
+                      {test.testDetail.userData.name}
+                    </span>
+                    <input
+                      type="checkbox"
+                      className="checkbox"
+                      name="testIds"
+                      value={test._id}
+                      onChange={formik.handleChange}
+                      checked={formik.values.testIds.includes(test._id)}
+                    />
+                  </label>
+                </div>
+              ))}
+          </div>
+          <div className="modal-action flex flex-col xs:flex-row">
+            <button
+              className="btn btn-info flex-1"
+              type="submit"
+              onClick={() => {
+                formik.handleSubmit();
+                toast.success("Exporting tests", {
+                  id: "exporting-tests",
+                });
+              }}
+            >
+              Export
+            </button>
+            <button
+              className="btn flex-1"
+              onClick={() => {
+                onClose();
+              }}
+            >
+              Close!
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
@@ -745,14 +878,6 @@ const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
                 </option>
               ))}
             </select>
-            {/* {doctors.map((doctor) => (
-              <div className="form-control">
-                <label className="label cursor-pointer flex justify-start gap-3">
-                  <input type="checkbox" defaultChecked className="checkbox" />
-                  <span className="label-text">{doctor.name}</span>
-                </label>
-              </div>
-            ))} */}
           </div>
           <div className="modal-action flex">
             <button

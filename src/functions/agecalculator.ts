@@ -1,4 +1,5 @@
 export function calculateAge(dateString: string): number {
+    if (!dateString) return 0;
     // Split the date string into year, month, and day
     const [year, month, day] = dateString.split('-').map(Number);
 

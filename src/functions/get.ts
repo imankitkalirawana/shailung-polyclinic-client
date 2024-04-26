@@ -30,13 +30,23 @@ export const getUserWithId = async (id: string) => {
 }
 
 export const getAllDoctors = async () => {
-    const response = await axios.get(`${API_BASE_URL}/api/user/doctors`, {
+    const response = await axios.get(`${API_BASE_URL}/api/doctor/doctors`, {
         headers: {
             Authorization: `${localStorage.getItem("token")}`,
         },
     });
     const data = response.data;
     return data.reverse();
+}
+
+export const getDoctorsWithIds = async (doctorIds: string[]) => {
+    const response = await axios.post(`${API_BASE_URL}/api/doctor/doctors`, { doctorIds }, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    const data = response.data;
+    return data;
 }
 
 

@@ -28,6 +28,7 @@ const Register = () => {
       otp: "",
       name: "",
       dob: "",
+      gender: "",
       email: "",
       password: "",
       confirm_password: "",
@@ -311,7 +312,7 @@ const Register = () => {
                 </>
                 {isOtpVerified && (
                   <>
-                    <div className="col-span-3">
+                    <div className="col-span-full">
                       <label htmlFor="name" className="label">
                         <span className="label-text">Name</span>
                       </label>
@@ -327,7 +328,7 @@ const Register = () => {
                       />
                     </div>
                     <div className="col-span-3">
-                      <label htmlFor="age" className="label">
+                      <label htmlFor="dob" className="label">
                         <span className="label-text">DOB</span>
                       </label>
 
@@ -340,6 +341,18 @@ const Register = () => {
                         value={formik.values.dob}
                         required
                       />
+                    </div>
+                    <div className="col-span-3">
+                      <label htmlFor="gender" className="label">
+                        <span className="label-text">Gender</span>
+                      </label>
+                      <select
+                        name="gender"
+                        className="select select-bordered w-full"
+                        id="gender"
+                      >
+                        <option value=""></option>
+                      </select>
                     </div>
                     <div className="col-span-full">
                       <label htmlFor="email" className="label">

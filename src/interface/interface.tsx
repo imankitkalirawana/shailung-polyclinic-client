@@ -10,6 +10,7 @@ export interface Test {
   appointmentdate: string;
   reportId: string;
   addedby: string;
+  doctors: string[];
   testDetail: {
     testData: {
       _id: string;
@@ -54,6 +55,7 @@ export interface AvailableTest {
   status: string;
   addeddate: string;
   updatedat: string;
+  doctors: string[];
   testProps: [
     {
       investigation: string;
@@ -61,6 +63,16 @@ export interface AvailableTest {
       unit: string;
     }
   ];
+}
+
+export interface Doctor {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  designation: string;
+  regno: string;
+  sign: string;
 }
 
 export interface Report {

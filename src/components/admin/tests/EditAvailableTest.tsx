@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
@@ -6,10 +6,13 @@ import { toast } from "sonner";
 import { API_BASE_URL } from "../../../utils/config";
 import { PlusIcon, XIcon } from "../../icons/Icons";
 import { isLoggedIn } from "../../../utils/auth";
+import { getAllDoctors } from "../../../functions/get";
+import { Doctor } from "../../../interface/interface";
 
 const EditAvailableTest = () => {
   const { user } = isLoggedIn();
   const navigate = useNavigate();
+  const [doctors, setDoctors] = useState([]);
   useEffect(() => {
     if (user?.role !== "admin" && user?.role !== "member") {
       navigate("/dashboard");
@@ -28,6 +31,8 @@ const EditAvailableTest = () => {
       );
       const data = response.data;
       formik.setValues(data);
+      const res2 = await getAllDoctors();
+      setDoctors(res2);
     };
     fetchUser();
   }, []);
@@ -40,6 +45,7 @@ const EditAvailableTest = () => {
       price: "0",
       duration: "",
       status: "active",
+      doctors: [] as string[],
       testProps: Array.from({ length: 1 }, () => ({
         investigation: "",
         referenceValue: "",
@@ -54,7 +60,7 @@ const EditAvailableTest = () => {
           },
         });
         toast.success("Updated Successfully");
-        navigate("/dashboard/tests/available-tests");
+        // navigate("/dashboard/tests/available-tests");
       } catch (error: any) {
         console.log(error.message);
         toast.error(error.message);
@@ -167,7 +173,7 @@ const EditAvailableTest = () => {
                 />
               </div>
             </div>
-            <div className="col-span-2">
+            <div className="col-span-6 md:col-span-2">
               <label htmlFor="status" className="label">
                 <span className="label-text">Status</span>
               </label>
@@ -179,9 +185,36 @@ const EditAvailableTest = () => {
                   onChange={formik.handleChange}
                   value={formik.values.status}
                 >
-                  <option value="active">Avalaible</option>
+                  <option value="active">Available</option>
                   <option value="inactive">Not Available</option>
                 </select>
+              </div>
+            </div>
+            <div className="col-span-2">
+              <label htmlFor="doctors" className="label">
+                <span className="label-text">Doctors</span>
+              </label>
+              <div className="max-h-48 overflow-y-scroll">
+                {doctors.map((doctor: Doctor, index) => (
+                  <div className="form-control" key={index}>
+                    <label
+                      key={doctor._id}
+                      className="cursor-pointer label flex-row-reverse justify-end gap-2"
+                    >
+                      <span className="label-text">{doctor.name}</span>
+                      <input
+                        type="checkbox"
+                        className="checkbox"
+                        name="doctors"
+                        value={doctor._id}
+                        onChange={formik.handleChange}
+                        checked={formik.values.doctors.includes(
+                          doctor._id as string
+                        )}
+                      />
+                    </label>
+                  </div>
+                ))}
               </div>
             </div>
             <div className="form-control col-span-full">

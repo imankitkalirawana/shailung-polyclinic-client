@@ -52,7 +52,12 @@ const Reports = () => {
       (report.testname &&
         report.testname.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (report.status &&
-        report.status.toLowerCase().includes(searchQuery.toLowerCase()))
+        report.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (report.addedby &&
+        report.addedby.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      humanReadableDate(report.reportDate)
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
     ) {
       return report;
     }

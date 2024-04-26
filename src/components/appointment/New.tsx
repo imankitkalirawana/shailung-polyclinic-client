@@ -61,6 +61,8 @@ const New = () => {
           ...formik.values,
           phone: data.phone,
           email: data.email,
+          name: data.name,
+          age: calculateAge(data.dob || ""),
         });
         if (data.name === "" || data.phone === "") {
           toast.error("Please update your profile to continue", {
@@ -98,7 +100,6 @@ const New = () => {
 
   const formik = useFormik({
     initialValues: {
-      testfor: "",
       testids: [],
       appointmentdate: "",
       phone: "",
@@ -113,7 +114,6 @@ const New = () => {
           .post(
             `${API_BASE_URL}/api/test`,
             {
-              testfor: values.testfor,
               testids: values.testids,
               appointmentdate: values.appointmentdate,
               phone: lUser.phone,
@@ -146,19 +146,7 @@ const New = () => {
     },
   });
 
-  const handleTestFor = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    formik.setFieldValue("testfor", e.target.value);
-    formik.setValues({
-      ...formik.values,
-      testfor: e.target.value,
-      testids: [],
-      appointmentdate: "",
-      phone: lUser.phone,
-      name: "",
-      age: 0,
-      email: lUser.email,
-    });
-  };
+  // console.log(formik.values.doctors);
 
   const fetchSelectedTest = async (id: string) => {
     try {
@@ -204,7 +192,6 @@ const New = () => {
               </Link>
             </div>
           </div>
-          {/*  */}
 
           <div className="flex flex-col md:flex-row-reverse justify-between items-center mt-12 gap-8">
             <div className="flex-1 md:max-w-[50%]">
@@ -214,307 +201,229 @@ const New = () => {
               className="grid grid-cols-2 gap-4 w-full md:max-w-[50%]"
               onSubmit={formik.handleSubmit}
             >
-              {!userId && (
-                <div className="form-control col-span-2">
-                  <label className="label" htmlFor="testfor">
-                    <span className="label-text">Test For</span>
-                  </label>
-                  <select
-                    className="select select-bordered"
-                    defaultValue={"Select Test"}
-                    name="testfor"
-                    id="testfor"
-                    onChange={handleTestFor}
-                    value={formik.values.testfor}
+              <>
+                {!lUser.name || !calculateAge(lUser.dob || "") ? (
+                  <div
+                    role="alert"
+                    className="alert mt-4 bg-error/20 col-span-full"
                   >
-                    <option value={""} disabled>
-                      Select Test
-                    </option>
-                    <option value="self">For Myself</option>
-                    <option value="family">For Family</option>
-                  </select>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      className="stroke-error shrink-0 w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    <span>
+                      {userId ? "User" : "You"} have incomplete profile.{" "}
+                      <Link
+                        to={
+                          userId
+                            ? `/dashboard/users/${lUser._id}/edit`
+                            : "/profile"
+                        }
+                        className="link"
+                      >
+                        Update Now
+                      </Link>
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    role="alert"
+                    className="alert mt-4 bg-info/20 col-span-full"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      className="stroke-info shrink-0 w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    <span>
+                      You can update your profile if below information is not
+                      displayed or incorrect.{" "}
+                      <Link
+                        to={
+                          userId
+                            ? `/dashboard/users/${lUser._id}/edit`
+                            : "/profile"
+                        }
+                        className="link"
+                      >
+                        Update Now
+                      </Link>
+                    </span>
+                  </div>
+                )}
+                <div className="form-control col-span-2">
+                  <label htmlFor="name" className="label">
+                    <span className="label-text">Patient Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    className="input input-bordered"
+                    placeholder="Patient Name"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                  />
                 </div>
-              )}
-              {(formik.values.testfor === "self" || userId) && (
-                <>
-                  {!lUser.name || !calculateAge(lUser.dob || "") ? (
-                    <div
-                      role="alert"
-                      className="alert mt-4 bg-error/20 col-span-full"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        className="stroke-error shrink-0 w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        ></path>
-                      </svg>
-                      <span>
-                        {userId ? "User" : "You"} have incomplete profile.{" "}
-                        <Link
-                          to={
-                            userId
-                              ? `/dashboard/users/${lUser._id}/edit`
-                              : "/profile"
-                          }
-                          className="link"
+                <div className="form-control col-span-2">
+                  <label htmlFor="phone" className="label">
+                    <span className="label-text">Patient Phone</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="phone"
+                    name="phone"
+                    className="input input-bordered"
+                    placeholder="Patient phone"
+                    value={formik.values.phone}
+                    onChange={formik.handleChange}
+                    disabled
+                  />
+                  <label className="label">
+                    <span className="label-text-alt">
+                      Patient number will be same as registered by the user
+                    </span>
+                  </label>
+                </div>
+                {/* patient age */}
+                <div className="form-control col-span-2 md:col-span-1">
+                  <label htmlFor="age" className="label">
+                    <span className="label-text">Patient Age</span>
+                  </label>
+                  <input
+                    type="number"
+                    className="input input-bordered"
+                    name="age"
+                    placeholder="Patient Age"
+                    value={formik.values.age}
+                    onChange={formik.handleChange}
+                  />
+                </div>
+              </>
+              <>
+                <div className="form-control col-span-2 md:col-span-1">
+                  <label className="label">
+                    <span className="label-text">Select Appointment Date</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="appointmentdate"
+                    className="input input-bordered"
+                    placeholder="Select Date"
+                    min={new Date().toISOString().split("T")[0]}
+                    onChange={formik.handleChange}
+                    value={formik.values.appointmentdate}
+                    required
+                  />
+                </div>
+                <div className="form-control col-span-2">
+                  <label className="label">
+                    <span className="label-text">Select Tests</span>
+                  </label>
+                  <div className="m max-h-40 overflow-y-scroll">
+                    {tests
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((test, index) => (
+                        <div
+                          className="flex items-center justify-between"
+                          key={index}
                         >
-                          Update Now
-                        </Link>
-                      </span>
-                    </div>
-                  ) : (
-                    <div
-                      role="alert"
-                      className="alert mt-4 bg-info/20 col-span-full"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        className="stroke-info shrink-0 w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        ></path>
-                      </svg>
-                      <span>
-                        You can update your profile if below information is not
-                        displayed or incorrect.{" "}
-                        <Link
-                          to={
-                            userId
-                              ? `/dashboard/users/${lUser._id}/edit`
-                              : "/profile"
-                          }
-                          className="link"
-                        >
-                          Update Now
-                        </Link>
-                      </span>
-                    </div>
-                  )}
-                  <div className="form-control col-span-2">
-                    <label htmlFor="name" className="label">
-                      <span className="label-text">Patient Name</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      className="input input-bordered"
-                      placeholder="Patient Name"
-                      value={lUser.name}
-                      disabled
-                    />
-                  </div>
-                  <div className="form-control col-span-2">
-                    <label htmlFor="phone" className="label">
-                      <span className="label-text">Patient Phone</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="phone"
-                      name="phone"
-                      className="input input-bordered"
-                      placeholder="Patient phone"
-                      value={lUser.phone}
-                      disabled
-                    />
-                  </div>
-                  {/* patient age */}
-                  <div className="form-control col-span-2 md:col-span-1">
-                    <label htmlFor="age" className="label">
-                      <span className="label-text">Patient Age</span>
-                    </label>
-                    <input
-                      type="number"
-                      className="input input-bordered"
-                      value={calculateAge(lUser.dob || "")}
-                      disabled
-                    />
-                  </div>
-                </>
-              )}
-
-              {formik.values.testfor === "family" && (
-                <>
-                  <div className="form-control col-span-2">
-                    <label htmlFor="name" className="label">
-                      <span className="label-text">Patient Name</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      className="input input-bordered"
-                      placeholder="Patient Name"
-                      value={formik.values.name}
-                      onChange={formik.handleChange}
-                      required
-                      minLength={3}
-                    />
-                  </div>
-                  <div className="form-control col-span-2">
-                    <label htmlFor="phone" className="label">
-                      <span className="label-text">Patient Phone</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="phone"
-                      name="phone"
-                      className="input input-bordered"
-                      placeholder="Patient phone"
-                      value={formik.values.phone}
-                      onChange={formik.handleChange}
-                      disabled
-                    />
-                  </div>
-                  {/* patient age */}
-                  <div className="form-control col-span-2 md:col-span-1">
-                    <label htmlFor="number" className="label">
-                      <span className="label-text">Patient Age</span>
-                    </label>
-                    <input
-                      type="number"
-                      className="input input-bordered"
-                      placeholder="Patient Age"
-                      max={100}
-                      min={0}
-                      id="age"
-                      name="age"
-                      value={formik.values.age}
-                      onChange={formik.handleChange}
-                      required
-                      minLength={1}
-                    />
-                  </div>
-                </>
-              )}
-
-              {(formik.values.testfor !== "" || userId) && (
-                <>
-                  <div className="form-control col-span-2 md:col-span-1">
-                    <label className="label">
-                      <span className="label-text">
-                        Select Appointment Date
-                      </span>
-                    </label>
-                    <input
-                      type="date"
-                      name="appointmentdate"
-                      className="input input-bordered"
-                      placeholder="Select Date"
-                      min={new Date().toISOString().split("T")[0]}
-                      onChange={formik.handleChange}
-                      value={formik.values.appointmentdate}
-                      required
-                    />
-                  </div>
-                  <div className="form-control col-span-2">
-                    <label className="label">
-                      <span className="label-text">Select Tests</span>
-                    </label>
-                    <div className="m max-h-40 overflow-y-scroll">
-                      {tests
-                        .sort((a, b) => a.name.localeCompare(b.name))
-                        .map((test, index) => (
-                          <div
-                            className="flex items-center justify-between"
-                            key={index}
-                          >
-                            <label className="label cursor-pointer flex-row-reverse justify-end gap-4">
-                              <span className="label-text">{test.name}</span>
-                              <input
-                                type="checkbox"
-                                className="checkbox checked:checkbox-primary"
-                                name="testids"
-                                value={test._id}
-                                onChange={formik.handleChange}
-                              />
-                            </label>
-                            <button
-                              className="btn btn-sm btn-circle"
-                              type="button"
-                              onClick={() => fetchSelectedTest(test._id)}
-                            >
-                              <IconInfoCircleFilled
-                                className={`${
-                                  selectedTest._id === test._id
-                                    ? "text-info"
-                                    : "text-gray-500"
-                                } h-6 w-6`}
-                              />
-                            </button>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                  {selectedTest && selectedTest.name && (
-                    <div className="stats bg-base-300 col-span-full w-full">
-                      <div className="stat">
-                        <div className="stat-title">Test Name</div>
-                        <div className="stat-value text-2xl">
-                          {selectedTest.name}
-                        </div>
-                        <div className="stat-actions">
-                          <div className="btn btn-sm btn-success">
-                            Available
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="stat">
-                        <div className="stat-title flex items-center justify-between">
-                          <span>Current price</span>
+                          <label className="label cursor-pointer flex-row-reverse justify-end gap-4">
+                            <span className="label-text">{test.name}</span>
+                            <input
+                              type="checkbox"
+                              className="checkbox checked:checkbox-primary"
+                              name="testids"
+                              value={test._id}
+                              onChange={formik.handleChange}
+                            />
+                          </label>
                           <button
+                            className="btn btn-sm btn-circle"
                             type="button"
-                            className="btn btn-sm btn-ghost btn-circle"
-                            onClick={() => setSelectedTest({} as Tests)}
+                            onClick={() => fetchSelectedTest(test._id)}
                           >
-                            <IconXboxXFilled />
+                            <IconInfoCircleFilled
+                              className={`${
+                                selectedTest._id === test._id
+                                  ? "text-info"
+                                  : "text-gray-500"
+                              } h-6 w-6`}
+                            />
                           </button>
                         </div>
-                        <div className="stat-value text-2xl">
-                          {selectedTest.price
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                        </div>
-                        <div className="stat-actions">
-                          <div className="btn btn-sm">
-                            {selectedTest.duration}
-                          </div>
+                      ))}
+                  </div>
+                </div>
+                {selectedTest && selectedTest.name && (
+                  <div className="stats bg-base-300 col-span-full w-full">
+                    <div className="stat">
+                      <div className="stat-title">Test Name</div>
+                      <div className="stat-value text-2xl">
+                        {selectedTest.name}
+                      </div>
+                      <div className="stat-actions">
+                        <div className="btn btn-sm btn-success">Available</div>
+                      </div>
+                    </div>
+
+                    <div className="stat">
+                      <div className="stat-title flex items-center justify-between">
+                        <span>Current price</span>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-ghost btn-circle"
+                          onClick={() => setSelectedTest({} as Tests)}
+                        >
+                          <IconXboxXFilled />
+                        </button>
+                      </div>
+                      <div className="stat-value text-2xl">
+                        {selectedTest.price
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      </div>
+                      <div className="stat-actions">
+                        <div className="btn btn-sm">
+                          {selectedTest.duration}
                         </div>
                       </div>
                     </div>
-                  )}
-                  {/* submit button */}
-                  <div className="form-control col-span-2">
-                    <button
-                      className="btn btn-primary w-full"
-                      type="button"
-                      onClick={() => setIsConfirm(true)}
-                      disabled={
-                        formik.values.testids.length < 1 ||
-                        formik.values.appointmentdate === "" ||
-                        formik.values.age === 0 ||
-                        formik.values.name === ""
-                      }
-                    >
-                      Book Appointment
-                    </button>
                   </div>
-                </>
-              )}
+                )}
+                <div className="form-control col-span-2">
+                  <button
+                    className="btn btn-primary w-full"
+                    type="button"
+                    onClick={() => setIsConfirm(true)}
+                    disabled={
+                      formik.values.testids.length < 1 ||
+                      formik.values.appointmentdate === "" ||
+                      formik.values.age === 0 ||
+                      formik.values.name === ""
+                    }
+                  >
+                    Book Appointment
+                  </button>
+                </div>
+              </>
             </form>
           </div>
         </div>
