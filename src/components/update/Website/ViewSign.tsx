@@ -19,7 +19,7 @@ const ViewSign = () => {
     onSubmit: async (values) => {
       try {
         setProcessing(true);
-        await axios.put(`${API_BASE_URL}/api/website/report`, values, {
+        await axios.put(`${API_BASE_URL}/api/doctors/report`, values, {
           headers: {
             Authorization: `${localStorage.getItem("token")}`,
           },

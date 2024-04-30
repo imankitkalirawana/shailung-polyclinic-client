@@ -15,7 +15,6 @@ const Complete = () => {
   const { id }: any = useParams();
   const navigate = useNavigate();
 
-  const [doctors, setDoctors] = useState<any[]>([]);
   const [test, setTest] = useState<Test | null>(null);
   const [files, setFiles] = useState<FileList | null>(null);
   const [isUplaoded, setIsUploaded] = useState<boolean>(false);
@@ -51,13 +50,10 @@ const Complete = () => {
               phone: data.testDetail.userData.phone,
               email: data.testDetail.userData.email,
               age: data.testDetail.userData.age,
-              doctor:
-                (data.testDetail.doctorData &&
-                  data.testDetail.doctorData._id) ||
-                "",
               userid: data.testDetail.userData._id,
               testname: data.testDetail.testData.name,
               testid: data._id,
+              doctors: data.doctors,
             }));
             axios
               .get(
@@ -87,17 +83,6 @@ const Complete = () => {
       }
     };
     fetchTests();
-    const fetchAllDoctors = async () => {
-      const response = await axios.get(`${API_BASE_URL}/api/user/doctors`, {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
-      });
-      const data = response.data;
-      setDoctors(data);
-    };
-
-    fetchAllDoctors();
   }, []);
 
   useEffect(() => {
@@ -118,7 +103,6 @@ const Complete = () => {
       testname: "",
       reportType: "both",
       reportDate: new Date().toISOString().split("T")[0],
-      doctor: "",
       testid: "",
       userid: "",
       addedby: "",
@@ -131,6 +115,7 @@ const Complete = () => {
         isDisabled: false,
       })),
       reportFile: [""],
+      doctors: [],
     },
     onSubmit: async (values) => {
       setProcessing(true);
@@ -299,9 +284,6 @@ const Complete = () => {
                   value={formik.values.phone}
                   disabled={test?.testDetail.userData.phone !== ""}
                 />
-                <label htmlFor="phone">
-                  <span className="label-text-alt">+91 9801234567</span>
-                </label>
               </div>
               {/* Email */}
               <div className="col-span-full md:col-span-3">
@@ -373,32 +355,6 @@ const Complete = () => {
                     value={formik.values.reportDate}
                   />
                 </div>
-              </div>
-              <div className="col-span-full md:col-span-2">
-                <label className="label" htmlFor="doctor">
-                  <span className="label-text">Doctor</span>
-                </label>
-                <select
-                  name="doctor"
-                  id="doctor"
-                  className="select select-bordered w-full"
-                  required
-                  onChange={formik.handleChange}
-                  value={formik.values.doctor}
-                  disabled={
-                    test?.testDetail.doctorData &&
-                    test?.testDetail.doctorData._id !== ""
-                  }
-                >
-                  <option value="" disabled>
-                    Doctor
-                  </option>
-                  {doctors.map((doctor) => (
-                    <option key={doctor._id} value={doctor._id}>
-                      {doctor.name}
-                    </option>
-                  ))}
-                </select>
               </div>
               <div className="col-span-full md:col-span-2">
                 <label className="label" htmlFor="status">

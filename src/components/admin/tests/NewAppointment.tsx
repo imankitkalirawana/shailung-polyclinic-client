@@ -264,7 +264,6 @@ const NewAppointment = () => {
 };
 
 const AddUser = () => {
-  const navigate = useNavigate();
   const [isAdding, setIsAdding] = useState(false);
   const { user } = isLoggedIn();
   const formik = useFormik({
@@ -281,20 +280,24 @@ const AddUser = () => {
       try {
         setIsAdding(true);
         if (values.phone && !values.phone.startsWith("+")) {
-          values.phone = "+" + values.phone;
+          values.phone = "+977" + values.phone;
         }
-        await axios.post(`${API_BASE_URL}/api/admin/user`, values, {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        });
-        toast.success("User added successfully");
-        navigate(0);
+        await axios
+          .post(`${API_BASE_URL}/api/admin/user`, values, {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          })
+          .then((res) => {
+            toast.success("User added successfully");
+            window.location.href = `/appointment/new?user=${res.data._id}`;
+          });
       } catch (error: any) {
         toast.error(error.response.data.error);
         console.log(error);
+      } finally {
+        setIsAdding(false);
       }
-      setIsAdding(false);
     },
   });
 

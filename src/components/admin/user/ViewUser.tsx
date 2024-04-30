@@ -8,11 +8,12 @@ import { EditIcon } from "../../icons/Icons";
 import { isLoggedIn } from "../../../utils/auth";
 import { Helmet } from "react-helmet-async";
 import { calculateAge } from "../../../functions/agecalculator";
+import { User } from "../../../interface/interface";
 
 const ViewUser = () => {
   const { id }: any = useParams();
   const { user } = isLoggedIn();
-  const [getUser, setUser] = useState<any>({});
+  const [getUser, setUser] = useState<User>({} as User);
   useEffect(() => {
     const fetchUser = async () => {
       try {

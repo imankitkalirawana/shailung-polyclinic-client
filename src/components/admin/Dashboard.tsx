@@ -329,7 +329,7 @@ const TestCard = ({ tests }: TestCardProps) => {
                     <th className="px-4 py-3">Test</th>
                     <th className="px-4 py-3">Patient</th>
                     <th className="px-4 py-3">Patient Phone</th>
-                    <th className="px-4 py-3">Doctor</th>
+                    <th className="px-4 py-3">Added by</th>
                     <th className="px-4 py-3">Added On</th>
                   </tr>
                 </thead>
@@ -370,9 +370,7 @@ const TestCard = ({ tests }: TestCardProps) => {
                         {test.testDetail.userData.phone}
                       </td>
                       <td className="px-4 py-3 text-sm text-nowrap">
-                        {test.testDetail.doctorData
-                          ? test.testDetail.doctorData.name
-                          : "Not Assigned"}
+                        {test.addedby}
                       </td>
                       <td className="px-4 py-3 text-sm text-nowrap">
                         {humanReadableDate(test.updatedat)}

@@ -33,6 +33,9 @@ import AvailableServices from "./components/Homepage/AvailableServices";
 import { isLoggedIn } from "./utils/auth";
 import UserDashboard from "./components/Homepage/UserDashboard";
 import Register from "./components/auth/Register";
+import Doctors from "./components/admin/doctors/Doctors";
+import Doctor from "./components/admin/doctors/Doctor";
+import ViewDoctor from "./components/admin/doctors/ViewDoctor";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -40,6 +43,8 @@ const MainLayout = ({ children }: any) => (
     {children}
   </>
 );
+
+
 
 function App() {
   const { user } = isLoggedIn();
@@ -84,12 +89,17 @@ function App() {
                     <Route path="users" element={<Users />} />
                     <Route path="users/:id" element={<ViewUser />} />
                     <Route path="users/:id/edit" element={<User />} />
-
                     <Route path="tests/" element={<Outlet />}>
                       <Route path="" element={<Tests />} />
                       <Route path="complete/:id" element={<Complete />} />
                       <Route path="appointment" element={<NewAppointment />} />
                     </Route>
+                    <Route path="doctors/*" element={<Outlet />}>
+                      <Route path="" element={<Doctors />} />
+                      <Route path=":id" element={<ViewDoctor />} />
+                      <Route path=":id/edit" element={<Doctor />} />
+                    </Route>
+
                     {/* reports */}
                     <Route path="reports" element={<Reports />} />
 

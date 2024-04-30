@@ -44,6 +44,8 @@ export interface User {
   address: string;
   updatedat: string;
   dob: string;
+  gender: string;
+  addeddate: string;
 }
 
 export interface AvailableTest {
@@ -92,6 +94,15 @@ export interface Report {
   status: string;
   addedby: string;
   testid: string;
+  doctors: [
+    {
+      _id: string;
+      name: string;
+      designation: string;
+      regno: string;
+      sign: string;
+    }
+  ];
   reportRows: {
     title: string;
     value: string;

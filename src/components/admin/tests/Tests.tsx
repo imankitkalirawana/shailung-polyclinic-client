@@ -5,7 +5,6 @@ import {
   LeftAngle,
   RightAngle,
   SearchIcon,
-  StethoscopeIcon,
   TrashXIcon,
 } from "../../icons/Icons";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -15,7 +14,7 @@ import { humanReadableDate } from "../user/Users";
 import { TestStatus } from "../../../utils/config";
 import NotFound from "../../NotFound";
 import { toast } from "sonner";
-import { getAllDoctors, getAllTests } from "../../../functions/get";
+import { getAllTests } from "../../../functions/get";
 import { isLoggedIn } from "../../../utils/auth";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
@@ -50,7 +49,6 @@ const Tests = () => {
   const [finalItem, setFinalItem] = useState(offset);
   const [selected, setSelected] = useState<Test | null>(null);
   const [isDelete, setIsDelete] = useState(false);
-  const [isAssign, setIsAssign] = useState(false);
   const [isSchedule, setIsSchedule] = useState(false);
   const [isExport, setIsExport] = useState(false);
   const navigate = useNavigate();
@@ -68,17 +66,8 @@ const Tests = () => {
     setIsDelete(true);
   };
 
-  const handleAssignClick = (test: Test) => {
-    setSelected(test);
-    setIsAssign(true);
-  };
-
   const handleStatusChange = async (test: Test, status: string) => {
     try {
-      if (status === "booked" && test.testDetail.doctorData) {
-        toast.error("Doctor is already assigned");
-        return;
-      }
       if (status === "completed") {
         navigate(`/dashboard/tests/complete/${test._id}`);
         return;
@@ -138,10 +127,6 @@ const Tests = () => {
           .includes(searchQuery.toLowerCase())) ||
       (test.testDetail.testData.name &&
         test.testDetail.testData.name
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase())) ||
-      (test.testDetail.doctorData &&
-        test.testDetail.doctorData.name
           .toLowerCase()
           .includes(searchQuery.toLowerCase())) ||
       (test.status &&
@@ -244,7 +229,7 @@ const Tests = () => {
                     <th className="px-4 py-3">Test</th>
                     <th className="px-4 py-3">Patient</th>
                     <th className="px-4 py-3">Patient Number</th>
-                    <th className="px-4 py-3">Doctor</th>
+                    <th className="px-4 py-3">Added By</th>
                     <th className="px-4 py-3">Added On</th>
                     <th className="px-4 py-3">Appointment Date</th>
                     <th className="px-4 py-3">Actions</th>
@@ -289,24 +274,13 @@ const Tests = () => {
                                   handleStatusChange(test, e.target.value);
                                 }}
                               >
-                                {!test.testDetail.doctorData ? (
-                                  <>
-                                    <option value={"booked"}>Booked</option>
-                                    <option value={"cancelled"}>
-                                      Cancelled
-                                    </option>
-                                  </>
-                                ) : (
-                                  TestStatus.filter(
-                                    (status) =>
-                                      status.value !== "booked" &&
-                                      status.value !== "overdue"
-                                  ).map((status, index) => (
-                                    <option key={index} value={status.value}>
-                                      {status.label}
-                                    </option>
-                                  ))
-                                )}
+                                {TestStatus.filter(
+                                  (status) => status.value !== "overdue"
+                                ).map((status, index) => (
+                                  <option key={index} value={status.value}>
+                                    {status.label}
+                                  </option>
+                                ))}
                               </select>
                             )}
                         </td>
@@ -320,9 +294,7 @@ const Tests = () => {
                           {test.testDetail.userData.phone}
                         </td>
                         <td className={`px-4 py-3 text-sm text-nowrap`}>
-                          {test.testDetail.doctorData
-                            ? test.testDetail.doctorData.name
-                            : "Not Assigned"}
+                          {test.addedby}
                         </td>
 
                         <td className="px-4 py-3 text-sm text-nowrap">
@@ -358,25 +330,6 @@ const Tests = () => {
                               </button>
                             )}
 
-                          {test.status !== "completed" &&
-                            test.status !== "cancelled" && (
-                              <button
-                                className={`btn btn-sm btn-circle ${
-                                  !test.testDetail.doctorData
-                                    ? "tooltip-primary"
-                                    : "tooltip-warning btn-ghost"
-                                } hover:btn-outline tooltip tooltip-left flex items-center justify-center`}
-                                aria-label="Assign Doctor"
-                                onClick={() => {
-                                  handleAssignClick(test);
-                                }}
-                                data-tip={`${
-                                  test.testDetail.doctorData ? "Re" : ""
-                                }Assign Doctor`}
-                              >
-                                <StethoscopeIcon className="w-4 h-4 button" />
-                              </button>
-                            )}
                           {test.status === "completed" && (
                             <Link
                               to={`/report/${test.reportId}/download`}
@@ -456,16 +409,6 @@ const Tests = () => {
           setTests={setTests}
         />
       )) ||
-        (selected && isAssign && (
-          <AssignModal
-            test={selected}
-            onClose={() => {
-              setSelected(null);
-              setIsAssign(false);
-            }}
-            setTests={setTests}
-          />
-        )) ||
         (selected && isSchedule && (
           <ScheduleModal
             test={selected}
@@ -774,121 +717,6 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
                 <span className="loading loading-dots loading-sm"></span>
               ) : (
                 "Schedule"
-              )}
-            </button>
-            <button
-              className="btn flex-1"
-              onClick={onClose}
-              disabled={processing}
-            >
-              Close!
-            </button>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-interface AssignModalProps {
-  test: Test;
-  onClose: () => void;
-  setTests: any;
-}
-
-const AssignModal = ({ test, onClose, setTests }: AssignModalProps) => {
-  const [doctors, setDoctors] = useState<any[]>([]);
-  const [processing, setProcessing] = useState(false);
-  const [selectedDoctor, setSelectedDoctor] = useState<string>("");
-  useEffect(() => {
-    const fetchAllDoctors = async () => {
-      const data = await getAllDoctors();
-      setDoctors(data);
-    };
-    fetchAllDoctors();
-  }, []);
-
-  const fetchTests = async () => {
-    const response = await axios.get(`${API_BASE_URL}/api/test/status/all`, {
-      headers: {
-        Authorization: `${localStorage.getItem("token")}`,
-      },
-    });
-    const data = response.data;
-    setTests(data.reverse());
-  };
-
-  const handleAssign = async () => {
-    setProcessing(true);
-    try {
-      await axios.put(
-        `${API_BASE_URL}/api/test/assign/${test._id}`,
-        {
-          doctorid: selectedDoctor,
-        },
-        {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      toast.success("Doctor assigned successfully");
-    } catch (err) {
-      console.log(err);
-      toast.error("Failed to assign doctor");
-    } finally {
-      fetchTests();
-      onClose();
-      setProcessing(false);
-    }
-  };
-
-  return (
-    <>
-      <div
-        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
-        role="dialog"
-      >
-        <a
-          href="#close"
-          className="absolute top-0 right-0 m-6"
-          onClick={(e) => {
-            e.preventDefault();
-            onClose();
-          }}
-        >
-          &times;
-        </a>
-        <div className="modal-box max-w-md xs:max-w-sm mx-auto">
-          <h3 className="font-bold text-lg text-center">
-            Assign Doctor to {test.testDetail.userData.name}'s{" "}
-            {test.testDetail.testData.name}
-          </h3>
-          <div className="py-4 max-h-48 overflow-y-scroll">
-            <select
-              className="input input-bordered w-full"
-              onChange={(e) => {
-                setSelectedDoctor(e.target.value);
-              }}
-            >
-              <option value="">Select Doctor</option>
-              {doctors.map((doctor) => (
-                <option key={doctor._id} value={doctor._id}>
-                  {doctor.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="modal-action flex">
-            <button
-              className="btn btn-primary flex-1"
-              onClick={() => handleAssign()}
-              disabled={processing}
-            >
-              {processing ? (
-                <span className="loading loading-dots loading-sm"></span>
-              ) : (
-                "Assign"
               )}
             </button>
             <button

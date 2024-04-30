@@ -297,7 +297,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
         }
       );
       const data = response.data;
-      setTests(data);
+      setTests(data.reverse());
     } catch (error) {
       console.error("Error fetching tests:", error);
     }

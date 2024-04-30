@@ -461,7 +461,7 @@ const Navbar = () => {
           </Dialog.Panel>
         </Dialog>
       </header>
-      <div className="fixed bottom-8 right-0 bg-base-300/30 backdrop-blur-xl rounded-l-full">
+      <div className="fixed bottom-8 z-10 right-0 bg-base-300/30 backdrop-blur-xl rounded-l-full">
         <label className="swap swap-rotate btn btn-ghost rounded-r-none btn-circle">
           <input
             type="checkbox"
@@ -532,7 +532,7 @@ const users = [
   {
     name: "View All Doctors",
     description: "View all the doctors registered in the system",
-    href: "/dashboard/users?type=employee",
+    href: "/dashboard/doctors",
     icon: IconUserDollar,
   },
   {

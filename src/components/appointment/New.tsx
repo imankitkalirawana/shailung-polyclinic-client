@@ -10,7 +10,11 @@ import { isLoggedIn } from "../../utils/auth";
 import { Helmet } from "react-helmet-async";
 import { calculateAge } from "../../functions/agecalculator";
 import { User } from "../../interface/interface";
-import { IconInfoCircleFilled, IconXboxXFilled } from "@tabler/icons-react";
+import {
+  IconHistory,
+  IconInfoCircleFilled,
+  IconXboxXFilled,
+} from "@tabler/icons-react";
 import { getUserWithId } from "../../functions/get";
 
 interface Tests {
@@ -185,10 +189,17 @@ const New = () => {
             <div className="flex gap-2 flex-row-reverse">
               <Link
                 to={"/appointment/history"}
-                className="btn btn-outline btn-sm hover:btn-primary"
+                className="btn hidden sm:flex btn-outline btn-sm hover:btn-primary"
               >
                 <HistoryIcon className="h-5 w-5" />
                 Appointment History
+              </Link>
+              <Link
+                to="/appointment/new"
+                className="btn sm:hidden flex items-center justify-center btn-secondary btn-circle btn-sm tooltip tooltip-left tooltip-primary"
+                data-tip="Appointment History"
+              >
+                <IconHistory className="h-5 w-5" />
               </Link>
             </div>
           </div>
@@ -337,7 +348,7 @@ const New = () => {
                   <label className="label">
                     <span className="label-text">Select Tests</span>
                   </label>
-                  <div className="m max-h-40 overflow-y-scroll">
+                  <div className="m max-h-36 overflow-y-scroll">
                     {tests
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .map((test, index) => (
@@ -446,10 +457,14 @@ interface ModalProps {
 
 // submitted modal
 const SubmittedModal: React.FC<ModalProps> = ({ onClose }) => {
+  const { user } = isLoggedIn();
   return (
     <>
-      <div className="modal modal-open backdrop-blur-md" role="dialog">
-        <div className="modal-box">
+      <div
+        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+        role="dialog"
+      >
+        <div className="modal-box w-full">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-lg">
               Appointment Booked Successfully!
@@ -463,7 +478,14 @@ const SubmittedModal: React.FC<ModalProps> = ({ onClose }) => {
             appointment history by clicking the button below.
           </p>
           <div className="modal-action">
-            <Link to="/appointment/history" className="btn btn-primary">
+            <Link
+              to={`${
+                user?.role === "admin" || user?.role === "member"
+                  ? "/dashboard/tests?status=booked"
+                  : "/appointment/history"
+              }`}
+              className="btn btn-primary w-full"
+            >
               View Appointment History
             </Link>
           </div>
@@ -487,15 +509,18 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 }) => {
   return (
     <>
-      <div className="modal modal-open backdrop-blur-md" role="dialog">
-        <div className="modal-box max-w-md">
+      <div
+        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+        role="dialog"
+      >
+        <div className="modal-box w-full">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-lg">Confirm Appointment</h3>
           </div>
           <p className="py-4">
             Are you sure you want to book this appointment? Please confirm.
           </p>
-          <div className="modal-action flex">
+          <div className="modal-action flex flex-col xs:flex-row gap-2">
             <button
               className="btn btn-primary flex-1"
               onClick={() => {

@@ -18,11 +18,6 @@ export const Roles = [
         label: "User",
         description: "User can book appointments and view their profiles",
         color: "badge-primary"
-    }, {
-        value: "guest",
-        label: "Guest",
-        description: "Guest can view the website and book appointments",
-        color: "badge-neutral"
     }
 ]
 

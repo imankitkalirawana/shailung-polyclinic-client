@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import { API_BASE_URL, Roles } from "../../../utils/config";
@@ -7,10 +7,12 @@ import { toast } from "sonner";
 import { isLoggedIn } from "../../../utils/auth";
 import NotFound from "../../NotFound";
 import { Helmet } from "react-helmet-async";
+import { UploadSingleFile } from "../../../utils/FileHandling";
 
 const User = () => {
   const navigate = useNavigate();
   const { user } = isLoggedIn();
+  const [file, setFile] = useState<File | null>(null);
 
   if (user?.role !== "admin") {
     return (
@@ -48,9 +50,17 @@ const User = () => {
       address: "",
       confirmemail: "",
       isDoctor: false,
+      previewPhoto: "",
     },
     onSubmit: async (values) => {
       try {
+        if (file) {
+          const filename = `profile-${values.email}-${Date.now()}.${
+            file.name.split(".").pop() || "jpg"
+          }`;
+          await UploadSingleFile(file, filename);
+          values.photo = filename;
+        }
         const response = await axios.put(
           `${API_BASE_URL}/api/admin/user/${id}`,
           values,
@@ -71,16 +81,17 @@ const User = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
+      const selectedFile: File = e.target.files[0];
+      setFile(selectedFile);
       const reader = new FileReader();
       reader.onload = () => {
         const imageData = reader.result as string;
         formik.setValues({
           ...formik.values,
-          photo: imageData,
+          previewPhoto: imageData,
         });
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(selectedFile);
     }
   };
 
@@ -140,10 +151,9 @@ const User = () => {
                 <div className="mt-2 flex items-center gap-x-3">
                   <img
                     src={
-                      formik.values.photo
-                        ? `${API_BASE_URL}/api/upload/single/${formik.values.photo}`
-                        : "https://ui-avatars.com/api/?name=" +
-                          formik.values.name
+                      formik.values.previewPhoto
+                        ? formik.values.previewPhoto
+                        : `${API_BASE_URL}/api/upload/single/${formik.values.photo}`
                     }
                     className="h-12 w-12 rounded-full aspect-square object-cover"
                     alt={formik.values.name}

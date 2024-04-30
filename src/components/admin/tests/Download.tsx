@@ -4,40 +4,9 @@ import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
 import { PDFExport } from "@progress/kendo-react-pdf";
 import { Link, useParams, useLocation } from "react-router-dom";
-import { getUserWithId } from "../../../functions/get";
 import { DownloadIcon, SmartHomeIcon } from "../../icons/Icons";
 import { isLoggedIn } from "../../../utils/auth";
-
-interface Report {
-  _id: string;
-  name: string;
-  fatherName: string;
-  age: number;
-  gender: string;
-  dob: string;
-  phone: string;
-  email: string;
-  address: string;
-  testname: string;
-  reportType: string;
-  reportDate: string;
-  testType: string;
-  doctor: string;
-  reportRows: {
-    title: string;
-    value: string;
-    unit: string;
-    reference: string;
-  }[];
-  reportFile: string[];
-}
-
-interface reportDetails {
-  docName: string;
-  docDesignation: string;
-  docReg: string;
-  docSign: string;
-}
+import { Report } from "../../../interface/interface";
 
 const Download = () => {
   const { loggedIn } = isLoggedIn();
@@ -45,8 +14,6 @@ const Download = () => {
   const { reportId }: any = useParams();
   const [report, setReport] = useState<Report | null>(null);
   const pdfExportComponent = useRef(null);
-  const [doctor, setDoctor] = useState<any>(null);
-  const [reportDetails, setReportDetails] = useState<reportDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const currentLocation = location.pathname;
 
@@ -69,11 +36,7 @@ const Download = () => {
           }
         );
         setReport(data);
-        await getUserWithId(data.doctor).then((res) => {
-          setDoctor(res.data);
-        });
-        const response = await axios.get(`${API_BASE_URL}/api/website/report`);
-        setReportDetails(response.data);
+
         setLoading(false);
       } catch (error) {
         toast.error("Failed to fetch report");
@@ -204,7 +167,9 @@ const Download = () => {
                               <div className="flex flex-col">
                                 <span>{report?.name}</span>
                                 <span>{report?.address}</span>
-                                <span>{doctor?.name}</span>
+                                <span>
+                                  {report?.doctors && report?.doctors[0].name}
+                                </span>
                               </div>
                             </div>
                             <div className="flex gap-4">
@@ -332,22 +297,24 @@ const Download = () => {
                                 * = Value Rechecked
                               </h3>
                               <div className="flex justify-evenly text-center">
-                                {reportDetails?.map((report, index) => (
-                                  <div key={index}>
-                                    <span className="flex items-center justify-center">
-                                      <img
-                                        src={report.docSign}
-                                        className="w-16 aspect-[4/3] object-contain"
-                                      />
-                                    </span>
-                                    <p className="text-xs font-semibold">
-                                      {report.docName}
-                                      <br />
-                                      {report.docDesignation} <br />
-                                      {report.docReg}
-                                    </p>
-                                  </div>
-                                ))}
+                                {report?.doctors
+                                  ?.slice(0, 2)
+                                  .map((report, index) => (
+                                    <div key={index}>
+                                      <span className="flex items-center justify-center">
+                                        <img
+                                          src={`${API_BASE_URL}/api/upload/single/${report.sign}`}
+                                          className="w-16 aspect-[4/3] object-contain"
+                                        />
+                                      </span>
+                                      <p className="text-xs font-semibold">
+                                        {report && report.name}
+                                        <br />
+                                        {report && report.designation} <br />
+                                        {report && report.regno}
+                                      </p>
+                                    </div>
+                                  ))}
                               </div>
                             </div>
                           </div>

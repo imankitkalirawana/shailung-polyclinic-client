@@ -1,5 +1,8 @@
 export function calculateAge(dateString: string): number {
-    if (!dateString) return 0;
+    if (!dateString) {
+        console.log("Invalid date string")
+        return 0;
+    }
     // Split the date string into year, month, and day
     const [year, month, day] = dateString.split('-').map(Number);
 
@@ -15,6 +18,9 @@ export function calculateAge(dateString: string): number {
     // Adjust age if birthday hasn't occurred yet this year
     if (currentDate.getMonth() < birthDate.getMonth() || (currentDate.getMonth() === birthDate.getMonth() && currentDate.getDate() < birthDate.getDate())) {
         age--;
+    }
+    if (age === 0) {
+        return 1;
     }
 
     return age;

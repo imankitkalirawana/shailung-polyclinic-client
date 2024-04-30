@@ -92,7 +92,7 @@ const History = () => {
           href="https://report.shailungpolyclinic.com/appointment/history"
         />
       </Helmet>
-      <div className="container mx-auto max-w-6xl my-24">
+      <div className="container mx-auto max-w-6xl my-24 px-4">
         <div className="flex mb-4 justify-between items-center">
           <h1 className="my-6 sm:text-2xl w-full font-semibold">
             Your Appointment History
@@ -105,7 +105,7 @@ const History = () => {
               New Appointment
             </Link>
             <Link
-              to="/appointment/history"
+              to="/appointment/new"
               className="btn sm:hidden flex items-center justify-center btn-secondary btn-circle btn-sm tooltip tooltip-left tooltip-primary"
               data-tip="New Appointment"
             >
@@ -173,7 +173,7 @@ const History = () => {
                       </div>
                       <div className="pt-6">
                         <div className="flex justify-between">
-                          <p className="font-light text-xs">On</p>
+                          <p className="font-light text-xs">Appointment On</p>
                           <div className="flex items-center justify-center gap-2">
                             {test.status === "completed" && (
                               <Link
