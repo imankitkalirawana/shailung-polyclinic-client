@@ -177,8 +177,11 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
   };
   return (
     <>
-      <div className="modal modal-open backdrop-blur-sm" role="dialog">
-        <div className="modal-box max-w-sm">
+      <div
+        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+        role="dialog"
+      >
+        <div className="modal-box w-full sm:max-w-sm">
           <h3 className="font-bold text-lg text-center">
             Delete <i>{doctor.email}</i>
           </h3>
@@ -186,7 +189,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
             Are you sure you want to delete this user? This action cannot be
             undone.
           </p>
-          <div className="modal-action flex">
+          <div className="modal-action flex flex-col xs:flex-row gap-2">
             <button
               className="btn btn-error flex-1"
               onClick={() => handleDelete(doctor)}
@@ -273,7 +276,7 @@ const AddUser = () => {
         } backdrop-blur-sm`}
         role="dialog"
       >
-        <div className="modal-box max-w-md">
+        <div className="modal-box w-full sm:max-w-sm">
           <div className="container flex items-center justify-center min-h-screen px-6 mx-auto">
             <form className="w-full max-w-md" onSubmit={formik.handleSubmit}>
               <h3 className="mb-6 text-3xl font-bold text-center">
@@ -386,7 +389,7 @@ const AddUser = () => {
                 </div>
               </div>
 
-              <div className="modal-action flex">
+              <div className="modal-action flex flex-col xs:flex-row gap-2">
                 <button
                   className="btn btn-primary flex-1"
                   type="submit"

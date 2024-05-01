@@ -20,7 +20,7 @@ import { useFormik } from "formik";
 import { Roles } from "../../../utils/config";
 import * as XLSX from "xlsx";
 import NotFound from "../../NotFound";
-import { getAllUsers } from "../../../functions/get";
+import { getAllUnknownUsers, getAllUsers } from "../../../functions/get";
 import { deleteUser } from "../../../functions/delete";
 import { isLoggedIn } from "../../../utils/auth";
 import { User } from "../../../interface/interface";
@@ -36,8 +36,9 @@ export const humanReadableDate = (date: string) => {
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
   const { user } = isLoggedIn();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const userType = searchParams.get("type");
+  const isPhone = searchParams.get("phone");
   const offset = 10;
   const [searchQuery, setSearchQuery] = useState("");
   const [initialItem, setInitialItem] = useState(0);
@@ -50,7 +51,16 @@ const Users = () => {
   };
 
   useEffect(() => {
-    const fetchData = async (userType: any) => {
+    if (!isPhone) {
+      setSearchParams({
+        type: "user",
+        phone: "true",
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchAllUsers = async (userType: any) => {
       if (userType === "employee" && user?.role === "admin") {
         const users = await getAllUsers("employee");
         setUsers(users);
@@ -65,8 +75,16 @@ const Users = () => {
         setUsers(users);
       }
     };
-    fetchData(userType);
-  }, []);
+    const fetchAllUnknownUsers = async () => {
+      const users = await getAllUnknownUsers();
+      setUsers(users);
+    };
+    if (isPhone === "false") {
+      fetchAllUnknownUsers();
+    } else {
+      fetchAllUsers(userType);
+    }
+  }, [isPhone]);
 
   const handleSearch = (user: any) => {
     if (searchQuery === "") {
@@ -76,7 +94,10 @@ const Users = () => {
         user.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (user.phone &&
         user.phone.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (user.name && user.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      (user.name &&
+        user.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (user.address &&
+        user.address.toLowerCase().includes(searchQuery.toLowerCase()))
     ) {
       return user;
     }
@@ -143,7 +164,9 @@ const Users = () => {
     if (
       e.target.classList.contains("button") ||
       e.target.classList.contains("btn") ||
-      e.target.classList.contains("modify")
+      e.target.classList.contains("modify") ||
+      e.target.nodeName.toLowerCase() === "svg" ||
+      e.target.nodeName.toLowerCase() === "path"
     ) {
       return;
     }
@@ -182,22 +205,42 @@ const Users = () => {
                 ? "Users"
                 : "All Users"}
             </h1>
-            <div className="flex gap-2 flex-row-reverse">
-              <Link to={"?action=new"} className="btn btn-primary btn-sm">
-                <span>Add User</span>
-              </Link>
-              {user?.role === "admin" && (
-                <button
-                  className="btn btn-outline hover:btn-primary btn-sm btn-circle tooltip tooltip-bottom flex"
-                  data-tip="Export to Excel"
-                  onClick={() => {
-                    exportToExcel();
-                  }}
-                >
-                  <ExportTableIcon className="w-4 h-4" />
-                </button>
-              )}
-            </div>
+            {isPhone !== "false" && (
+              <div className="flex gap-2 flex-row-reverse">
+                <Link to={"?action=new"} className="btn btn-primary btn-sm">
+                  <span>Add User</span>
+                </Link>
+                {user?.role === "admin" && (
+                  <button
+                    className="btn btn-outline hover:btn-primary btn-sm btn-circle tooltip tooltip-bottom flex"
+                    data-tip="Export to Excel"
+                    onClick={() => {
+                      exportToExcel();
+                    }}
+                  >
+                    <ExportTableIcon className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="flex gap-4 my-8 overflow-x-scroll">
+            <Link
+              className={`btn btn-sm ${
+                isPhone === "true" ? "btn-primary" : ""
+              }`}
+              to={`/dashboard/users?type=user&phone=true`}
+            >
+              With Phone
+            </Link>
+            <Link
+              className={`btn btn-sm ${
+                isPhone === "false" ? "btn-primary" : ""
+              }`}
+              to={`/dashboard/users?type=user&phone=false`}
+            >
+              Without Phone
+            </Link>
           </div>
           <div className="relative w-full max-w-md mb-4">
             <input
@@ -239,7 +282,7 @@ const Users = () => {
                         sortUsers("email");
                       }}
                     >
-                      Email
+                      {isPhone === "false" ? "Address" : "Email"}
                     </th>
                     <th
                       className="px-4 py-3 hover:bg-primary/10"
@@ -247,8 +290,13 @@ const Users = () => {
                         sortUsers("phone");
                       }}
                     >
-                      Phone
+                      {isPhone === "false" ? "DOB" : "Phone"}
                     </th>
+                    {isPhone === "false" && (
+                      <th className="px-4 py-3 hover:bg-primary/10">
+                        Added By
+                      </th>
+                    )}
 
                     <th
                       className="px-4 py-3 hover:bg-primary/10"
@@ -274,10 +322,15 @@ const Users = () => {
                         user.email !== "divinelydeveloper@gmail.com" && (
                           <tr
                             key={index}
-                            className="cursor-pointer hover:bg-primary/5"
+                            className={`${
+                              isPhone !== "false" &&
+                              "cursor-pointer hover:bg-primary/5"
+                            }`}
                             role="button"
                             onClick={(e) => {
-                              handleRowClick(user._id, e);
+                              if (isPhone !== "false") {
+                                handleRowClick(user._id, e);
+                              }
                             }}
                           >
                             <td className="px-4 py-3 text-sm">
@@ -302,25 +355,40 @@ const Users = () => {
                               </div>
                             </td>
                             <td className="px-4 py-3 text-sm text-nowrap">
-                              {user.email ? user.email : "-"}
+                              {isPhone === "false"
+                                ? user.address
+                                : user.email
+                                ? user.email
+                                : "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-nowrap">
-                              {user.phone ? user.phone : "-"}
+                              {isPhone === "false"
+                                ? humanReadableDate(user.dob)
+                                : user.phone
+                                ? user.phone
+                                : "-"}
                             </td>
+                            {isPhone === "false" && (
+                              <td className="px-4 py-3 text-sm text-nowrap">
+                                {user.addedby}
+                              </td>
+                            )}
 
                             <td className="px-4 py-3 text-sm text-nowrap">
                               {humanReadableDate(user.updatedat)}
                             </td>
                             {loggedUser?.role === "admin" && (
                               <td className="px-4 py-3 text-sm flex items-center gap-4 justify-center modify">
-                                <Link
-                                  to={`/dashboard/users/${user._id}/edit`}
-                                  className="btn btn-sm btn-circle tooltip tooltip-info flex items-center justify-center btn-ghost"
-                                  aria-label="Edit"
-                                  data-tip="Edit"
-                                >
-                                  <EditIcon className="w-4 h-4 button" />
-                                </Link>
+                                {isPhone !== "false" && (
+                                  <Link
+                                    to={`/dashboard/users/${user._id}/edit`}
+                                    className="btn btn-sm btn-circle tooltip tooltip-info flex items-center justify-center btn-ghost"
+                                    aria-label="Edit"
+                                    data-tip="Edit"
+                                  >
+                                    <EditIcon className="w-4 h-4 button" />
+                                  </Link>
+                                )}
                                 <button
                                   className="btn btn-sm btn-circle flex justify-center items-center tooltip-error tooltip btn-ghost hover:btn-outline"
                                   aria-label="Delete"
@@ -337,7 +405,13 @@ const Users = () => {
                   <tr className="bg-primary/20">
                     <td
                       className="px-4 py-3 text-sm"
-                      colSpan={user?.role === "admin" ? 5 : 4}
+                      colSpan={
+                        user?.role === "admin"
+                          ? isPhone === "false"
+                            ? 6
+                            : 5
+                          : 4
+                      }
                     >
                       Showing {initialItem + 1}-{finalItem} of {users.length}
                     </td>
@@ -399,11 +473,25 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
   onClose,
   setUsers,
 }) => {
+  const [searchParams] = useSearchParams();
+  const isPhone = searchParams.get("phone");
   const handleDelete = async (user: User) => {
     try {
-      await deleteUser(user._id).then(() => {
+      if (!user.phone) {
+        await axios.delete(
+          `${API_BASE_URL}/api/admin/unknown-user/${user._id}`,
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          }
+        );
         fetchUsers();
-      });
+      } else {
+        await deleteUser(user._id).then(() => {
+          fetchUsers();
+        });
+      }
       toast.success("User deleted successfully");
       onClose();
     } catch (error: any) {
@@ -413,16 +501,24 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
   };
   const fetchUsers = async () => {
     try {
-      const users = await getAllUsers("all");
-      setUsers(users);
+      if (isPhone !== "false") {
+        const users = await getAllUsers("all");
+        setUsers(users);
+      } else {
+        const users = await getAllUnknownUsers();
+        setUsers(users);
+      }
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   };
   return (
     <>
-      <div className="modal modal-open backdrop-blur-sm" role="dialog">
-        <div className="modal-box max-w-sm">
+      <div
+        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+        role="dialog"
+      >
+        <div className="modal-box w-full sm:max-w-sm">
           <h3 className="font-bold text-lg text-center">
             Delete <i>{user.email}</i>
           </h3>
@@ -430,7 +526,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
             Are you sure you want to delete this user? This action cannot be
             undone.
           </p>
-          <div className="modal-action flex">
+          <div className="modal-action flex flex-col xs:flex-row gap-2">
             <button
               className="btn btn-error flex-1"
               onClick={() => handleDelete(user)}
@@ -460,7 +556,7 @@ const AddUser = () => {
       email: "",
       phone: "",
       gender: "male",
-      age: 0,
+      dob: "",
       role: "user",
     },
 
@@ -488,12 +584,12 @@ const AddUser = () => {
     <>
       <input type="checkbox" id="add_user" className="modal-toggle" />
       <div
-        className={`modal ${
+        className={`modal modal-bottom xs:modal-middle ${
           action === "new" ? "modal-open" : ""
         } backdrop-blur-sm`}
         role="dialog"
       >
-        <div className="modal-box max-w-md">
+        <div className="modal-box w-full">
           <div className="container flex items-center justify-center min-h-screen px-6 mx-auto">
             <form className="w-full max-w-md" onSubmit={formik.handleSubmit}>
               <h3 className="mb-6 text-3xl font-bold text-center">Add User</h3>
@@ -516,7 +612,7 @@ const AddUser = () => {
                   <span className="label-text">Gender</span>
                 </label>
                 <select
-                  className="select select-bordered w-full max-w-xs"
+                  className="select select-bordered w-full"
                   name="gender"
                   onChange={formik.handleChange}
                   value={formik.values.gender}
@@ -526,6 +622,20 @@ const AddUser = () => {
                   <option value="female">Female</option>
                   <option value="other">Other</option>
                 </select>
+              </div>
+              <div>
+                <label htmlFor="dob" className="label">
+                  <span className="label-text">DOB</span>
+                </label>
+                <input
+                  type="date"
+                  className="input input-bordered w-full"
+                  name="dob"
+                  id="dob"
+                  onChange={formik.handleChange}
+                  value={formik.values.dob}
+                  required
+                />
               </div>
 
               <div className="">
@@ -563,7 +673,7 @@ const AddUser = () => {
                     <span className="label-text">Role</span>
                   </label>
                   <select
-                    className="select select-bordered w-full max-w-xs"
+                    className="select select-bordered w-full"
                     name="role"
                     id="role"
                     onChange={formik.handleChange}
@@ -579,9 +689,9 @@ const AddUser = () => {
                 </div>
               )}
 
-              <div className="modal-action flex">
+              <div className="modal-action flex flex-col xs:flex-row gap-2">
                 <button
-                  className="btn btn-primary flex-1"
+                  className="btn btn-primary flex-1 w-full"
                   type="submit"
                   disabled={isAdding}
                 >
@@ -594,7 +704,7 @@ const AddUser = () => {
                   )}
                 </button>
                 <button
-                  className="btn flex-1"
+                  className="btn flex-1 w-full"
                   type="button"
                   onClick={() => {
                     const url = location.pathname;

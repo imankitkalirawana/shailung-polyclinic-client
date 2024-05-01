@@ -489,7 +489,7 @@ const ExportModal = ({ tests, onClose }: ExportModalProps) => {
         className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
         role="dialog"
       >
-        <div className="modal-box w-full">
+        <div className="modal-box w-full sm:max-w-sm">
           <h3 className="font-bold text-lg text-center">Export Tests</h3>
           <div className="py-4 max-h-48 overflow-y-scroll">
             {/* checkbox to select all */}
@@ -607,7 +607,7 @@ const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
         className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
         role="dialog"
       >
-        <div className="modal-box max-w-md xs:max-w-sm mx-auto">
+        <div className="modal-box w-full sm:max-w-sm">
           <h3 className="font-bold text-lg text-center">
             Delete {test.testDetail.userData.name}'s{" "}
             {test.testDetail.testData.name}
@@ -616,7 +616,7 @@ const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
             Are you sure you want to delete this test? This action cannot be
             undone.
           </p>
-          <div className="modal-action flex">
+          <div className="modal-action flex flex-col xs:flex-row gap-2">
             <button
               className="btn btn-error flex-1"
               onClick={() => handleDelete()}
@@ -691,7 +691,7 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
         className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
         role="dialog"
       >
-        <div className="modal-box max-w-md xs:max-w-sm mx-auto">
+        <div className="modal-box w-full sm:max-w-sm">
           <h3 className="font-bold text-lg text-center">
             Schedule {test.testDetail.userData.name}'s{" "}
             {test.testDetail.testData.name}
@@ -707,7 +707,7 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
               }}
             />
           </p>
-          <div className="modal-action flex">
+          <div className="modal-action flex flex-col xs:flex-row gap-2">
             <button
               className="btn btn-info flex-1"
               onClick={() => handleSchedule()}

@@ -285,8 +285,11 @@ const DeleteModal = ({ report, onClose, setReports }: DeleteModalProps) => {
   };
 
   return (
-    <div className="modal modal-open backdrop-blur-sm" role="dialog">
-      <div className="modal-box max-w-sm">
+    <div
+      className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+      role="dialog"
+    >
+      <div className="modal-box w-full sm:max-w-sm">
         <h3 className="font-bold text-lg text-center">
           Delete {report.name}'s Report
         </h3>
@@ -294,7 +297,7 @@ const DeleteModal = ({ report, onClose, setReports }: DeleteModalProps) => {
           Are you sure you want to delete this test? This action cannot be
           undone.
         </p>
-        <div className="modal-action flex">
+        <div className="modal-action flex flex-col xs:flex-row gap-2">
           <button
             className="btn btn-error flex-1"
             onClick={() => handleDelete()}

@@ -400,7 +400,7 @@ const Profile = () => {
           </div>
           <input type="checkbox" id="delete_modal" className="modal-toggle" />
           <div className="modal" role="dialog">
-            <div className="modal-box max-w-96">
+            <div className="modal-box w-full sm:max-w-sm">
               <label htmlFor="city" className="label">
                 <span className="label-text">
                   Enter <b>{formik.values.email}</b> to delete

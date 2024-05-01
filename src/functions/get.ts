@@ -11,6 +11,36 @@ export const getAllUsers = async (role: string) => {
     return data.reverse();
 }
 
+export const getAllUnknownUsers = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/admin/unknown-users`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    const data = response.data;
+    return data.reverse();
+}
+
+// get unknown user by id
+export const getUnknownUser = async (id: string) => {
+    const response = await axios.get(`${API_BASE_URL}/api/admin/unknown-user/${id}`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    return response.data;
+}
+
+export const getBothUsers = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/admin/all-users`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    const data = response.data;
+    return data.reverse();
+}
+
 export const getLoggedUser = async () => {
     const response = await axios.get(`${API_BASE_URL}/api/user/profile`, {
         headers: {

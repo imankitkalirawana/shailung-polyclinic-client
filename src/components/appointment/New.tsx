@@ -15,7 +15,7 @@ import {
   IconInfoCircleFilled,
   IconXboxXFilled,
 } from "@tabler/icons-react";
-import { getUserWithId } from "../../functions/get";
+import { getUnknownUser, getUserWithId } from "../../functions/get";
 
 interface Tests {
   _id: string;
@@ -36,6 +36,7 @@ const New = () => {
   const [isModal, setIsModal] = useState(false);
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user");
+  const isPhone = searchParams.get("phone");
 
   useEffect(() => {
     if (!loggedIn) {
@@ -95,8 +96,22 @@ const New = () => {
         console.error(error);
       }
     };
+
+    const fetchUnknownUserById = async () => {
+      const data = await getUnknownUser(userId as string);
+      setUser(data);
+      formik.setValues({
+        ...formik.values,
+        name: data.name,
+        age: calculateAge(data.dob),
+      });
+    };
     if (userId) {
-      fetchUserById();
+      if (isPhone === "false") {
+        fetchUnknownUserById();
+      } else {
+        fetchUserById();
+      }
     } else {
       fetchUserByProfile();
     }
@@ -212,73 +227,77 @@ const New = () => {
               className="grid grid-cols-2 gap-4 w-full md:max-w-[50%]"
               onSubmit={formik.handleSubmit}
             >
+              {isPhone !== "false" && (
+                <>
+                  {!lUser.name || !calculateAge(lUser.dob || "") ? (
+                    <div
+                      role="alert"
+                      className="alert mt-4 bg-error/20 col-span-full"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        className="stroke-error shrink-0 w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                      </svg>
+                      <span>
+                        {userId ? "User" : "You"} have incomplete profile.{" "}
+                        <Link
+                          to={
+                            userId
+                              ? `/dashboard/users/${lUser._id}/edit`
+                              : "/profile"
+                          }
+                          className="link"
+                        >
+                          Update Now
+                        </Link>
+                      </span>
+                    </div>
+                  ) : (
+                    <div
+                      role="alert"
+                      className="alert mt-4 bg-info/20 col-span-full"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        className="stroke-info shrink-0 w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
+                      </svg>
+                      <span>
+                        You can update your profile if below information is not
+                        displayed or incorrect.{" "}
+                        <Link
+                          to={
+                            userId
+                              ? `/dashboard/users/${lUser._id}/edit`
+                              : "/profile"
+                          }
+                          className="link"
+                        >
+                          Update Now
+                        </Link>
+                      </span>
+                    </div>
+                  )}
+                </>
+              )}
               <>
-                {!lUser.name || !calculateAge(lUser.dob || "") ? (
-                  <div
-                    role="alert"
-                    className="alert mt-4 bg-error/20 col-span-full"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      className="stroke-error shrink-0 w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
-                    <span>
-                      {userId ? "User" : "You"} have incomplete profile.{" "}
-                      <Link
-                        to={
-                          userId
-                            ? `/dashboard/users/${lUser._id}/edit`
-                            : "/profile"
-                        }
-                        className="link"
-                      >
-                        Update Now
-                      </Link>
-                    </span>
-                  </div>
-                ) : (
-                  <div
-                    role="alert"
-                    className="alert mt-4 bg-info/20 col-span-full"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      className="stroke-info shrink-0 w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
-                    <span>
-                      You can update your profile if below information is not
-                      displayed or incorrect.{" "}
-                      <Link
-                        to={
-                          userId
-                            ? `/dashboard/users/${lUser._id}/edit`
-                            : "/profile"
-                        }
-                        className="link"
-                      >
-                        Update Now
-                      </Link>
-                    </span>
-                  </div>
-                )}
                 <div className="form-control col-span-2">
                   <label htmlFor="name" className="label">
                     <span className="label-text">Patient Name</span>
@@ -328,6 +347,7 @@ const New = () => {
                   />
                 </div>
               </>
+
               <>
                 <div className="form-control col-span-2 md:col-span-1">
                   <label className="label">
@@ -464,7 +484,7 @@ const SubmittedModal: React.FC<ModalProps> = ({ onClose }) => {
         className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
         role="dialog"
       >
-        <div className="modal-box w-full">
+        <div className="modal-box w-full sm:max-w-sm">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-lg">
               Appointment Booked Successfully!
@@ -513,7 +533,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
         role="dialog"
       >
-        <div className="modal-box w-full">
+        <div className="modal-box w-full sm:max-w-sm">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-lg">Confirm Appointment</h3>
           </div>

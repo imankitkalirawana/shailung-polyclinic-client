@@ -14,8 +14,9 @@ import {
 } from "../../icons/Icons";
 import { useFormik } from "formik";
 import NotFound from "../../NotFound";
-import { getAllAvailableTests } from "../../../functions/get";
+import { getAllAvailableTests, getAllDoctors } from "../../../functions/get";
 import { isLoggedIn } from "../../../utils/auth";
+import { Doctor } from "../../../interface/interface";
 
 interface Test {
   _id: string;
@@ -50,7 +51,9 @@ const AvailableTests = () => {
     if (
       e.target.classList.contains("button") ||
       e.target.classList.contains("btn") ||
-      e.target.classList.contains("modify")
+      e.target.classList.contains("modify") ||
+      e.target.nodeName.toLowerCase() === "svg" ||
+      e.target.nodeName.toLowerCase() === "path"
     ) {
       return;
     }
@@ -304,8 +307,11 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
   };
   return (
     <>
-      <div className="modal modal-open backdrop-blur-sm" role="dialog">
-        <div className="modal-box max-w-sm">
+      <div
+        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+        role="dialog"
+      >
+        <div className="modal-box w-full sm:max-w-sm">
           <h3 className="font-bold text-lg text-center">
             Delete <i>{test.name}</i>
           </h3>
@@ -313,7 +319,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
             Are you sure you want to delete this user? This action cannot be
             undone.
           </p>
-          <div className="modal-action flex">
+          <div className="modal-action flex flex-col xs:flex-row gap-2">
             <button
               className="btn btn-error flex-1"
               onClick={() => handleDelete(test)}
@@ -331,6 +337,19 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
 };
 
 const AddTest = () => {
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const res = await getAllDoctors();
+        setDoctors(res);
+      } catch (error: any) {
+        console.error("Error fetching doctors:", error);
+      }
+    };
+    fetchDoctors();
+  }, []);
+
   const navigate = useNavigate();
   const [isAdding, setIsAdding] = useState(false);
   const formik = useFormik({
@@ -339,11 +358,19 @@ const AddTest = () => {
       description: "",
       price: "",
       duration: "",
+      doctors: [] as string[],
       testProps: Array.from({ length: 1 }, () => ({
         investigation: "",
         referenceValue: "",
         unit: "",
       })),
+    },
+    validate: (values) => {
+      const errors: any = {};
+      if (values.doctors.length === 0) {
+        errors.doctors = "Select at least one doctor";
+      }
+      return errors;
     },
 
     onSubmit: async (values) => {
@@ -389,7 +416,7 @@ const AddTest = () => {
     <>
       <input type="checkbox" id="add_test" className="modal-toggle" />
       <div className="modal backdrop-blur-sm" role="dialog">
-        <div className="modal-box max-w-xl">
+        <div className="modal-box w-full">
           <div className="container flex items-center justify-center px-6 mx-auto">
             <form className="w-full max-w-md" onSubmit={formik.handleSubmit}>
               <h3 className="mb-6 text-3xl font-bold text-center">New Test</h3>
@@ -452,6 +479,43 @@ const AddTest = () => {
                   value={formik.values.duration}
                 />
               </div>
+              <div className="max-h-48 pt-8 overflow-y-scroll">
+                <label htmlFor="doctors" className="label">
+                  <span
+                    className="label-text tooltip tooltip-right"
+                    data-tip="Choose the doctors who will be assigned this test"
+                  >
+                    Doctors
+                  </span>
+                </label>
+                {doctors.map((doctor: Doctor, index) => (
+                  <div className="form-control" key={index}>
+                    <label
+                      key={doctor._id}
+                      className="cursor-pointer label flex-row-reverse justify-end gap-2"
+                    >
+                      <span className="label-text">{doctor.name}</span>
+                      <input
+                        type="checkbox"
+                        className="checkbox"
+                        name="doctors"
+                        value={doctor._id}
+                        onChange={formik.handleChange}
+                        checked={formik.values.doctors.includes(
+                          doctor._id as string
+                        )}
+                      />
+                    </label>
+                  </div>
+                ))}
+              </div>
+              {formik.errors.doctors && (
+                <label htmlFor="doctors" className="label">
+                  <span className="label-text text-error">
+                    {formik.errors.doctors}
+                  </span>
+                </label>
+              )}
               <div className="divider"></div>
 
               <div className="form-control">

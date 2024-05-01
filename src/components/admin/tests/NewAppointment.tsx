@@ -6,15 +6,14 @@ import {
   IconUserEdit,
   IconUserPlus,
 } from "@tabler/icons-react";
-import { getAllUsers, getUserWithId } from "../../../functions/get";
+import { getBothUsers, getUserWithId } from "../../../functions/get";
 import { CheckIcon } from "../../icons/Icons";
 import { calculateAge } from "../../../functions/agecalculator";
 import { User } from "../../../interface/interface";
-import { isLoggedIn } from "../../../utils/auth";
 import axios from "axios";
 import { useFormik } from "formik";
 import { toast } from "sonner";
-import { API_BASE_URL, Roles } from "../../../utils/config";
+import { API_BASE_URL } from "../../../utils/config";
 
 const NewAppointment = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,7 +37,7 @@ const NewAppointment = () => {
   }, [userType]);
 
   const fetchUsers = async () => {
-    await getAllUsers("user").then((data) => {
+    await getBothUsers().then((data) => {
       setUsers(data);
     });
   };
@@ -48,7 +47,7 @@ const NewAppointment = () => {
       return user;
     } else if (
       user.name.toLowerCase().includes(query.toLowerCase()) ||
-      user.phone.toLowerCase().includes(query.toLowerCase())
+      (user.phone && user.phone.toLowerCase().includes(query.toLowerCase()))
     ) {
       return user;
     }
@@ -244,7 +243,11 @@ const NewAppointment = () => {
                       <div className="flex justify-between items-end">
                         <div className="flex justify-end mt-4">
                           <Link
-                            to={`/appointment/new?user=${selectedUser._id}`}
+                            to={`/appointment/new?user=${selectedUser._id}${
+                              selectedUser.phone
+                                ? "&phone=true"
+                                : "&phone=false"
+                            }`}
                             className="btn btn-sm btn-primary"
                           >
                             Create Appointment
@@ -265,15 +268,25 @@ const NewAppointment = () => {
 
 const AddUser = () => {
   const [isAdding, setIsAdding] = useState(false);
-  const { user } = isLoggedIn();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isPhone = searchParams.get("phone");
+
+  // useEffect to add phone number to true if not presend in searchparams
+  useEffect(() => {
+    if (!isPhone) {
+      setSearchParams({ user: "new", phone: "true" });
+    }
+  }, []);
+
   const formik = useFormik({
     initialValues: {
       name: "",
       email: "",
       phone: "",
       gender: "male",
-      age: 0,
       role: "user",
+      dob: "",
+      address: "",
     },
 
     onSubmit: async (values) => {
@@ -283,14 +296,23 @@ const AddUser = () => {
           values.phone = "+977" + values.phone;
         }
         await axios
-          .post(`${API_BASE_URL}/api/admin/user`, values, {
-            headers: {
-              Authorization: `${localStorage.getItem("token")}`,
+          .post(
+            `${API_BASE_URL}/api/admin/user`,
+            {
+              ...values,
+              isPhone: isPhone === "true",
             },
-          })
+            {
+              headers: {
+                Authorization: `${localStorage.getItem("token")}`,
+              },
+            }
+          )
           .then((res) => {
             toast.success("User added successfully");
-            window.location.href = `/appointment/new?user=${res.data._id}`;
+            window.location.href = `/appointment/new?user=${res.data._id}${
+              values.phone ? "&phone=true" : "&phone=false"
+            }`;
           });
       } catch (error: any) {
         toast.error(error.response.data.error);
@@ -335,8 +357,37 @@ const AddUser = () => {
 
   return (
     <>
-      <div className="container flex items-center justify-center min-h-screen px-6 mx-auto">
-        <form className="w-full max-w-md" onSubmit={formik.handleSubmit}>
+      <div className="container flex items-start justify-center min-h-screen px-6 mx-auto">
+        <form className="w-full max-w-md mt-8" onSubmit={formik.handleSubmit}>
+          <div className="form-control">
+            <label className="label cursor-pointer flex-row-reverse justify-end gap-4">
+              <span className="label-text">With Phone Number</span>
+              <input
+                type="radio"
+                name="radio-10"
+                className="radio checked:radio-primary"
+                onChange={() => {
+                  setSearchParams({ user: "new", phone: "true" });
+                }}
+                checked={isPhone === "true"}
+              />
+            </label>
+          </div>
+          <div className="form-control">
+            <label className="label cursor-pointer flex-row-reverse justify-end gap-4">
+              <span className="label-text">Without Phone Number</span>
+              <input
+                type="radio"
+                name="radio-10"
+                className="radio checked:radio-primary"
+                onChange={() => {
+                  setSearchParams({ user: "new", phone: "false" });
+                }}
+                checked={isPhone !== "true"}
+              />
+            </label>
+          </div>
+
           <div>
             <label htmlFor="name" className="label">
               <span className="label-text">Name</span>
@@ -368,95 +419,106 @@ const AddUser = () => {
               <option value="other">Other</option>
             </select>
           </div>
-
-          <div className="">
-            <label htmlFor="email" className="label">
-              <span className="label-text">Email</span>
-            </label>
-            <input
-              type="text"
-              className="input input-bordered w-full"
-              name="email"
-              id="email"
-              value={formik.values.email}
-              onChange={async (e) => {
-                formik.handleChange(e);
-                const email = e.target.value;
-                if (email === "") return;
-                if (await checkMail(email)) {
-                  formik.setErrors({
-                    email: "Email is already registered",
-                  });
-                }
-              }}
-              required
-            />
-            <label className="label">
-              <span className="label-text-alt text-error">
-                {formik.errors.email}
-              </span>
-            </label>
-          </div>
           <div>
-            <label htmlFor="phone" className="label">
-              <span className="label-text">Phone</span>
+            <label htmlFor="gender" className="label">
+              <span className="label-text">DOB</span>
             </label>
             <input
-              type="text"
+              type="date"
               className="input input-bordered w-full"
-              name="phone"
-              id="phone"
-              placeholder="e.g. +1234567890"
-              value={formik.values.phone}
-              onChange={async (e) => {
-                formik.handleChange(e);
-                const phone = e.target.value;
-                if (phone === "") return;
-                if (await checkPhone(phone)) {
-                  formik.setErrors({
-                    phone: "Phone number already exists",
-                  });
-                }
-              }}
+              name="dob"
+              id="dob"
+              onChange={formik.handleChange}
+              value={formik.values.dob}
               required
             />
-            <label className="label">
-              <span className="label-text-alt text-error">
-                {formik.errors.phone}
-              </span>
-            </label>
           </div>
-          {user?.role === "admin" && (
+          {isPhone !== "true" && (
             <div>
-              <label htmlFor="role" className="label">
-                <span className="label-text">Role</span>
+              <label htmlFor="address" className="label">
+                <span className="label-text">Address</span>
               </label>
-              <select
-                className="select select-bordered w-full"
-                name="role"
-                id="role"
+              <input
+                type="text"
+                className="input input-bordered w-full"
+                name="address"
+                id="address"
                 onChange={formik.handleChange}
-                value={formik.values.role}
-              >
-                <option disabled>Select Role for user</option>
-                {Roles.map((role) => (
-                  <option value={role.value} key={role.value}>
-                    {role.label}
-                  </option>
-                ))}
-              </select>
+                value={formik.values.address}
+                required
+              />
             </div>
           )}
+          {isPhone === "true" && (
+            <>
+              <div className="">
+                <label htmlFor="email" className="label">
+                  <span className="label-text">Email</span>
+                </label>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  name="email"
+                  id="email"
+                  value={formik.values.email}
+                  onChange={async (e) => {
+                    formik.handleChange(e);
+                    const email = e.target.value;
+                    if (email === "") return;
+                    if (await checkMail(email)) {
+                      formik.setErrors({
+                        email: "Email is already registered",
+                      });
+                    }
+                  }}
+                  required
+                />
+                <label className="label">
+                  <span className="label-text-alt text-error">
+                    {formik.errors.email}
+                  </span>
+                </label>
+              </div>
+              <div>
+                <label htmlFor="phone" className="label">
+                  <span className="label-text">Phone</span>
+                </label>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  name="phone"
+                  id="phone"
+                  value={formik.values.phone}
+                  onChange={async (e) => {
+                    formik.handleChange(e);
+                    const phone = e.target.value;
+                    if (phone === "") return;
+                    if (await checkPhone(phone)) {
+                      formik.setErrors({
+                        phone: "Phone number already exists",
+                      });
+                    }
+                  }}
+                  required
+                />
+                <label className="label">
+                  <span className="label-text-alt text-error">
+                    {formik.errors.phone}
+                  </span>
+                </label>
+              </div>
+            </>
+          )}
 
-          <div className="modal-action flex">
+          <div className="modal-action flex flex-col xs:flex-row gap-2">
             <button
               className="btn btn-primary flex-1"
               type="submit"
               disabled={
                 isAdding ||
                 !formik.values.name ||
-                !formik.values.email ||
-                !formik.values.phone
+                (isPhone === "true" &&
+                  (!formik.values.email || !formik.values.phone))
               }
             >
               {isAdding ? (

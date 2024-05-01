@@ -1,10 +1,14 @@
 import { isLoggedIn } from "../../utils/auth";
-import { ClockCancel, ClockCheck, MicroscopeIcon } from "../icons/Icons";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { API_BASE_URL } from "../../utils/config";
 import History from "../appointment/History";
-import { IconTestPipe } from "@tabler/icons-react";
+import {
+  IconCalendarClock,
+  IconClockCancel,
+  IconClockCheck,
+  IconTestPipe,
+} from "@tabler/icons-react";
 import { countAll } from "../../functions/get";
 import { Link } from "react-router-dom";
 
@@ -59,19 +63,25 @@ const UserDashboard = () => {
           </h1>
         </div>
         <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4 mt-8">
-          <div className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row">
+          <Link
+            to={"/appointment/history"}
+            className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
+          >
             <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
-              <MicroscopeIcon className="w-5 h-5" />
+              <IconCalendarClock className="w-5 h-5" stroke={1.5} />
             </div>
             <div>
-              <p className="mb-2 text-sm font-medium">Total Tests</p>
+              <p className="mb-2 text-sm font-medium">Total Appointments</p>
               <p className="text-lg font-semibold">{tests.length || 0}</p>
             </div>
-          </div>
+          </Link>
 
-          <div className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row">
+          <Link
+            to="/appointment/history"
+            className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
+          >
             <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
-              <ClockCheck className="w-5 h-5" />
+              <IconClockCheck className="w-5 h-5" stroke={1.5} />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium">Completed Tests</p>
@@ -79,10 +89,13 @@ const UserDashboard = () => {
                 {tests.filter((test) => test.status === "completed").length}
               </p>
             </div>
-          </div>
-          <div className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row">
+          </Link>
+          <Link
+            to="/appointment/history"
+            className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
+          >
             <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
-              <ClockCancel className="w-5 h-5" />
+              <IconClockCancel className="w-5 h-5" stroke={1.5} />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium">Cancelled Tests</p>
@@ -90,13 +103,13 @@ const UserDashboard = () => {
                 {tests.filter((test) => test.status === "cancelled").length}
               </p>
             </div>
-          </div>
+          </Link>
           <Link
             to={"/dashboard/tests/available-tests"}
             className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
           >
             <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
-              <IconTestPipe className="w-5 h-5" />
+              <IconTestPipe className="w-5 h-5" stroke={1.5} />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium">Available Services</p>

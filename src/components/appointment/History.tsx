@@ -164,11 +164,9 @@ const History = () => {
                       </div>
 
                       <div className="mt-4">
-                        <p className="font-light text-xs">Doctor</p>
-                        <p className="font-medium tracking-more-wider">
-                          {test.testDetail.doctorData
-                            ? test.testDetail.doctorData.name
-                            : "Not Assigned"}
+                        <p className="font-light text-xs">Status</p>
+                        <p className="font-medium tracking-more-wider capitalize">
+                          {test.status}
                         </p>
                       </div>
                       <div className="pt-6">
@@ -340,11 +338,14 @@ const DeleteModal = ({
 
   return (
     <>
-      <div className="modal modal-open backdrop-blur-sm" role="dialog">
-        <div className="modal-box max-w-sm">
+      <div
+        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+        role="dialog"
+      >
+        <div className="modal-box w-full sm:max-w-sm">
           <h3 className="font-bold text-lg text-center">{modalDate.title}</h3>
           <p className="py-4">{modalDate.message}</p>
-          <div className="modal-action flex">
+          <div className="modal-action flex flex-col xs:flex-row gap-2">
             <button
               className="btn btn-error flex-1 whitespace-nowrap"
               onClick={() => handleDelete()}
@@ -401,8 +402,11 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
     }
   };
   return (
-    <div className="modal modal-open backdrop-blur-sm" role="dialog">
-      <div className="modal-box max-w-sm">
+    <div
+      className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
+      role="dialog"
+    >
+      <div className="modal-box w-full sm:max-w-sm">
         <h3 className="font-bold text-lg text-center">
           Schedule {test.testDetail.userData.name}'s{" "}
           {test.testDetail.testData.name}
@@ -418,7 +422,7 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
             }}
           />
         </p>
-        <div className="modal-action flex">
+        <div className="modal-action flex flex-col xs:flex-row gap-2">
           <button
             className="btn btn-info flex-1"
             onClick={() => handleSchedule()}

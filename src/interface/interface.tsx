@@ -46,6 +46,7 @@ export interface User {
   dob: string;
   gender: string;
   addeddate: string;
+  addedby: string;
 }
 
 export interface AvailableTest {

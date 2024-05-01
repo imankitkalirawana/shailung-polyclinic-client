@@ -52,6 +52,13 @@ const EditAvailableTest = () => {
         unit: "",
       })),
     },
+    validate: (values) => {
+      const errors: any = {};
+      if (values.doctors.length === 0) {
+        errors.doctors = "Select atleast one doctor";
+      }
+      return errors;
+    },
     onSubmit: async (values) => {
       try {
         await axios.put(`${API_BASE_URL}/api/available-test/${id}`, values, {
@@ -105,7 +112,11 @@ const EditAvailableTest = () => {
                 Update your Test information.
               </p>
             </div>
-            <button type="submit" className="btn btn-primary btn-sm">
+            <button
+              type="submit"
+              className="btn btn-primary btn-sm"
+              disabled={formik.isSubmitting}
+            >
               Update
             </button>
           </div>
@@ -215,6 +226,13 @@ const EditAvailableTest = () => {
                     </label>
                   </div>
                 ))}
+                {formik.errors.doctors && (
+                  <label htmlFor="doctors" className="label">
+                    <span className="label-text text-error">
+                      {formik.errors.doctors}
+                    </span>
+                  </label>
+                )}
               </div>
             </div>
             <div className="form-control col-span-full">
