@@ -3,40 +3,23 @@ import { useEffect, useRef, useState } from "react";
 import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
 import { PDFExport } from "@progress/kendo-react-pdf";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { DownloadIcon, SmartHomeIcon } from "../../icons/Icons";
-import { isLoggedIn } from "../../../utils/auth";
 import { Report } from "../../../interface/interface";
 
 const Download = () => {
-  const { loggedIn } = isLoggedIn();
-  const location = useLocation();
   const { reportId }: any = useParams();
   const [report, setReport] = useState<Report | null>(null);
   const pdfExportComponent = useRef(null);
   const [loading, setLoading] = useState(true);
-  const currentLocation = location.pathname;
-
-  useEffect(() => {
-    if (!loggedIn) {
-      toast.error("You need to login to view this page");
-      window.location.href = `/auth/login?redirect=${currentLocation}`;
-    }
-  }, []);
 
   useEffect(() => {
     const fetchReport = async () => {
       try {
         const { data } = await axios.get(
-          `${API_BASE_URL}/api/report/${reportId}`,
-          {
-            headers: {
-              Authorization: `${localStorage.getItem("token")}`,
-            },
-          }
+          `${API_BASE_URL}/api/report/${reportId}`
         );
         setReport(data);
-
         setLoading(false);
       } catch (error) {
         toast.error("Failed to fetch report");
@@ -107,7 +90,7 @@ const Download = () => {
           </div>
         ) : (
           <>
-            <div className="mx-auto mt-12 overflow-scroll">
+            <div className="mx-auto mt-12 w-full">
               <PDFExport
                 ref={pdfExportComponent}
                 fileName={report?.name + "-" + report?.reportDate + "-Report"}
@@ -148,7 +131,7 @@ const Download = () => {
                           </div>
                           <div>
                             <img
-                              src="/microscope.png"
+                              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${report?._id}/download`}
                               className="w-24 h-24"
                               alt=""
                             />
@@ -156,13 +139,14 @@ const Download = () => {
                         </div>
                       </header>
                       <main className="px-8 mt-4">
-                        <div className="space-y-4 font-serif flex flex-col gap-4">
+                        <div className="space-y-4 font-roboto flex flex-col gap-4">
                           <div className="flex justify-between">
                             <div className="flex gap-4">
                               <div className="flex flex-col">
                                 <span>Name :</span>
                                 <span>Address :</span>
                                 <span>Doctor :</span>
+                                <span>Test ID :</span>
                               </div>
                               <div className="flex flex-col">
                                 <span>{report?.name}</span>
@@ -170,6 +154,7 @@ const Download = () => {
                                 <span>
                                   {report?.doctors && report?.doctors[0].name}
                                 </span>
+                                <span>{report?.testid}</span>
                               </div>
                             </div>
                             <div className="flex gap-4">

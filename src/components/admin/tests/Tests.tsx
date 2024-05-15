@@ -589,9 +589,7 @@ const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
           },
         });
       }
-      setTests((prev: Test[]) => {
-        return prev.filter((prevTest) => prevTest._id !== test._id);
-      });
+      fetchTests();
       toast.success("Test deleted successfully");
       onClose();
     } catch (err) {
@@ -599,6 +597,11 @@ const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
       toast.error("Failed to delete test");
     }
     setProcessing(false);
+  };
+
+  const fetchTests = async () => {
+    const data = await getAllTests("all");
+    setTests(data);
   };
 
   return (

@@ -419,20 +419,7 @@ const AddUser = () => {
               <option value="other">Other</option>
             </select>
           </div>
-          <div>
-            <label htmlFor="gender" className="label">
-              <span className="label-text">DOB</span>
-            </label>
-            <input
-              type="date"
-              className="input input-bordered w-full"
-              name="dob"
-              id="dob"
-              onChange={formik.handleChange}
-              value={formik.values.dob}
-              required
-            />
-          </div>
+
           {isPhone !== "true" && (
             <div>
               <label htmlFor="address" className="label">

@@ -36,6 +36,7 @@ import Register from "./components/auth/Register";
 import Doctors from "./components/admin/doctors/Doctors";
 import Doctor from "./components/admin/doctors/Doctor";
 import ViewDoctor from "./components/admin/doctors/ViewDoctor";
+import Stats from "./components/admin/Stats";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -43,8 +44,6 @@ const MainLayout = ({ children }: any) => (
     {children}
   </>
 );
-
-
 
 function App() {
   const { user } = isLoggedIn();
@@ -76,6 +75,7 @@ function App() {
                     element={<AvailableServices />}
                   />
                   <Route path="/dashboard/*" element={<Admin />}>
+                    <Route path="stats" element={<Stats />} />
                     <Route
                       path=""
                       element={

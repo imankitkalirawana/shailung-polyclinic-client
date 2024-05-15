@@ -1,12 +1,14 @@
 import axios from "axios";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/config";
 import { useFormik } from "formik";
 import { toast } from "sonner";
 
 const Login = () => {
+  const [searchParams] = useSearchParams();
   const [processing, setProcessing] = useState(false);
+  const redirect = searchParams.get("redirect");
 
   const formik = useFormik({
     initialValues: {
@@ -26,7 +28,11 @@ const Login = () => {
           toast.success("Logged in successfully");
           // remove session storage
           sessionStorage.removeItem("register");
-          window.location.href = "/dashboard";
+          if (redirect) {
+            window.location.href = redirect;
+          } else {
+            window.location.href = "/dashboard";
+          }
         }
       } catch (err: any) {
         toast.error(err.response.data.error);

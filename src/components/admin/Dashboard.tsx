@@ -20,6 +20,7 @@ import {
 import { toast } from "sonner";
 import { IconTestPipe } from "@tabler/icons-react";
 import { Test, User, AvailableTest, Report } from "../../interface/interface";
+import Overview from "./Overview";
 
 const humanReadableDate = (date: string) => {
   return new Date(date).toLocaleDateString("en-US", {
@@ -159,6 +160,16 @@ const Dashboard = () => {
               </div>
             </Link>
           </div>
+          <div className="flex justify-between items-center">
+            <h2 className="my-6 text-2xl font-semibold">Last Day Stats</h2>
+            <Link
+              to="/dashboard/stats"
+              className="btn btn-outline hover:btn-primary btn-sm"
+            >
+              <span>View all</span>
+            </Link>
+          </div>
+          <Overview />
           <TestCard tests={tests} />
           <div className="divider"></div>
           <ReportCard reports={reports} />
@@ -373,7 +384,7 @@ const TestCard = ({ tests }: TestCardProps) => {
                         {test.addedby}
                       </td>
                       <td className="px-4 py-3 text-sm text-nowrap">
-                        {humanReadableDate(test.updatedat)}
+                        {humanReadableDate(test.addeddate)}
                       </td>
                     </tr>
                   ))}

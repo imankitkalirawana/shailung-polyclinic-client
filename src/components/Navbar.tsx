@@ -161,7 +161,6 @@ const Navbar = () => {
                             {item.name}
                             <span className="absolute inset-0" />
                           </a>
-                          <p className="mt-1">{item.description}</p>
                         </div>
                       </div>
                     ))}
@@ -208,7 +207,6 @@ const Navbar = () => {
                             {item.name}
                             <span className="absolute inset-0" />
                           </a>
-                          <p className="mt-1">{item.description}</p>
                         </div>
                       </div>
                     ))}
@@ -256,7 +254,6 @@ const Navbar = () => {
                               {item.name}
                               <span className="absolute inset-0" />
                             </a>
-                            <p className="mt-1">{item.description}</p>
                           </div>
                         </div>
                       ))}
