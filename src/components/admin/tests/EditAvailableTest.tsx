@@ -46,6 +46,7 @@ const EditAvailableTest = () => {
       duration: "",
       status: "active",
       doctors: [] as string[],
+      summary: "",
       testProps: Array.from({ length: 1 }, () => ({
         investigation: "",
         referenceValue: "",
@@ -174,13 +175,26 @@ const EditAvailableTest = () => {
                 <span className="label-text">Description</span>
               </label>
               <div className="mt-2">
-                <input
+                <textarea
                   id="description"
                   name="description"
-                  type="text"
                   className="textarea textarea-bordered w-full"
                   onChange={formik.handleChange}
                   value={formik.values.description}
+                />
+              </div>
+            </div>
+            <div className="col-span-6">
+              <label htmlFor="summary" className="label">
+                <span className="label-text">Test Information</span>
+              </label>
+              <div className="mt-2">
+                <textarea
+                  id="summary"
+                  name="summary"
+                  className="textarea textarea-bordered w-full"
+                  onChange={formik.handleChange}
+                  value={formik.values.summary}
                 />
               </div>
             </div>
@@ -273,7 +287,7 @@ const EditAvailableTest = () => {
                           <td className="whitespace-nowrap text-sm font-medium">
                             <input
                               type="text"
-                              className="input focus:outline-none rounded-none w-full"
+                              className="input focus:outline-none focus:border-none rounded-none w-full"
                               name={`testProps[${index}].investigation`}
                               id="investigation"
                               placeholder="Hemoglobin"
@@ -282,9 +296,8 @@ const EditAvailableTest = () => {
                             />
                           </td>
                           <td className="whitespace-nowrap text-sm font-medium">
-                            <input
-                              type="text"
-                              className="input focus:outline-none rounded-none w-full"
+                            <textarea
+                              className="input focus:outline-none focus:border-none rounded-none w-full"
                               name={`testProps[${index}].referenceValue`}
                               id="referenceValue"
                               placeholder="13.0 - 17.0"
@@ -295,7 +308,7 @@ const EditAvailableTest = () => {
                           <td className="whitespace-nowrap text-end text-sm font-medium flex items-center">
                             <input
                               type="text"
-                              className="input focus:outline-none rounded-none w-full"
+                              className="input focus:outline-none focus:border-none rounded-none w-full"
                               name={`testProps[${index}].unit`}
                               id="unit"
                               placeholder="g/dL"

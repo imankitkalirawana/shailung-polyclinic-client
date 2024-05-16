@@ -54,6 +54,8 @@ const Complete = () => {
               testname: data.testDetail.testData.name,
               testid: data._id,
               doctors: data.doctors,
+              summary: data.testDetail.testData.summary,
+              description: data.testDetail.testData.description,
             }));
             axios
               .get(
@@ -497,8 +499,7 @@ const Complete = () => {
                                   />
                                 </td>
                                 <td className="whitespace-nowrap text-sm">
-                                  <input
-                                    type="text"
+                                  <textarea
                                     className="input focus:outline-none rounded-none w-full "
                                     onChange={(e) => {
                                       formik.setFieldValue(

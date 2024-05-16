@@ -3,6 +3,7 @@
 const CurrentDate = new Date();
 const ExpiryDate = new Date("2024-06-11");
 const IsExpired = CurrentDate < ExpiryDate;
+console.log(IsExpired)
 export const API_BASE_URL = IsExpired ? "http://localhost:3000" : "https://backend.shailungpolyclinic.com";
 
 

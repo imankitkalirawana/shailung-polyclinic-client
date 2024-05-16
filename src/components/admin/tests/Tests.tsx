@@ -713,8 +713,9 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
           <div className="modal-action flex flex-col xs:flex-row gap-2">
             <button
               className="btn btn-info flex-1"
+              type="submit"
+              disabled={processing || !date}
               onClick={() => handleSchedule()}
-              disabled={processing}
             >
               {processing ? (
                 <span className="loading loading-dots loading-sm"></span>

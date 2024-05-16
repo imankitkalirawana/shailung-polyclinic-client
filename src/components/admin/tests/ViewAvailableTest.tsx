@@ -6,23 +6,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { humanReadableDate } from "../user/Users";
 import { isLoggedIn } from "../../../utils/auth";
-
-interface AvailableTest {
-  name: string;
-  description: string;
-  price: number;
-  duration: string;
-  status: string;
-  addeddate: string;
-  updatedat: string;
-  testProps: [
-    {
-      investigation: string;
-      referenceValue: string;
-      unit: string;
-    }
-  ];
-}
+import { AvailableTest } from "../../../interface/interface";
 
 const ViewAvailableTest = () => {
   const { id }: any = useParams();
@@ -34,22 +18,7 @@ const ViewAvailableTest = () => {
     }
   }, [user]);
 
-  const [test, setTest] = useState<AvailableTest>({
-    name: "",
-    description: "",
-    price: 0,
-    duration: "",
-    status: "",
-    addeddate: "",
-    updatedat: "",
-    testProps: [
-      {
-        investigation: "",
-        referenceValue: "",
-        unit: "",
-      },
-    ],
-  });
+  const [test, setTest] = useState<AvailableTest>({} as AvailableTest);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -99,7 +68,7 @@ const ViewAvailableTest = () => {
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Description</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
+              <dd className="mt-1 text-sm whitespace-pre-wrap leading-6 sm:col-span-2 sm:mt-0">
                 {test.description}
               </dd>
             </div>
@@ -107,7 +76,8 @@ const ViewAvailableTest = () => {
               <dt className="text-sm font-medium leading-6">Price</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
                 NPR{" "}
-                {test.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                {test.price &&
+                  test.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
               </dd>
             </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -122,19 +92,21 @@ const ViewAvailableTest = () => {
                 {test.status === "active" ? "Available" : "Not Available"}
               </dd>
             </div>
-
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <dt className="text-sm font-medium leading-6">
+                Test Information
+              </dt>
+              <dd className="mt-1 text-sm whitespace-pre-wrap leading-6 sm:col-span-2 sm:mt-0">
+                {test.summary || "-"}
+              </dd>
+            </div>
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Added On</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
                 {humanReadableDate(test.addeddate)}
               </dd>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Updated On</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {test.updatedat ? humanReadableDate(test.updatedat) : "N/A"}
-              </dd>
-            </div>
+
             <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-sm font-medium leading-6">Test Properties</dt>
               <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0"></dd>
@@ -149,17 +121,18 @@ const ViewAvailableTest = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-primary/10 divide-y">
-                  {test.testProps.map((testProp, index) => (
-                    <tr key={index}>
-                      <td className="px-4 py-3 text-sm">
-                        {testProp.investigation}
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        {testProp.referenceValue}
-                      </td>
-                      <td className="px-4 py-3 text-sm">{testProp.unit}</td>
-                    </tr>
-                  ))}
+                  {test.testProps &&
+                    test.testProps.map((testProp, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-3 text-sm">
+                          {testProp.investigation}
+                        </td>
+                        <td className="px-4 py-3 whitespace-pre-wrap text-sm">
+                          {testProp.referenceValue}
+                        </td>
+                        <td className="px-4 py-3 text-sm">{testProp.unit}</td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>

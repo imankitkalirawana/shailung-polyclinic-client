@@ -59,6 +59,7 @@ export interface AvailableTest {
   addeddate: string;
   updatedat: string;
   doctors: string[];
+  summary: string;
   testProps: [
     {
       investigation: string;
@@ -82,6 +83,7 @@ export interface Report {
   _id: string;
   name: string;
   doctor: string;
+  description: string;
   age: number;
   gender: string;
   dob: string;
@@ -95,6 +97,7 @@ export interface Report {
   status: string;
   addedby: string;
   testid: string;
+  summary: string;
   doctors: [
     {
       _id: string;

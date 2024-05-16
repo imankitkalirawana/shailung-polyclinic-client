@@ -42,6 +42,7 @@ const Stats = () => {
   const [endDate, setEndDate] = useState("");
   const [data, setData] = useState({} as any);
   const [previousData, setPreviousData] = useState({} as any);
+  console.log(data, previousData);
   const fetchData = async () => {
     const response = await getTestStats(timeframe || "1d", startDate, endDate);
     const data = response.data;
@@ -126,7 +127,7 @@ const Stats = () => {
             starttime={startDate}
             endtime={endDate}
           />
-          <div className="stats stats-vertical md:stats-horizontal shadow bg-base-300">
+          <div className="stats hidden stats-vertical md:stats-horizontal shadow bg-base-300">
             <div className="stat">
               <div className="stat-figure text-primary">
                 <IconTestPipe size={32} />

@@ -77,10 +77,10 @@ const AvailableTests = () => {
       <section>
         <div className="w-full overflow-hidden card shadow-xs">
           <div className="flex justify-between items-center">
-            <h2 className="my-6 text-2xl font-semibold">Available Tests</h2>
+            <h2 className="my-6 text-2xl font-semibold">Available Services</h2>
             {user?.role === "admin" && (
               <label htmlFor="add_test" className="btn btn-primary btn-sm">
-                <span>New Test</span>
+                <span>New Service</span>
               </label>
             )}
           </div>
@@ -358,6 +358,7 @@ const AddTest = () => {
       description: "",
       price: "",
       duration: "",
+      summary: "",
       doctors: [] as string[],
       testProps: Array.from({ length: 1 }, () => ({
         investigation: "",
@@ -419,7 +420,9 @@ const AddTest = () => {
         <div className="modal-box w-full">
           <div className="container flex items-center justify-center px-6 mx-auto">
             <form className="w-full max-w-md" onSubmit={formik.handleSubmit}>
-              <h3 className="mb-6 text-3xl font-bold text-center">New Test</h3>
+              <h3 className="mb-6 text-3xl font-bold text-center">
+                New Service
+              </h3>
               <div className="form-control">
                 <label htmlFor="name" className="label">
                   <span className="label-text">Name</span>
@@ -440,12 +443,11 @@ const AddTest = () => {
                 <label htmlFor="description" className="label">
                   <span className="label-text">Description</span>
                 </label>
-                <input
-                  type="text"
+                <textarea
                   className="input input-bordered w-full"
                   name="description"
                   id="description"
-                  placeholder="eg: Complete Blood Count"
+                  placeholder="eg: Done on Automated Chemiluminescence ANALYER By CLA Method"
                   onChange={formik.handleChange}
                   value={formik.values.description}
                 />
@@ -477,6 +479,19 @@ const AddTest = () => {
                   placeholder="eg: 1hr 30mins"
                   onChange={formik.handleChange}
                   value={formik.values.duration}
+                />
+              </div>
+              <div className="form-control">
+                <label htmlFor="summary" className="label">
+                  <span className="label-text">Test Information</span>
+                </label>
+                <textarea
+                  className="input input-bordered w-full"
+                  name="summary"
+                  id="summary"
+                  placeholder="eg: 1hr 30mins"
+                  onChange={formik.handleChange}
+                  value={formik.values.summary}
                 />
               </div>
               <div className="max-h-48 pt-8 overflow-y-scroll">
@@ -573,8 +588,7 @@ const AddTest = () => {
                               />
                             </td>
                             <td className="whitespace-nowrap text-sm font-medium">
-                              <input
-                                type="text"
+                              <textarea
                                 className="input focus:outline-none rounded-none w-full"
                                 name={`testProps[${index}].referenceValue`}
                                 id="referenceValue"
@@ -622,7 +636,7 @@ const AddTest = () => {
                       <span className="loading loading-dots loading-sm"></span>
                     </>
                   ) : (
-                    "Add Test"
+                    "Add Service"
                   )}
                 </button>
                 <label htmlFor="add_test" className="btn flex-1">
