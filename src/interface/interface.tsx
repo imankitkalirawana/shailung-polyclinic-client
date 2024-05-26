@@ -11,6 +11,7 @@ export interface Test {
   reportId: string;
   addedby: string;
   doctors: string[];
+  labId: string;
   testDetail: {
     testData: {
       _id: string;
@@ -98,6 +99,7 @@ export interface Report {
   addedby: string;
   testid: string;
   summary: string;
+  labId: string;
   doctors: [
     {
       _id: string;

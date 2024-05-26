@@ -37,6 +37,7 @@ import Doctors from "./components/admin/doctors/Doctors";
 import Doctor from "./components/admin/doctors/Doctor";
 import ViewDoctor from "./components/admin/doctors/ViewDoctor";
 import Stats from "./components/admin/Stats";
+import CompleteHold from "./components/admin/tests/CompleteHold";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -92,6 +93,10 @@ function App() {
                     <Route path="tests/" element={<Outlet />}>
                       <Route path="" element={<Tests />} />
                       <Route path="complete/:id" element={<Complete />} />
+                      <Route
+                        path="complete/report/:id"
+                        element={<CompleteHold />}
+                      />
                       <Route path="appointment" element={<NewAppointment />} />
                     </Route>
                     <Route path="doctors/*" element={<Outlet />}>

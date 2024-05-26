@@ -20,6 +20,7 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Test } from "../../../interface/interface";
 import { useFormik } from "formik";
+import { IconEdit } from "@tabler/icons-react";
 
 export const testStatus = async (testId: any, status: string) => {
   try {
@@ -265,7 +266,8 @@ const Tests = () => {
                             }}
                           ></span>
                           {test.status != "completed" &&
-                            test.status !== "overdue" && (
+                            test.status !== "overdue" &&
+                            test.status !== "hold" && (
                               <select
                                 tabIndex={0}
                                 className="dropdown-content z-[1] menu p-2 select select-bordered shadow bg-base-100 rounded-box w-52"
@@ -307,7 +309,8 @@ const Tests = () => {
                         </td>
                         <td className="px-4 py-3 text-sm modify justify-end flex gap-2">
                           {test.status !== "completed" &&
-                            test.status !== "cancelled" && (
+                            test.status !== "cancelled" &&
+                            test.status !== "hold" && (
                               <button
                                 className={`btn btn-sm btn-circle hover:btn-outline tooltip flex ${
                                   test.appointmentdate
@@ -337,6 +340,15 @@ const Tests = () => {
                               data-tip="Download"
                             >
                               <DownloadIcon className="w-4 h-4" />
+                            </Link>
+                          )}
+                          {test.status === "hold" && (
+                            <Link
+                              to={`/dashboard/tests/complete/report/${test._id}`}
+                              className="btn btn-sm btn-circle btn-ghost flex items-center justify-center tooltip tooltip-success"
+                              data-tip="Edit"
+                            >
+                              <IconEdit className="w-4 h-4" stroke={1} />
                             </Link>
                           )}
                           {user?.role === "admin" && (

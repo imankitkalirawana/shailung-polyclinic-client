@@ -115,7 +115,7 @@ const Download = () => {
                               <span>Name :</span>
                               <span>Address :</span>
                               <span>Doctor :</span>
-                              <span>Test ID :</span>
+                              <span>Lab ID :</span>
                             </div>
                             <div className="flex flex-col">
                               <span>{report?.name}</span>
@@ -123,7 +123,7 @@ const Download = () => {
                               <span>
                                 {report?.doctors && report?.doctors[0].name}
                               </span>
-                              <span>{report?.testid}</span>
+                              <span>{report?.labId || "-"}</span>
                             </div>
                           </div>
                           <div className="flex gap-4">

@@ -130,9 +130,9 @@ const Reports = () => {
                           <span
                             className={`badge tooltip tooltip-right badge-${
                               report.status === "positive"
-                                ? "success tooltip-success"
-                                : report.status === "negative"
                                 ? "error tooltip-error"
+                                : report.status === "negative"
+                                ? "primary tooltip-primary"
                                 : ""
                             }`}
                             data-tip={

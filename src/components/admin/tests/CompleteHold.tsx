@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Test } from "../../../interface/interface";
 
-const Complete = () => {
+const CompleteHold = () => {
   const { loggedIn } = isLoggedIn();
   const { id }: any = useParams();
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ const Complete = () => {
               Authorization: `${localStorage.getItem("token")}`,
             },
           })
-          .then(({ data }) => {
+          .then(async ({ data }) => {
             setTest(data);
             formik.setValues((previousData) => ({
               ...previousData,
@@ -57,6 +57,7 @@ const Complete = () => {
               summary: data.testDetail.testData.summary,
               description: data.testDetail.testData.description,
             }));
+
             axios
               .get(
                 `${API_BASE_URL}/api/available-test/${data.testDetail.testData._id}`,
@@ -78,6 +79,22 @@ const Complete = () => {
                   })),
                 }));
               });
+            axios
+              .get(`${API_BASE_URL}/api/report/${data.reportId}`)
+              .then(({ data }) => {
+                formik.setValues((previousData) => ({
+                  ...previousData,
+                  _id: data._id,
+                  fatherName: data.fatherName,
+                  address: data.address,
+                  gender: data.gender,
+                  labId: data.labId,
+                  reportDate: data.reportDate,
+                  status: data.status,
+                  reportType: data.reportType,
+                  reportRows: data.reportRows,
+                }));
+              });
           });
       } catch (error) {
         toast.error("Failed to fetch tests");
@@ -95,6 +112,7 @@ const Complete = () => {
 
   const formik = useFormik({
     initialValues: {
+      _id: "",
       name: "",
       fatherName: "",
       age: 0,
@@ -125,11 +143,15 @@ const Complete = () => {
       setProcessing(true);
       try {
         if (values.isDraft) {
-          await axios.post(`${API_BASE_URL}/api/report/draft`, values, {
-            headers: {
-              Authorization: `${localStorage.getItem("token")}`,
-            },
-          });
+          await axios.put(
+            `${API_BASE_URL}/api/report/redraft/${values._id}`,
+            values,
+            {
+              headers: {
+                Authorization: `${localStorage.getItem("token")}`,
+              },
+            }
+          );
           toast.success("Report saved as draft");
           navigate("/dashboard/tests");
         } else {
@@ -242,6 +264,7 @@ const Complete = () => {
                   name="fatherName"
                   type="text"
                   className="input input-bordered w-full"
+                  value={formik.values.fatherName}
                   required
                   onChange={formik.handleChange}
                 />
@@ -620,4 +643,4 @@ const Complete = () => {
   );
 };
 
-export default Complete;
+export default CompleteHold;
