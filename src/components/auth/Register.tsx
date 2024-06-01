@@ -120,7 +120,6 @@ const Register = () => {
       const res = await axios.post(`${API_BASE_URL}/api/user/generate-otp`, {
         phone: formik.values.phone,
       });
-
       formik.values.dbOtp = res.data.otp;
       // console.log(res.data.otp);
       const api_key = "26614D70EA4E26";

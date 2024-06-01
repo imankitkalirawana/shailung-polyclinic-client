@@ -16,20 +16,26 @@ const ForgotPassword = () => {
     onSubmit: async (values) => {
       try {
         setIsSubmitting(true);
-        const response = await axios.post(
-          `${API_BASE_URL}/api/user/forgot-password/`,
-          {
+        await axios
+          .post(`${API_BASE_URL}/api/user/forgot-password/`, {
             id: values.id,
-          }
-        );
-        console.log(response.data);
-        toast.success(response.data.message);
-        setIsSent(true);
+          })
+          .then(async (res) => {
+            const api_key = "26614D70EA4E26";
+            const contact = res.data.data.phone;
+            const message = `Click on this link to reset your password: ${res.data.resetLink}`;
+            const api_url = `https://samayasms.com.np/smsapi/index?key=${api_key}&routeid=116&contacts=${contact}&senderid=SMSBit&msg=${message}&responsetype=json`;
+            toast.success("Reset Password link sent to your email/phone.");
+            setIsSent(true);
+            const response = await axios.get(api_url);
+            console.log(response.data);
+          });
       } catch (error: any) {
-        toast.error(error.response.data.error);
+        toast.error("Error:", error.response.data.error);
         console.log(error.response.data.error);
+      } finally {
+        setIsSubmitting(false);
       }
-      setIsSubmitting(false);
     },
   });
 

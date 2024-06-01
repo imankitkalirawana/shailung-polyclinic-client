@@ -71,29 +71,38 @@ const CompleteHold = () => {
                 formik.setValues((previousData) => ({
                   ...previousData,
                   reportRows: data.testProps.map((prop: any) => ({
+                    ...prop,
                     title: prop.investigation,
                     reference: prop.referenceValue,
                     unit: prop.unit,
-                    value: "",
                     isDisabled: true,
                   })),
                 }));
-              });
-            axios
-              .get(`${API_BASE_URL}/api/report/${data.reportId}`)
-              .then(({ data }) => {
-                formik.setValues((previousData) => ({
-                  ...previousData,
-                  _id: data._id,
-                  fatherName: data.fatherName,
-                  address: data.address,
-                  gender: data.gender,
-                  labId: data.labId,
-                  reportDate: data.reportDate,
-                  status: data.status,
-                  reportType: data.reportType,
-                  reportRows: data.reportRows,
-                }));
+              })
+              .then(() => {
+                axios
+                  .get(`${API_BASE_URL}/api/report/${data.reportId}`)
+                  .then(({ data }) => {
+                    formik.setValues((previousData) => ({
+                      ...previousData,
+                      _id: data._id,
+                      fatherName: data.fatherName,
+                      address: data.address,
+                      gender: data.gender,
+                      labId: data.labId,
+                      reportDate: data.reportDate,
+                      status: data.status,
+                      reportType: data.reportType,
+                      isDraft: data.isDraft,
+                      //   map reportRows with data.reportRows
+                      reportRows: data.reportRows.map((row: any) => ({
+                        title: row.title,
+                        value: row.value,
+                        unit: row.unit,
+                        reference: row.reference,
+                      })),
+                    }));
+                  });
               });
           });
       } catch (error) {
@@ -153,7 +162,6 @@ const CompleteHold = () => {
             }
           );
           toast.success("Report saved as draft");
-          navigate("/dashboard/tests");
         } else {
           if (files) {
             const filenames = Array.from(files).map(
@@ -190,11 +198,15 @@ const CompleteHold = () => {
 
   const uploadReport = async (values: any) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/report`, values, {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await axios.put(
+        `${API_BASE_URL}/api/report/draft/${values._id}`,
+        values,
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        }
+      );
       return res.data;
     } catch (error) {
       console.error(error);
@@ -225,6 +237,8 @@ const CompleteHold = () => {
     }));
   };
 
+  console.log(formik.values.reportRows);
+
   return (
     <>
       <div className="container mx-auto p-4">
@@ -238,7 +252,7 @@ const CompleteHold = () => {
               Patient Information
             </h2>
           </div>
-          <form onSubmit={formik.handleSubmit}>
+          <form>
             <div className="grid grid-cols-1 gap-6 mt-4 md:grid-cols-6">
               <div className="col-span-full md:col-span-3">
                 <label className="label" htmlFor="name">
@@ -609,24 +623,37 @@ const CompleteHold = () => {
                 </div>
               )}
               <div className="col-span-full flex gap-4 md:justify-self-end">
+                {!processing && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      formik.setValues((prevValues) => ({
+                        ...prevValues,
+                        isDraft: true,
+                      }));
+                      formik.handleSubmit();
+                    }}
+                    className="btn btn-outline"
+                    disabled={isUplaoded || processing}
+                  >
+                    {processing ? (
+                      <span className="loading loading-dots loading-sm"></span>
+                    ) : (
+                      "Save Draft"
+                    )}
+                  </button>
+                )}
+
                 <button
-                  type="button"
+                  className="btn btn-primary"
+                  disabled={isUplaoded || processing}
                   onClick={() => {
                     formik.setValues((prevValues) => ({
                       ...prevValues,
-                      isDraft: true,
+                      isDraft: false,
                     }));
                     formik.handleSubmit();
                   }}
-                  className="btn btn-outline"
-                >
-                  Save Draft
-                </button>
-
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={isUplaoded || processing}
                 >
                   {processing ? (
                     <span className="loading loading-dots loading-sm"></span>

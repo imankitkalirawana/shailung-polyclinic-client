@@ -277,7 +277,9 @@ const Tests = () => {
                                 }}
                               >
                                 {TestStatus.filter(
-                                  (status) => status.value !== "overdue"
+                                  (status) =>
+                                    status.value !== "overdue" &&
+                                    status.value !== "hold"
                                 ).map((status, index) => (
                                   <option key={index} value={status.value}>
                                     {status.label}

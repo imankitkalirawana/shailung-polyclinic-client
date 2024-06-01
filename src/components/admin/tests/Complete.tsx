@@ -586,19 +586,26 @@ const Complete = () => {
                 </div>
               )}
               <div className="col-span-full flex gap-4 md:justify-self-end">
-                <button
-                  type="button"
-                  onClick={() => {
-                    formik.setValues((prevValues) => ({
-                      ...prevValues,
-                      isDraft: true,
-                    }));
-                    formik.handleSubmit();
-                  }}
-                  className="btn btn-outline"
-                >
-                  Save Draft
-                </button>
+                {!processing && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      formik.setValues((prevValues) => ({
+                        ...prevValues,
+                        isDraft: true,
+                      }));
+                      formik.handleSubmit();
+                    }}
+                    className="btn btn-outline"
+                    disabled={isUplaoded || processing}
+                  >
+                    {processing ? (
+                      <span className="loading loading-dots loading-sm"></span>
+                    ) : (
+                      "Save Draft"
+                    )}
+                  </button>
+                )}
 
                 <button
                   type="submit"
