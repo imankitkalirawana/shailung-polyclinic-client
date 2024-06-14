@@ -7,6 +7,15 @@ import { API_BASE_URL } from "../../../utils/config";
 import axios from "axios";
 import { toast } from "sonner";
 import { getWebsite } from "../../../functions/get";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Input,
+  Textarea,
+} from "@nextui-org/react";
 
 // get domain name from url
 
@@ -76,99 +85,90 @@ const Website = () => {
         />
       </Helmet>
       <div>
-        <form onSubmit={formik.handleSubmit}>
-          <div>
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-base font-semibold leading-7 text-base-content">
-                  Website Information
-                </h1>
-              </div>
-            </div>
+        <Card
+          as={"form"}
+          onSubmit={(e) => {
+            e.preventDefault();
+            formik.handleSubmit();
+          }}
+          className="p-4"
+        >
+          <CardHeader className="flex flex-col items-start px-4 pb-0 pt-4">
+            <p className="text-large">Website Information</p>
+          </CardHeader>
 
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-3">
-                <label htmlFor="website-title" className="label">
-                  <span className="label-text">Title</span>
-                </label>
-                <input
-                  id="title"
-                  name="title"
-                  type="text"
-                  className="input input-bordered w-full"
-                  value={formik.values.title}
-                  onChange={formik.handleChange}
-                />
-              </div>
-              <div className="sm:col-span-3">
-                <label htmlFor="website-email" className="label">
-                  <span className="label-text">Email</span>
-                </label>
-                <input
-                  id="website-email"
-                  name="email"
-                  type="text"
-                  className="input input-bordered w-full"
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
-                />
-              </div>
-              <div className="sm:col-span-3">
-                <label htmlFor="website-phone" className="label">
-                  <span className="label-text">Phone</span>
-                </label>
-                <input
-                  id="website-phone"
-                  name="phone"
-                  type="text"
-                  className="input input-bordered w-full"
-                  value={formik.values.phone}
-                  onChange={formik.handleChange}
-                />
-              </div>
-              <div className="sm:col-span-3">
-                <label htmlFor="website-description" className="label">
-                  <span className="label-text">Description</span>
-                </label>
-                <input
-                  id="website-description"
-                  name="description"
-                  type="text"
-                  className="input input-bordered w-full"
-                  value={formik.values.description}
-                  onChange={formik.handleChange}
-                />
-              </div>
-              <div className="sm:col-span-full">
-                <label htmlFor="website-address" className="label">
-                  <span className="label-text">Address</span>
-                </label>
-                <input
-                  id="website-address"
-                  name="address"
-                  type="text"
-                  className="input input-bordered w-full"
-                  value={formik.values.address}
-                  onChange={formik.handleChange}
-                />
-              </div>
+          <CardBody className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+            <div className="sm:col-span-3">
+              <Input
+                id="title"
+                name="title"
+                type="text"
+                placeholder="eg. Shailung Polyclinic"
+                label="Title"
+                value={formik.values.title}
+                onChange={formik.handleChange}
+                description="This will be displayed on the website header."
+              />
             </div>
-          </div>
-          <div className="flex items-center gap-2 justify-end mt-12">
-            <a href="/dashboard" className="btn btn-sm">
+            <div className="sm:col-span-3">
+              <Input
+                id="website-email"
+                name="email"
+                type="text"
+                placeholder="eg: contact@shailungpolyclinic.com"
+                label="Email"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+              />
+            </div>
+            <div className="sm:col-span-3">
+              <Input
+                id="website-phone"
+                name="phone"
+                type="text"
+                placeholder="eg: +977 1234567890"
+                label="Phone"
+                value={formik.values.phone}
+                onChange={formik.handleChange}
+              />
+            </div>
+            <div className="sm:col-span-3">
+              <Input
+                id="website-address"
+                name="address"
+                type="text"
+                placeholder="eg: Kathmandu, Nepal"
+                label="Address"
+                value={formik.values.address}
+                onChange={formik.handleChange}
+              />
+            </div>
+            <div className="sm:col-span-full">
+              <Textarea
+                id="website-description"
+                name="description"
+                placeholder="eg: Shailung Polyclinic is a medical facility that provides various health services to the people of Nepal."
+                label="Description"
+                value={formik.values.description}
+                onChange={formik.handleChange}
+              />
+            </div>
+          </CardBody>
+          <CardFooter className="flex items-center gap-2 justify-end mt-12">
+            <Button as={"a"} href="/dashboard" variant="flat">
               Cancel
-            </a>
-            <button className="btn btn-primary btn-sm" type="submit">
+            </Button>
+            <Button
+              variant="flat"
+              color="primary"
+              isLoading={formik.isSubmitting}
+              isDisabled={formik.isSubmitting}
+              type="submit"
+            >
               Update
-            </button>
-          </div>
-        </form>
-
-        {/* <div className="divider my-12"></div>
-        <div className="my-8">
-          <ViewTeam />
-        </div> */}
-        <div className="divider"></div>
+            </Button>
+          </CardFooter>
+        </Card>
         <div className="my-8">
           <ViewSign />
         </div>

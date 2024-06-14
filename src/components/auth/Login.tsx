@@ -1,14 +1,30 @@
 import axios from "axios";
-import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { API_BASE_URL } from "../../utils/config";
 import { useFormik } from "formik";
 import { toast } from "sonner";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Input,
+  Link as NextLink,
+} from "@nextui-org/react";
+import { isLoggedIn } from "../../utils/auth";
+import { useEffect } from "react";
 
 const Login = () => {
+  const { user } = isLoggedIn();
   const [searchParams] = useSearchParams();
-  const [processing, setProcessing] = useState(false);
   const redirect = searchParams.get("redirect");
+
+  useEffect(() => {
+    if (user) {
+      window.location.href = "/dashboard";
+    }
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -17,7 +33,6 @@ const Login = () => {
       password: "",
     },
     onSubmit: async (values) => {
-      setProcessing(true);
       try {
         const res = await axios.post(`${API_BASE_URL}/api/user/login`, values);
         const { data } = res;
@@ -37,8 +52,6 @@ const Login = () => {
       } catch (err: any) {
         toast.error(err.response.data.error);
         console.log(err);
-      } finally {
-        setProcessing(false);
       }
     },
   });
@@ -54,14 +67,19 @@ const Login = () => {
     }
   };
 
-  // console.log(formik.values);
-
   return (
     <>
-      <section className="">
-        <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-          <main className="flex items-center justify-center px-8 py-8 sm:px-12 col-span-full">
-            <div className="lg:max-w-md max-w-md mx-auto">
+      <main className="flex h-screen items-center justify-center p-8">
+        <div className="max-w-md mx-auto">
+          <Card
+            as={"form"}
+            className="p-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              formik.handleSubmit();
+            }}
+          >
+            <CardHeader className="flex-col">
               <div className="block text-primary">
                 <span className="sr-only">Home</span>
                 <img
@@ -70,93 +88,62 @@ const Login = () => {
                   alt="Shailung Polyclinic"
                 />
               </div>
-
               <h1 className="mt-6 text-2xl text-center">
                 Welcome to Shailung Polyclinic 🏥
               </h1>
-              <form
-                onSubmit={formik.handleSubmit}
-                className="mt-8 grid grid-cols-6 gap-4"
+            </CardHeader>
+            <CardBody className="flex flex-col gap-3">
+              <Input
+                type="text"
+                id="id"
+                name="id"
+                onChange={(e) => {
+                  handleIdChange(e);
+                }}
+                fullWidth
+                label="Email or Phone"
+                placeholder="Enter your email or phone"
+                variant="bordered"
+              />
+
+              <Input
+                type="password"
+                id="Password"
+                name="password"
+                onChange={formik.handleChange}
+                value={formik.values.password}
+                fullWidth
+                label="Password"
+                placeholder="Enter your password"
+                variant="bordered"
+              />
+              <p className="text-end text-small">
+                <NextLink size="sm" as={Link} to="/auth/forgot-password">
+                  Forgot password?
+                </NextLink>
+              </p>
+            </CardBody>
+            <CardFooter className="flex-col gap-2">
+              <Button
+                type="submit"
+                variant="flat"
+                color="primary"
+                fullWidth
+                isDisabled={formik.isSubmitting}
+                isLoading={formik.isSubmitting}
               >
-                <div className="col-span-full">
-                  <label htmlFor="id" className="label">
-                    <span className="label-text">Email / Phone Number</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="id"
-                    name="id"
-                    className="input input-bordered w-full"
-                    onChange={(e) => {
-                      handleIdChange(e);
-                    }}
-                  />
-                </div>
-
-                <div className="col-span-full">
-                  <label htmlFor="Password" className="label">
-                    <span className="label-text">Password</span>
-                  </label>
-
-                  <input
-                    type="password"
-                    id="Password"
-                    name="password"
-                    className="input input-bordered w-full"
-                    onChange={formik.handleChange}
-                    value={formik.values.password}
-                  />
-                  <label htmlFor="Password" className="label">
-                    <Link
-                      to="/auth/forgot-password"
-                      className="label-text-alt underline"
-                    >
-                      Forgot Password
-                    </Link>
-                  </label>
-                </div>
-
-                <div className="col-span-6 hidden">
-                  <p className="text-sm">
-                    By creating an account, you agree to our
-                    <a href="#" className="underline">
-                      {" "}
-                      terms and conditions{" "}
-                    </a>
-                    and
-                    <a href="#" className="underline">
-                      privacy policy
-                    </a>
-                    .
-                  </p>
-                </div>
-
-                <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                  <button type="submit" className="btn btn-primary w-full">
-                    {processing ? (
-                      <span className="loading loading-dots loading-sm"></span>
-                    ) : (
-                      "Login"
-                    )}
-                  </button>
-                </div>
-                <div className="col-span-full">
-                  <p className="leading-relaxed text-sm">
-                    Don't have an Account?{" "}
-                    <Link
-                      to="/auth/register"
-                      className="text-primary underline"
-                    >
-                      Create an account
-                    </Link>
-                    .
-                  </p>
-                </div>
-              </form>
-            </div>
-          </main>
+                Login
+              </Button>
+              <p className="text-center text-small">
+                Need to create an account?&nbsp;
+                <NextLink as={Link} to="/auth/register" size="sm">
+                  Sign Up
+                </NextLink>
+              </p>
+            </CardFooter>
+          </Card>
         </div>
-      </section>
+      </main>
     </>
   );
 };

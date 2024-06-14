@@ -1,22 +1,45 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { humanReadableDate } from "../user/Users";
 import { toast } from "sonner";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
-import {
-  EditIcon,
-  LeftAngle,
-  PlusIcon,
-  RightAngle,
-  TrashXIcon,
-  XIcon,
-} from "../../icons/Icons";
+import { PlusIcon, XIcon } from "../../icons/Icons";
 import { useFormik } from "formik";
-import NotFound from "../../NotFound";
 import { getAllAvailableTests, getAllDoctors } from "../../../functions/get";
 import { isLoggedIn } from "../../../utils/auth";
 import { Doctor } from "../../../interface/interface";
+import * as Yup from "yup";
+import {
+  Button,
+  Checkbox,
+  Chip,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  Textarea,
+  Tooltip,
+  useDisclosure,
+} from "@nextui-org/react";
+import {
+  IconDotsVertical,
+  IconArrowUpRight,
+  IconPencil,
+  IconTrash,
+} from "@tabler/icons-react";
 
 interface Test {
   _id: string;
@@ -37,243 +60,24 @@ interface Test {
 
 const AvailableTests = () => {
   const { user } = isLoggedIn();
-  const offset = 10;
-  const [initialItem, setInitialItem] = useState(0);
-  const [finalItem, setFinalItem] = useState(offset);
   const [tests, setTests] = useState<Test[]>([]);
   const navigate = useNavigate();
   const [selected, setSelected] = useState<Test | null>(null);
-  const handleDeleteClick = (test: Test) => {
-    setSelected(test);
-  };
+  const deleteTestModal = useDisclosure();
+  const newServiceModal = useDisclosure();
 
-  const handleRowClick = (id: string, e: any) => {
-    if (
-      e.target.classList.contains("button") ||
-      e.target.classList.contains("btn") ||
-      e.target.classList.contains("modify") ||
-      e.target.nodeName.toLowerCase() === "svg" ||
-      e.target.nodeName.toLowerCase() === "path"
-    ) {
-      return;
+  const fetchTests = async () => {
+    try {
+      const data = await getAllAvailableTests();
+      setTests(data);
+    } catch (error: any) {
+      toast.error(error.response.statusText);
     }
-    navigate(`/dashboard/tests/available-tests/${id}`);
   };
-
   useEffect(() => {
-    const fetchTests = async () => {
-      try {
-        const data = await getAllAvailableTests();
-        setTests(data);
-      } catch (error: any) {
-        toast.error(error.response.statusText);
-      }
-    };
     fetchTests();
   }, []);
 
-  return (
-    <>
-      <section>
-        <div className="w-full overflow-hidden card shadow-xs">
-          <div className="flex justify-between items-center">
-            <h2 className="my-6 text-2xl font-semibold">Available Services</h2>
-            {user?.role === "admin" && (
-              <label htmlFor="add_test" className="btn btn-primary btn-sm">
-                <span>New Service</span>
-              </label>
-            )}
-          </div>
-          {tests.length > 0 ? (
-            <>
-              <div className={`w-full overflow-x-auto card`}>
-                <table className="w-full whitespace-no-wrap">
-                  {tests.length > 0 ? (
-                    <>
-                      <thead>
-                        <tr
-                          className={`text-xs font-semibold tracking-wide text-left uppercase border-b bg-primary/20`}
-                        >
-                          <th className="px-4 py-3">Status</th>
-                          <th className="px-4 py-3">Test</th>
-                          <th className="px-4 py-3">Description</th>
-                          <th className="px-4 py-3">Price</th>
-                          <th className="px-4 py-3">Duration</th>
-                          {(user?.role === "admin" ||
-                            user?.role === "member") && (
-                            <th className="px-4 py-3">Updated On</th>
-                          )}
-                          {user?.role === "admin" && (
-                            <th className="px-4 py-3">Modify</th>
-                          )}
-                        </tr>
-                      </thead>
-                      <tbody className="bg-primary/10 divide-y">
-                        {tests
-                          .slice(initialItem, finalItem)
-                          .map((test, index) => (
-                            <tr
-                              key={index}
-                              className={`${
-                                (user?.role === "admin" ||
-                                  user?.role === "member") &&
-                                "cursor-pointer hover:bg-primary/5"
-                              }`}
-                              onClick={(e) => {
-                                if (
-                                  user?.role === "admin" ||
-                                  user?.role === "member"
-                                ) {
-                                  handleRowClick(test._id, e);
-                                }
-                              }}
-                            >
-                              <td className="px-4 py-3 text-sm">
-                                <span
-                                  className={`badge tooltip tooltip-right badge-${
-                                    test.status === "active"
-                                      ? "success"
-                                      : "error"
-                                  }`}
-                                  data-tip={
-                                    test.status === "active"
-                                      ? "Available"
-                                      : "Not Available"
-                                  }
-                                ></span>
-                              </td>
-                              <td className="px-4 py-3">
-                                <div className="flex items-center text-sm">
-                                  <div>
-                                    <p className="font-semibold text-nowrap">
-                                      {test.name}
-                                    </p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td
-                                className="px-4 py-3 text-sm max-w-48 text-ellipsis overflow-hidden whitespace-nowrap"
-                                title={test.description}
-                              >
-                                {test.description}
-                              </td>
-                              <td className="px-4 py-3 text-sm text-nowrap">
-                                {test.price
-                                  .toString()
-                                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                              </td>
-                              <td className="px-4 py-3 text-sm text-nowrap">
-                                {test.duration}
-                              </td>
-                              {(user?.role === "admin" ||
-                                user?.role === "member") && (
-                                <td className="px-4 py-3 text-sm text-nowrap">
-                                  {humanReadableDate(test.updatedat)}
-                                </td>
-                              )}
-                              {user?.role === "admin" && (
-                                <td className="px-4 py-3 text-sm modify">
-                                  <Link
-                                    to={`/dashboard/tests/available-tests/${test._id}/edit`}
-                                    className="btn btn-sm btn-circle btn-ghost"
-                                    aria-label="Edit"
-                                  >
-                                    <EditIcon className="w-4 h-4 button" />
-                                  </Link>
-                                  <button
-                                    className="btn btn-sm btn-circle btn-ghost hover:btn-outline"
-                                    aria-label="Delete"
-                                    onClick={() => handleDeleteClick(test)}
-                                  >
-                                    <TrashXIcon className="w-4 h-4 button" />
-                                  </button>
-                                </td>
-                              )}
-                            </tr>
-                          ))}
-                        <tr className="bg-primary/20">
-                          <td
-                            className="px-4 py-3 text-sm"
-                            colSpan={
-                              user?.role === "admin"
-                                ? 6
-                                : user?.role === "member"
-                                ? 5
-                                : 4
-                            }
-                          >
-                            Showing {initialItem + 1}-{finalItem} of{" "}
-                            {tests.length}
-                          </td>
-                          <td className="px-4 py-3 text-sm flex justify-end">
-                            <button
-                              className="btn btn-sm btn-ghost btn-circle"
-                              aria-label="Previous"
-                              onClick={() => {
-                                if (initialItem > 0) {
-                                  setInitialItem(initialItem - offset);
-                                  setFinalItem(finalItem - offset);
-                                }
-                              }}
-                            >
-                              <LeftAngle className="w-4 h-4 fill-current" />
-                            </button>
-                            <button
-                              className="btn btn-sm btn-ghost btn-circle"
-                              aria-label="Next"
-                              onClick={() => {
-                                if (finalItem < tests.length) {
-                                  setInitialItem(initialItem + offset);
-                                  setFinalItem(finalItem + offset);
-                                }
-                              }}
-                            >
-                              <RightAngle className="w-4 h-4 fill-current" />
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </>
-                  ) : (
-                    <tbody className="bg-primary/10 divide-y">
-                      <tr>
-                        <td className="px-4 py-3 text-sm">
-                          No tests available!
-                        </td>
-                      </tr>
-                    </tbody>
-                  )}
-                </table>
-              </div>
-            </>
-          ) : (
-            <NotFound message="No tests available!" />
-          )}
-        </div>
-      </section>
-      <AddTest />
-      {selected && (
-        <DeleteModal
-          test={selected}
-          onClose={() => setSelected(null)}
-          setTests={setTests}
-        />
-      )}
-    </>
-  );
-};
-
-interface DeleteModalProps {
-  test: Test;
-  onClose: () => void;
-  setTests: any;
-}
-
-const DeleteModal: React.FC<DeleteModalProps> = ({
-  test,
-  onClose,
-  setTests,
-}) => {
   const handleDelete = async (test: Test) => {
     try {
       await axios.delete(`${API_BASE_URL}/api/available-test/${test._id}`, {
@@ -283,60 +87,171 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
       });
       await fetchTests();
       toast.success("Test deleted successfully");
-      onClose();
+      deleteTestModal.onClose();
     } catch (error: any) {
       console.log(error.response.data);
       toast.error("Error deleting user");
     }
   };
-  const fetchTests = async () => {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/available-test/all`,
-        {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      const data = response.data;
-      setTests(data.reverse());
-    } catch (error) {
-      console.error("Error fetching tests:", error);
-    }
-  };
+
   return (
     <>
-      <div
-        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
-        role="dialog"
-      >
-        <div className="modal-box w-full sm:max-w-sm">
-          <h3 className="font-bold text-lg text-center">
-            Delete <i>{test.name}</i>
-          </h3>
-          <p className="py-4">
-            Are you sure you want to delete this user? This action cannot be
-            undone.
-          </p>
-          <div className="modal-action flex flex-col xs:flex-row gap-2">
-            <button
-              className="btn btn-error flex-1"
-              onClick={() => handleDelete(test)}
-            >
-              Delete
-            </button>
-            <button className="btn flex-1" onClick={onClose}>
-              Close!
-            </button>
+      <section>
+        <div className="w-full shadow-xs">
+          <div className="flex justify-between items-center">
+            <h2 className="my-6 text-2xl font-semibold">Available Services</h2>
+            {user?.role === "admin" && (
+              <Button
+                variant="flat"
+                color="primary"
+                onClick={newServiceModal.onOpenChange}
+              >
+                <span>New Service</span>
+              </Button>
+            )}
           </div>
+          <Table
+            topContent={
+              <span className="text-default-400 text-small">
+                Total {tests.length} services
+              </span>
+            }
+            aria-label="Users"
+            onRowAction={(key) => {
+              navigate(`/dashboard/tests/available-tests/${key}`);
+            }}
+            selectionMode="single"
+          >
+            <TableHeader>
+              <TableColumn allowsSorting key="status">
+                Status
+              </TableColumn>
+              <TableColumn allowsSorting key="name">
+                Name
+              </TableColumn>
+              <TableColumn key="price">Price</TableColumn>
+              <TableColumn key="duration">Duration</TableColumn>
+              <TableColumn key="date">Added On</TableColumn>
+              <TableColumn key="modify" hidden={user?.role !== "admin"}>
+                Actions
+              </TableColumn>
+            </TableHeader>
+            <TableBody emptyContent={"No Available services"} items={tests}>
+              {(test) => (
+                <TableRow key={test._id}>
+                  <TableCell>
+                    <Chip
+                      variant="dot"
+                      color={test.status === "active" ? "success" : "danger"}
+                    >
+                      {test.status}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>{test.name}</TableCell>
+                  <TableCell>{test.price}</TableCell>
+                  <TableCell>{test.duration}</TableCell>
+                  <TableCell>{humanReadableDate(test.updatedat)}</TableCell>
+                  <TableCell hidden={user?.role !== "admin"}>
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button
+                          variant="light"
+                          radius="full"
+                          size="sm"
+                          isIconOnly
+                        >
+                          <IconDotsVertical size={16} />
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu aria-label="Actions">
+                        <DropdownItem
+                          startContent={<IconArrowUpRight size={16} />}
+                          key="view"
+                          onPress={() =>
+                            navigate(
+                              `/dashboard/tests/available-tests/${test._id}`
+                            )
+                          }
+                        >
+                          View test
+                        </DropdownItem>
+                        <DropdownItem
+                          startContent={<IconPencil size={16} />}
+                          key="edit"
+                          onPress={() =>
+                            navigate(
+                              `/dashboard/tests/available-tests/${test._id}/edit`
+                            )
+                          }
+                        >
+                          Edit Test
+                        </DropdownItem>
+                        <DropdownItem
+                          key="delete"
+                          className="text-danger"
+                          color="danger"
+                          startContent={<IconTrash size={16} />}
+                          onPress={() => {
+                            deleteTestModal.onOpen();
+                            setSelected(test);
+                          }}
+                        >
+                          Delete file
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
-      </div>
+      </section>
+      <AddTest newServiceModal={newServiceModal} />
+      <Modal
+        isOpen={deleteTestModal.isOpen}
+        onOpenChange={deleteTestModal.onOpenChange}
+        backdrop="blur"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                <p>Are you sure you want to delete {selected?.name}</p>
+              </ModalHeader>
+              <ModalFooter className="flex-col-reverse sm:flex-row">
+                <Button
+                  color="default"
+                  fullWidth
+                  variant="flat"
+                  onPress={onClose}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  fullWidth
+                  onPress={() => {
+                    handleDelete(selected as Test);
+                  }}
+                >
+                  Delete
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 };
 
-const AddTest = () => {
+interface AddTestProps {
+  newServiceModal: any;
+}
+
+const AddTest = ({ newServiceModal }: AddTestProps) => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -349,9 +264,14 @@ const AddTest = () => {
     };
     fetchDoctors();
   }, []);
-
   const navigate = useNavigate();
-  const [isAdding, setIsAdding] = useState(false);
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Name is required"),
+    price: Yup.string().required("Price is required"),
+    doctors: Yup.array().min(1, "Select at least one doctor"),
+  });
+
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -366,29 +286,21 @@ const AddTest = () => {
         unit: "",
       })),
     },
-    validate: (values) => {
-      const errors: any = {};
-      if (values.doctors.length === 0) {
-        errors.doctors = "Select at least one doctor";
-      }
-      return errors;
-    },
-
+    validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        setIsAdding(true);
         await axios.post(`${API_BASE_URL}/api/available-test/`, values, {
           headers: {
             Authorization: `${localStorage.getItem("token")}`,
           },
         });
         toast.success("Test added successfully");
+        newServiceModal.onClose();
         navigate(0);
       } catch (error: any) {
         toast.error(error.response.data.error);
         console.log(error);
       }
-      setIsAdding(false);
     },
   });
 
@@ -415,241 +327,193 @@ const AddTest = () => {
 
   return (
     <>
-      <input type="checkbox" id="add_test" className="modal-toggle" />
-      <div className="modal backdrop-blur-sm" role="dialog">
-        <div className="modal-box w-full">
-          <div className="container flex items-center justify-center px-6 mx-auto">
-            <form className="w-full max-w-md" onSubmit={formik.handleSubmit}>
-              <h3 className="mb-6 text-3xl font-bold text-center">
-                New Service
-              </h3>
-              <div className="form-control">
-                <label htmlFor="name" className="label">
-                  <span className="label-text">Name</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  name="name"
-                  id="name"
-                  required
-                  placeholder="eg: Blood Test - CBC"
-                  onChange={formik.handleChange}
-                  value={formik.values.name}
-                />
-              </div>
+      <Modal
+        isOpen={newServiceModal.isOpen}
+        onOpenChange={newServiceModal.onOpenChange}
+        backdrop="blur"
+        scrollBehavior="inside"
+        as="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          formik.handleSubmit();
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">New Service</ModalHeader>
+          <ModalBody>
+            <Input
+              type="text"
+              name="name"
+              id="name"
+              label="Name"
+              isRequired
+              placeholder="eg: Blood Test - CBC"
+              onChange={formik.handleChange}
+              value={formik.values.name}
+              isInvalid={formik.touched.name && !!formik.errors.name}
+              errorMessage={formik.errors.name}
+            />
 
-              <div className="form-control">
-                <label htmlFor="description" className="label">
-                  <span className="label-text">Description</span>
-                </label>
-                <textarea
-                  className="input input-bordered w-full"
-                  name="description"
-                  id="description"
-                  placeholder="eg: Done on Automated Chemiluminescence ANALYER By CLA Method"
-                  onChange={formik.handleChange}
-                  value={formik.values.description}
-                />
-              </div>
-              <div className="form-control">
-                <label htmlFor="price" className="label">
-                  <span className="label-text">Price</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  name="price"
-                  placeholder="eg: NPR 1000"
-                  id="price"
-                  onChange={formik.handleChange}
-                  value={formik.values.price}
-                  required
-                />
-              </div>
-              <div className="form-control">
-                <label htmlFor="duration" className="label">
-                  <span className="label-text">Duration</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  name="duration"
-                  id="duration"
-                  placeholder="eg: 1hr 30mins"
-                  onChange={formik.handleChange}
-                  value={formik.values.duration}
-                />
-              </div>
-              <div className="form-control">
-                <label htmlFor="summary" className="label">
-                  <span className="label-text">Test Information</span>
-                </label>
-                <textarea
-                  className="input input-bordered w-full"
-                  name="summary"
-                  id="summary"
-                  placeholder="eg: 1hr 30mins"
-                  onChange={formik.handleChange}
-                  value={formik.values.summary}
-                />
-              </div>
-              <div className="max-h-48 pt-8 overflow-y-scroll">
-                <label htmlFor="doctors" className="label">
-                  <span
-                    className="label-text tooltip tooltip-right"
-                    data-tip="Choose the doctors who will be assigned this test"
-                  >
-                    Doctors
-                  </span>
-                </label>
-                {doctors.map((doctor: Doctor, index) => (
-                  <div className="form-control" key={index}>
-                    <label
-                      key={doctor._id}
-                      className="cursor-pointer label flex-row-reverse justify-end gap-2"
-                    >
-                      <span className="label-text">{doctor.name}</span>
-                      <input
-                        type="checkbox"
-                        className="checkbox"
-                        name="doctors"
-                        value={doctor._id}
-                        onChange={formik.handleChange}
-                        checked={formik.values.doctors.includes(
-                          doctor._id as string
-                        )}
-                      />
-                    </label>
-                  </div>
-                ))}
-              </div>
-              {formik.errors.doctors && (
-                <label htmlFor="doctors" className="label">
-                  <span className="label-text text-error">
-                    {formik.errors.doctors}
-                  </span>
-                </label>
-              )}
-              <div className="divider"></div>
+            <Textarea
+              name="description"
+              id="description"
+              label="Description"
+              placeholder="eg: Done on Automated Chemiluminescence ANALYER By CLA Method"
+              description="This will be displayed on top of the investigation report table in the report. (Just after the patient details)"
+              onChange={formik.handleChange}
+              value={formik.values.description}
+            />
 
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text">Test Properties</span>
-                  <button
+            <Input
+              type="text"
+              name="price"
+              label="Price"
+              placeholder="eg: NPR 1000"
+              id="price"
+              onChange={formik.handleChange}
+              value={formik.values.price}
+              isRequired
+              isInvalid={formik.touched.price && !!formik.errors.price}
+              errorMessage={formik.errors.price}
+            />
+
+            <Input
+              type="text"
+              name="duration"
+              label="Duration"
+              id="duration"
+              placeholder="eg: 1hr 30mins"
+              onChange={formik.handleChange}
+              value={formik.values.duration}
+            />
+
+            <Textarea
+              name="summary"
+              label="Summary"
+              id="summary"
+              placeholder="eg: 1hr 30mins"
+              description="This will be displayed at the bottom of the investigation report table in the report. (Just before the doctor's signature)"
+              onChange={formik.handleChange}
+              value={formik.values.summary}
+            />
+            <label className="label" htmlFor="doctors">
+              <span className="label-text">Select Doctors:</span>
+            </label>
+            <div className="max-h-48 min-h-32 flex flex-col p-2 overflow-y-scroll">
+              {doctors.map((doctor: Doctor) => (
+                <Checkbox
+                  key={doctor._id}
+                  name="doctors"
+                  className="mb-1"
+                  value={doctor._id}
+                  isSelected={formik.values.doctors.includes(
+                    doctor._id as string
+                  )}
+                  onChange={formik.handleChange}
+                >
+                  {doctor.name}
+                </Checkbox>
+              ))}
+            </div>
+            {/* show error */}
+            {formik.touched.doctors && formik.errors.doctors && (
+              <div className="text-danger">{formik.errors.doctors}</div>
+            )}
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Test Properties</span>
+                <Tooltip content="Add new row" color="primary">
+                  <Button
+                    isIconOnly
+                    variant="flat"
+                    radius="full"
                     type="button"
                     onClick={addNewRow}
-                    className="btn btn-sm btn-ghost btn-circle tooltip flex items-center justify-center tooltip-primary"
-                    data-tip="Add Row"
                   >
                     <PlusIcon className="w-5 h-5" />
-                  </button>
-                </label>
-                <div className="flex flex-col">
-                  <div className="border rounded-lg overflow-hidden border-base-content/30">
-                    <table className="divide-y divide-base-content w-full">
-                      <thead>
-                        <tr>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-start text-xs font-medium uppercase"
+                  </Button>
+                </Tooltip>
+              </label>
+              <Table removeWrapper aria-label="Investigation table">
+                <TableHeader>
+                  <TableColumn key={"investigation"}>Investigation</TableColumn>
+                  <TableColumn key={"reference-value"}>
+                    Reference Value
+                  </TableColumn>
+                  <TableColumn key={"unit"}>Unit</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {formik.values.testProps.map((testProp, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="p-1">
+                        <Textarea
+                          type="text"
+                          name={`testProps[${index}].investigation`}
+                          id="investigation"
+                          placeholder="Hemoglobin"
+                          onChange={formik.handleChange}
+                          value={testProp.investigation}
+                        />
+                      </TableCell>
+                      <TableCell className="p-1">
+                        <Textarea
+                          name={`testProps[${index}].referenceValue`}
+                          id="referenceValue"
+                          placeholder="13.0 - 17.0"
+                          onChange={formik.handleChange}
+                          value={testProp.referenceValue}
+                        />
+                      </TableCell>
+                      <TableCell className="flex p-1 items-center">
+                        <Textarea
+                          type="text"
+                          name={`testProps[${index}].unit`}
+                          id="unit"
+                          placeholder="g/dL"
+                          onChange={formik.handleChange}
+                          value={testProp.unit}
+                        />
+                        {formik.values.testProps.length > 1 && (
+                          <Button
+                            isIconOnly
+                            radius="full"
+                            variant="light"
+                            type="button"
+                            onClick={() => removeRow(index)}
+                            className="opacity-0 mr-1 group-hover:opacity-100"
                           >
-                            Investigation
-                          </th>
-                          <th
-                            scope="col"
-                            className="text-start text-xs font-medium uppercase"
-                          >
-                            Reference Value
-                          </th>
-                          <th
-                            scope="col"
-                            className="text-start text-xs font-medium uppercase"
-                          >
-                            Unit
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-base-content/30">
-                        {formik.values.testProps.map((testProp, index) => (
-                          <tr
-                            key={index}
-                            className="divide-x divide-base-content/30 group"
-                          >
-                            <td className="whitespace-nowrap text-sm font-medium">
-                              <input
-                                type="text"
-                                className="input focus:outline-none rounded-none w-full"
-                                name={`testProps[${index}].investigation`}
-                                id="investigation"
-                                placeholder="Hemoglobin"
-                                onChange={formik.handleChange}
-                                value={testProp.investigation}
-                              />
-                            </td>
-                            <td className="whitespace-nowrap text-sm font-medium">
-                              <textarea
-                                className="input focus:outline-none rounded-none w-full"
-                                name={`testProps[${index}].referenceValue`}
-                                id="referenceValue"
-                                placeholder="13.0 - 17.0"
-                                onChange={formik.handleChange}
-                                value={testProp.referenceValue}
-                              />
-                            </td>
-                            <td className="whitespace-nowrap text-end text-sm font-medium flex items-center">
-                              <input
-                                type="text"
-                                className="input focus:outline-none rounded-none w-full"
-                                name={`testProps[${index}].unit`}
-                                id="unit"
-                                placeholder="g/dL"
-                                onChange={formik.handleChange}
-                                value={testProp.unit}
-                              />
-                              {formik.values.testProps.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => removeRow(index)}
-                                  className="btn btn-sm btn-ghost btn-circle opacity-0 mr-1 group-hover:opacity-100"
-                                >
-                                  <XIcon className="w-5 h-5" />
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-action flex flex-col sm:flex-row gap-4">
-                <button
-                  className="btn btn-primary flex-1"
-                  type="submit"
-                  disabled={isAdding}
-                >
-                  {isAdding ? (
-                    <>
-                      <span className="loading loading-dots loading-sm"></span>
-                    </>
-                  ) : (
-                    "Add Service"
-                  )}
-                </button>
-                <label htmlFor="add_test" className="btn flex-1">
-                  Cancel!
-                </label>
-              </div>
-            </form>
-          </div>
-        </div>
-        <label className="modal-backdrop" htmlFor="add_test">
-          Close
-        </label>
-      </div>
+                            <XIcon className="w-5 h-5" />
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </ModalBody>
+          <ModalFooter className="flex-col-reverse sm:flex-row">
+            <Button
+              fullWidth
+              variant="flat"
+              onClick={newServiceModal.onOpenChange}
+            >
+              Cancel
+            </Button>
+            <Button
+              color="primary"
+              variant="flat"
+              type="submit"
+              isLoading={formik.isSubmitting}
+              isDisabled={formik.isSubmitting}
+              fullWidth
+            >
+              Add Service
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };

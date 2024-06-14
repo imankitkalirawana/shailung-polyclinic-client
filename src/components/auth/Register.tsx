@@ -5,6 +5,14 @@ import { toast } from "sonner";
 import { API_BASE_URL } from "../../utils/config";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
+import {
+  Button,
+  DatePicker,
+  Input,
+  Select,
+  SelectItem,
+} from "@nextui-org/react";
+import { parseDate } from "@internationalized/date";
 
 const Register = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
@@ -27,7 +35,7 @@ const Register = () => {
       dbOtp: "",
       otp: "",
       name: "",
-      dob: "",
+      dob: "2000-01-01",
       gender: "",
       email: "",
       password: "",
@@ -139,8 +147,8 @@ const Register = () => {
         })
       );
       toast.success("OTP Sent Successfully");
-      const response = await axios.get(api_url);
-      console.log(response.data);
+      await axios.get(api_url);
+      // console.log(response.data);
       // console.log(formik.values.dbOtp);
     } catch (e) {
       console.log(e);
@@ -208,71 +216,59 @@ const Register = () => {
                 .
               </p>
 
-              <form
-                onSubmit={formik.handleSubmit}
-                className="mt-8 grid grid-cols-6 gap-6"
-              >
+              <form onSubmit={formik.handleSubmit}>
                 <>
-                  <div className="col-span-full">
-                    <label htmlFor="phone" className="label">
-                      <span className="label-text">Phone Number</span>
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      className="input input-bordered w-full"
-                      placeholder="eg. 9841234567"
-                      value={formik.values.phone}
-                      maxLength={10}
-                      autoFocus
-                      disabled={isOtpSent || isOtpVerified}
-                      onChange={async (e) => {
-                        formik.handleChange(e);
-                        const phone = e.target.value;
-                        if (phone === "") return;
-                        if (await checkPhone(phone)) {
-                          formik.setErrors({
-                            phone: "Phone number already exists",
-                          });
-                        }
-                      }}
-                    />
-                    <label htmlFor="phone" className="label">
-                      {/* {formik.errors.phone && formik.touched.phone && ( */}
-                      <span className="label-text-alt text-error">
-                        {formik.errors.phone}
+                  <Input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    label="Phone Number"
+                    placeholder="eg. 9841234567"
+                    value={formik.values.phone}
+                    maxLength={10}
+                    autoFocus
+                    isDisabled={isOtpSent || isOtpVerified}
+                    onChange={async (e) => {
+                      formik.handleChange(e);
+                      const phone = e.target.value;
+                      if (phone === "") return;
+                      if (await checkPhone(phone)) {
+                        formik.setErrors({
+                          phone: "Phone number already exists",
+                        });
+                      }
+                    }}
+                    isInvalid={formik.errors.phone !== undefined}
+                    errorMessage={formik.errors.phone}
+                  />
+                  <label htmlFor="phone" className="label">
+                    {(isOtpSent || isOtpVerified) && (
+                      <span
+                        className="label-text-alt underline"
+                        onClick={() => {
+                          setIsOtpSent(false);
+                          setIsOtpVerified(false);
+                          handleSessionStorage(false);
+                        }}
+                      >
+                        Change phone number?{" "}
                       </span>
-                      {/* )} */}
-                      {(isOtpSent || isOtpVerified) && (
-                        <span
-                          className="label-text-alt underline"
-                          onClick={() => {
-                            setIsOtpSent(false);
-                            setIsOtpVerified(false);
-                            handleSessionStorage(false);
-                          }}
-                        >
-                          Change phone number?{" "}
-                        </span>
-                      )}
-                    </label>
-                  </div>
+                    )}
+                  </label>
                   {isOtpSent && !isOtpVerified && (
-                    <div className={`col-span-full`}>
-                      <label htmlFor="otp" className="label">
-                        <span className="label-text">OTP</span>
-                      </label>
-                      <input
+                    <>
+                      <Input
+                        label="OTP"
                         type="tel"
                         id="otp"
                         name="otp"
-                        className="input input-bordered w-full"
                         placeholder="Enter OTP"
                         onChange={formik.handleChange}
                         value={formik.values.otp}
                         maxLength={6}
                         max={999999}
+                        isInvalid={formik.errors.otp !== undefined}
+                        errorMessage={formik.errors.otp}
                       />
                       <label className="label">
                         <button
@@ -285,162 +281,105 @@ const Register = () => {
                         >
                           Resend OTP
                         </button>
-                        {formik.errors.otp && formik.touched.otp && (
-                          <span className="label-text-alt text-error">
-                            {formik.errors.otp}
-                          </span>
-                        )}
                       </label>
-                    </div>
+                    </>
                   )}
-
-                  <div className="col-span-6 hidden">
-                    <p className="text-sm">
-                      By creating an account, you agree to our
-                      <a href="#" className="underline">
-                        {" "}
-                        terms and conditions{" "}
-                      </a>
-                      and
-                      <a href="#" className="underline">
-                        privacy policy
-                      </a>
-                      .
-                    </p>
-                  </div>
                 </>
                 {isOtpVerified && (
-                  <>
-                    <div className="col-span-full">
-                      <label htmlFor="name" className="label">
-                        <span className="label-text">Name</span>
-                      </label>
+                  <div className="flex flex-col gap-4">
+                    <Input
+                      type="text"
+                      id="name"
+                      name="name"
+                      label="Full Name"
+                      placeholder="Enter your full name"
+                      onChange={formik.handleChange}
+                      value={formik.values.name}
+                      isRequired
+                    />
+                    <DatePicker
+                      label="Date of Birth"
+                      labelPlacement="outside"
+                      onChange={(date) => {
+                        formik.setFieldValue(
+                          "dob",
+                          date.toString().split("T")[0]
+                        );
+                      }}
+                      value={parseDate(formik.values.dob)}
+                      name="dob"
+                      isRequired
+                    />
+                    <Select name="gender" isRequired label="Gender" id="gender">
+                      <SelectItem key="male">Male</SelectItem>
+                      <SelectItem key="female">Female</SelectItem>
+                      <SelectItem key="other">Other</SelectItem>
+                    </Select>
+                    <Input
+                      type="text"
+                      id="email"
+                      name="email"
+                      label="Email"
+                      placeholder="Enter your email"
+                      value={formik.values.email}
+                      onChange={async (e) => {
+                        formik.handleChange(e);
+                        const email = e.target.value;
+                        if (email === "") return;
+                        if (await checkMail(email)) {
+                          formik.setErrors({
+                            email: "Email is already registered",
+                          });
+                        }
+                      }}
+                      isRequired
+                      isInvalid={formik.errors.email !== undefined}
+                      errorMessage={formik.errors.email}
+                    />
 
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        className="input input-bordered w-full"
-                        onChange={formik.handleChange}
-                        value={formik.values.name}
-                        required
-                      />
-                    </div>
-                    <div className="col-span-3">
-                      <label htmlFor="dob" className="label">
-                        <span className="label-text">DOB</span>
-                      </label>
+                    <Input
+                      type="password"
+                      id="password"
+                      name="password"
+                      label="Password"
+                      placeholder="Enter your password"
+                      onChange={formik.handleChange}
+                      value={formik.values.password}
+                      isRequired
+                    />
 
-                      <input
-                        type="date"
-                        id="dob"
-                        name="dob"
-                        className="input input-bordered w-full"
-                        onChange={formik.handleChange}
-                        value={formik.values.dob}
-                        required
-                      />
-                    </div>
-                    <div className="col-span-3">
-                      <label htmlFor="gender" className="label">
-                        <span className="label-text">Gender</span>
-                      </label>
-                      <select
-                        name="gender"
-                        className="select select-bordered w-full"
-                        id="gender"
-                      >
-                        <option value=""></option>
-                      </select>
-                    </div>
-                    <div className="col-span-full">
-                      <label htmlFor="email" className="label">
-                        <span className="label-text">Email</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="email"
-                        name="email"
-                        className="input input-bordered w-full"
-                        value={formik.values.email}
-                        onChange={async (e) => {
-                          formik.handleChange(e);
-                          const email = e.target.value;
-                          if (email === "") return;
-                          if (await checkMail(email)) {
-                            formik.setErrors({
-                              email: "Email is already registered",
-                            });
-                          }
-                        }}
-                        required
-                      />
-                      <label className="label">
-                        <span className="label-text-alt text-error">
-                          {formik.errors.email}
-                        </span>
-                      </label>
-                    </div>
-                    <div className="col-span-full">
-                      <label htmlFor="password" className="label">
-                        <span className="label-text">Password</span>
-                      </label>
-
-                      <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        className="input input-bordered w-full"
-                        onChange={formik.handleChange}
-                        value={formik.values.password}
-                        required
-                      />
-                    </div>
-                    <div className="col-span-full">
-                      <label htmlFor="confirm_password" className="label">
-                        <span className="label-text">Confirm Password</span>
-                      </label>
-
-                      <input
-                        type="password"
-                        id="confirm_password"
-                        name="confirm_password"
-                        className="input input-bordered w-full"
-                        onChange={formik.handleChange}
-                        value={formik.values.confirm_password}
-                        required
-                      />
-                      <label className="label">
-                        {formik.errors.confirm_password && (
-                          <span className="label-text-alt text-error">
-                            {formik.errors.confirm_password}
-                          </span>
-                        )}
-                      </label>
-                    </div>
-                  </>
+                    <Input
+                      type="password"
+                      id="confirm_password"
+                      name="confirm_password"
+                      label="Confirm Password"
+                      placeholder="Re-enter your password"
+                      onChange={formik.handleChange}
+                      value={formik.values.confirm_password}
+                      isInvalid={formik.errors.confirm_password !== undefined}
+                      errorMessage={formik.errors.confirm_password}
+                      isRequired
+                    />
+                    <Button
+                      type="submit"
+                      isLoading={formik.isSubmitting}
+                      fullWidth
+                      color="primary"
+                      variant="flat"
+                      isDisabled={
+                        formik.isSubmitting ||
+                        formik.errors.email !== undefined ||
+                        formik.errors.phone !== undefined
+                      }
+                    >
+                      {isOtpVerified
+                        ? "Register"
+                        : isOtpSent
+                        ? "Verify OTP"
+                        : "Send OTP"}
+                    </Button>
+                  </div>
                 )}
-                <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                  <button
-                    type="submit"
-                    className="btn btn-primary w-full"
-                    disabled={
-                      formik.isSubmitting ||
-                      formik.errors.email !== undefined ||
-                      formik.errors.phone !== undefined
-                    }
-                  >
-                    {formik.isSubmitting ? (
-                      <span className="loading loading-dots loading-sm"></span>
-                    ) : isOtpVerified ? (
-                      "Register"
-                    ) : isOtpSent ? (
-                      "Verify OTP"
-                    ) : (
-                      "Send OTP"
-                    )}
-                  </button>
-                </div>
               </form>
             </div>
           </main>

@@ -6,6 +6,7 @@ import {
   IconChartLine,
   IconReservedLine,
 } from "@tabler/icons-react";
+import { Card } from "@nextui-org/react";
 
 interface Props {
   timeframe?: string;
@@ -43,7 +44,10 @@ const Overview = ({ timeframe, starttime, endtime }: Props) => {
   };
   return (
     <>
-      <div className="stats stats-vertical md:stats-horizontal shadow bg-base-300">
+      <Card
+        className="stats md:flex-row stats-vertical md:stats-horizontal"
+        shadow="lg"
+      >
         <div className="stat">
           <div className="stat-figure text-primary">
             <IconReservedLine size={32} />
@@ -104,7 +108,6 @@ const Overview = ({ timeframe, starttime, endtime }: Props) => {
           </div>
           <div className="stat-title">Total Revenue</div>
           <div className="stat-value text-secondary">
-            {" "}
             {parseInt(data.revenue).toLocaleString()}
           </div>
           {!(starttime && endtime) && timeframe === "1d" && (
@@ -179,7 +182,7 @@ const Overview = ({ timeframe, starttime, endtime }: Props) => {
             </div>
           ) : null}
         </div>
-      </div>
+      </Card>
     </>
   );
 };

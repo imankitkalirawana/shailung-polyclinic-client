@@ -257,25 +257,6 @@ const Download = () => {
                           chunkArray(report?.reportRows || [], 12).length -
                             1 && (
                           <div className="space-y-2">
-                            <div className="space-y-1">
-                              <h3 className="text-sm font-semibold leading-none">
-                                Comments
-                              </h3>
-                              <ul className="l list-disc">
-                                <li className="text-xs font-normal">
-                                  If Clinically Suspected. Please Repeat Assay
-                                  After Weeks.
-                                </li>
-                                <li className="text-xs font-normal">
-                                  Done on Automated Chemiluminescence ANALYER
-                                </li>
-                              </ul>
-                            </div>
-                            <div className="space-y-2">
-                              <h3 className="text-xs font-semibold">
-                                * = Value Rechecked
-                              </h3>
-                            </div>
                             {report?.summary && (
                               <div>
                                 <h3 className="text-xs font-semibold">

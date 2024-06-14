@@ -2,7 +2,15 @@ import { useFormik } from "formik";
 import { API_BASE_URL } from "../../../utils/config";
 import axios from "axios";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Input,
+} from "@nextui-org/react";
 
 type reportDetails = {
   docName: string;
@@ -11,14 +19,12 @@ type reportDetails = {
   docSign: string;
 };
 const ViewSign = () => {
-  const [processing, setProcessing] = useState(false);
   const formik = useFormik({
     initialValues: {
       reportDetails: [] as reportDetails[],
     },
     onSubmit: async (values) => {
       try {
-        setProcessing(true);
         await axios.put(`${API_BASE_URL}/api/doctors/report`, values, {
           headers: {
             Authorization: `${localStorage.getItem("token")}`,
@@ -28,7 +34,6 @@ const ViewSign = () => {
       } catch (error) {
         toast.error("Error Updating Details");
       } finally {
-        setProcessing(false);
       }
     },
   });
@@ -72,18 +77,23 @@ const ViewSign = () => {
 
   return (
     <>
-      <form onSubmit={formik.handleSubmit}>
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-base font-semibold leading-7 text-base-content">
-              Report Information
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-base-neutral">
-              Update information displayed on the report.
-            </p>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4 select-none">
+      <Card
+        as={"form"}
+        onSubmit={(e) => {
+          e.preventDefault();
+          formik.handleSubmit();
+        }}
+        className="p-4"
+      >
+        <CardHeader className="flex flex-col items-start px-4 pb-0 pt-4">
+          <h2 className="text-base font-semibold leading-7 text-base-content">
+            Report Information
+          </h2>
+          <p className="mt-1 text-sm leading-6 text-base-neutral">
+            Update information displayed on the report.
+          </p>
+        </CardHeader>
+        <CardBody className="grid grid-cols-2 gap-4 select-none">
           {formik.values.reportDetails.map((report, index) => (
             <div
               key={index}
@@ -93,38 +103,31 @@ const ViewSign = () => {
                 src={report.docSign}
                 className="object-contain w-auto aspect-square h-48 card mix-blend-darken"
               />
-              <div className="p-8">
-                <div className="block mb-3">
-                  <label htmlFor="doc-name" className="label">
-                    <span className="label-text">Name</span>
-                  </label>
-                  <input
-                    name="doc-name"
-                    id="doc-name"
-                    type="text"
-                    className="input input-bordered bg-transparent w-full"
-                    value={report.docName}
-                    onChange={(e) => {
-                      const updatedReport = [...formik.values.reportDetails];
-                      updatedReport[index] = {
-                        ...updatedReport[index],
-                        docName: e.target.value,
-                      };
-                      formik.setValues({
-                        ...formik.values,
-                        reportDetails: updatedReport,
-                      });
-                    }}
-                  />
-                </div>
-                <label htmlFor="docDesignation-1" className="label">
-                  <span className="label-text">Designation</span>
-                </label>
-                <input
+              <div className="p-8 space-y-2">
+                <Input
+                  name="doc-name"
+                  id="doc-name"
+                  type="text"
+                  value={report.docName}
+                  label="Doctor Name"
+                  onChange={(e) => {
+                    const updatedReport = [...formik.values.reportDetails];
+                    updatedReport[index] = {
+                      ...updatedReport[index],
+                      docName: e.target.value,
+                    };
+                    formik.setValues({
+                      ...formik.values,
+                      reportDetails: updatedReport,
+                    });
+                  }}
+                />
+
+                <Input
                   name="docDesignation-1"
                   id="docDesignation-1"
                   type="text"
-                  className="input input-bordered bg-transparent w-full"
+                  label="Designation"
                   value={report.docDesignation}
                   onChange={(e) => {
                     const updatedReport = [...formik.values.reportDetails];
@@ -138,14 +141,11 @@ const ViewSign = () => {
                     });
                   }}
                 />
-                <label htmlFor="docReg-1" className="label">
-                  <span className="label-text">Registration Number</span>
-                </label>
-                <input
+                <Input
                   name="docReg-1"
                   id="docReg-1"
                   type="text"
-                  className="input input-bordered bg-transparent w-full"
+                  label="Registration Number"
                   value={report.docReg}
                   onChange={(e) => {
                     const updatedReport = [...formik.values.reportDetails];
@@ -160,12 +160,9 @@ const ViewSign = () => {
                   }}
                 />
 
-                <label
-                  className="btn btn-outline mt-4 hover:btn-primary btn-sm"
-                  htmlFor={`doc-image-${index}`}
-                >
+                <Button fullWidth as={"label"} htmlFor={`doc-image-${index}`}>
                   <span>Change Sign</span>
-                </label>
+                </Button>
                 <input
                   type="file"
                   name="doc-image"
@@ -177,24 +174,22 @@ const ViewSign = () => {
               </div>
             </div>
           ))}
-        </div>
-        <div className="flex items-center gap-2 justify-end mt-12">
-          <a href="/dashboard" className="btn btn-sm">
+        </CardBody>
+        <CardFooter className="flex items-center gap-2 justify-end mt-12">
+          <Button as={"a"} href="/dashboard" variant="flat">
             Cancel
-          </a>
-          <button
-            className="btn btn-primary btn-sm"
+          </Button>
+          <Button
+            variant="flat"
+            color="primary"
+            isLoading={formik.isSubmitting}
+            isDisabled={formik.isSubmitting}
             type="submit"
-            disabled={processing}
           >
-            {processing ? (
-              <span className="loading loading-spinner loading-sm"></span>
-            ) : (
-              "Update"
-            )}
-          </button>
-        </div>
-      </form>
+            Update
+          </Button>
+        </CardFooter>
+      </Card>
     </>
   );
 };

@@ -11,6 +11,7 @@ import {
 } from "@tabler/icons-react";
 import { countAll } from "../../functions/get";
 import { Link } from "react-router-dom";
+import { Avatar, Card } from "@nextui-org/react";
 
 interface Test {
   _id: string;
@@ -63,61 +64,85 @@ const UserDashboard = () => {
           </h1>
         </div>
         <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4 mt-8">
-          <Link
-            to={"/appointment/history"}
-            className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
+          <Card
+            isHoverable
+            isPressable
+            shadow="lg"
+            as={Link}
+            className="flex-row items-center p-4 gap-2"
+            to="/appointment/history"
           >
-            <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
-              <IconCalendarClock className="w-5 h-5" stroke={1.5} />
-            </div>
+            <Avatar
+              className="bg-primary text-base-100"
+              showFallback
+              fallback={<IconCalendarClock className="w-5 h-5" stroke={1.5} />}
+            />
             <div>
               <p className="mb-2 text-sm font-medium">Total Appointments</p>
               <p className="text-lg font-semibold">{tests.length || 0}</p>
             </div>
-          </Link>
+          </Card>
 
-          <Link
+          <Card
             to="/appointment/history"
-            className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
+            isHoverable
+            isPressable
+            shadow="lg"
+            as={Link}
+            className="flex-row items-center p-4 gap-2"
           >
-            <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
-              <IconClockCheck className="w-5 h-5" stroke={1.5} />
-            </div>
+            <Avatar
+              className="bg-primary text-base-100"
+              showFallback
+              fallback={<IconClockCheck className="w-5 h-5" stroke={1.5} />}
+            />
             <div>
               <p className="mb-2 text-sm font-medium">Completed Tests</p>
               <p className="text-lg font-semibold">
                 {tests.filter((test) => test.status === "completed").length}
               </p>
             </div>
-          </Link>
-          <Link
+          </Card>
+          <Card
+            isHoverable
+            isPressable
+            shadow="lg"
+            as={Link}
+            className="flex-row items-center p-4 gap-2"
             to="/appointment/history"
-            className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
           >
-            <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
-              <IconClockCancel className="w-5 h-5" stroke={1.5} />
-            </div>
+            <Avatar
+              className="bg-primary text-base-100"
+              showFallback
+              fallback={<IconClockCancel className="w-5 h-5" stroke={1.5} />}
+            />
             <div>
               <p className="mb-2 text-sm font-medium">Cancelled Tests</p>
               <p className="text-lg font-semibold">
                 {tests.filter((test) => test.status === "cancelled").length}
               </p>
             </div>
-          </Link>
-          <Link
+          </Card>
+          <Card
+            isHoverable
+            isPressable
+            shadow="lg"
+            as={Link}
+            className="flex-row items-center p-4 gap-2"
             to={"/dashboard/tests/available-tests"}
-            className="flex items-center p-4 shadow-xs bg-primary/10 card flex-row hover:bg-gradient-to-br from-primary/20 to-secondary/30 transition-all"
           >
-            <div className="p-3 mr-4 text-base-100 rounded-full bg-primary">
-              <IconTestPipe className="w-5 h-5" stroke={1.5} />
-            </div>
+            <Avatar
+              className="bg-primary text-base-100"
+              showFallback
+              fallback={<IconTestPipe className="w-5 h-5" stroke={1.5} />}
+            />
             <div>
               <p className="mb-2 text-sm font-medium">Available Services</p>
               <p className="text-lg font-semibold">
                 {countData?.availableTestCount || 0}
               </p>
             </div>
-          </Link>
+          </Card>
         </div>
         <div className="-mt-24">
           <History />

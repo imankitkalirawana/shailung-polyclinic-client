@@ -1,6 +1,5 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import DoctorSVG from "../icons/DoctorSVG";
-import { HistoryIcon, SquareCrossIcon } from "../icons/Icons";
+import { HistoryIcon } from "../icons/Icons";
 import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import axios from "axios";
@@ -10,12 +9,34 @@ import { isLoggedIn } from "../../utils/auth";
 import { Helmet } from "react-helmet-async";
 import { calculateAge } from "../../functions/agecalculator";
 import { User } from "../../interface/interface";
+import { parseDate } from "@internationalized/date";
+import { getLocalTimeZone, today } from "@internationalized/date";
+
 import {
   IconHistory,
+  IconInfoCircle,
   IconInfoCircleFilled,
-  IconXboxXFilled,
+  IconXboxX,
 } from "@tabler/icons-react";
 import { getUnknownUser, getUserWithId } from "../../functions/get";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Chip,
+  DatePicker,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+  Link as NextLink,
+  Tooltip,
+  CardBody,
+  CardFooter,
+} from "@nextui-org/react";
 
 interface Tests {
   _id: string;
@@ -31,12 +52,10 @@ const New = () => {
   const [tests, setTests] = useState<Tests[]>([]);
   const [lUser, setUser] = useState<User>({} as User);
   const [selectedTest, setSelectedTest] = useState<Tests>({} as Tests);
-  const [submitting, setSubmitting] = useState(false);
-  const [isConfirm, setIsConfirm] = useState(false);
-  const [isModal, setIsModal] = useState(false);
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user");
   const isPhone = searchParams.get("phone");
+  const confirmModal = useDisclosure();
 
   useEffect(() => {
     if (!loggedIn) {
@@ -120,7 +139,7 @@ const New = () => {
   const formik = useFormik({
     initialValues: {
       testids: [],
-      appointmentdate: "",
+      appointmentdate: new Date().toISOString().split("T")[0],
       phone: "",
       name: "",
       email: "",
@@ -128,7 +147,6 @@ const New = () => {
     },
     onSubmit: async (values) => {
       try {
-        setSubmitting(true);
         await axios
           .post(
             `${API_BASE_URL}/api/test`,
@@ -147,9 +165,16 @@ const New = () => {
             }
           )
           .then(() => {
-            setIsConfirm(false);
-            setIsModal(true);
-
+            confirmModal.onClose();
+            toast("Appointment Booked Succesfully", {
+              action: {
+                label: "View",
+                onClick: () => {
+                  navigate("/appointment/history");
+                },
+              },
+              duration: Infinity,
+            });
             formik.resetForm();
           })
           .catch((error) => {
@@ -159,13 +184,9 @@ const New = () => {
       } catch (error) {
         toast.error("Failed to book appointment");
         console.error(error);
-      } finally {
-        setSubmitting(false);
       }
     },
   });
-
-  // console.log(formik.values.doctors);
 
   const fetchSelectedTest = async (id: string) => {
     try {
@@ -197,373 +218,290 @@ const New = () => {
           href="https://report.shailungpolyclinic.com/appointment/new"
         />
       </Helmet>
-      <div className="container mx-auto p-4 my-24">
-        <div className="w-full card shadow-xs">
-          <div className="flex justify-between items-center">
-            <h1 className="text-lg font-semibold">Book an Test Appointment</h1>
-            <div className="flex gap-2 flex-row-reverse">
-              <Link
-                to={"/appointment/history"}
-                className="btn hidden sm:flex btn-outline btn-sm hover:btn-primary"
-              >
-                <HistoryIcon className="h-5 w-5" />
-                Appointment History
-              </Link>
-              <Link
-                to="/appointment/new"
-                className="btn sm:hidden flex items-center justify-center btn-secondary btn-circle btn-sm tooltip tooltip-left tooltip-primary"
-                data-tip="Appointment History"
+      <div className="w-full p-4 mt-24 max-w-6xl mx-auto shadow-xs">
+        <div className="flex justify-between items-center">
+          <h1 className="text-lg font-semibold">Book an Test Appointment</h1>
+          <div className="flex gap-2 flex-row-reverse">
+            <Button
+              as={Link}
+              to={"/appointment/history"}
+              variant="bordered"
+              className="hidden sm:flex"
+            >
+              <HistoryIcon className="h-5 w-5" />
+              Appointment History
+            </Button>
+            <Tooltip content="Appointment History" color="primary">
+              <Button
+                as={Link}
+                isIconOnly
+                radius="full"
+                variant="flat"
+                color="primary"
+                to="/appointment/history"
+                className="sm:hidden flex items-center justify-center"
               >
                 <IconHistory className="h-5 w-5" />
-              </Link>
-            </div>
+              </Button>
+            </Tooltip>
           </div>
+        </div>
 
-          <div className="flex flex-col md:flex-row-reverse justify-between items-center mt-12 gap-8">
-            <div className="flex-1 md:max-w-[50%]">
-              <DoctorSVG className="w-full" />
-            </div>
-            <form
-              className="grid grid-cols-2 gap-4 w-full md:max-w-[50%]"
-              onSubmit={formik.handleSubmit}
-            >
-              {isPhone !== "false" && (
-                <>
-                  {!lUser.name || !calculateAge(lUser.dob || "") ? (
-                    <div
-                      role="alert"
-                      className="alert mt-4 bg-error/20 col-span-full"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        className="stroke-error shrink-0 w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        ></path>
-                      </svg>
-                      <span>
-                        {userId ? "User" : "You"} have incomplete profile.{" "}
-                        <Link
-                          to={
-                            userId
-                              ? `/dashboard/users/${lUser._id}/edit`
-                              : "/profile"
-                          }
-                          className="link"
-                        >
-                          Update Now
-                        </Link>
-                      </span>
-                    </div>
-                  ) : (
-                    <div
-                      role="alert"
-                      className="alert mt-4 bg-info/20 col-span-full"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        className="stroke-info shrink-0 w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        ></path>
-                      </svg>
-                      <span>
-                        You can update your profile if below information is not
-                        displayed or incorrect.{" "}
-                        <Link
-                          to={
-                            userId
-                              ? `/dashboard/users/${lUser._id}/edit`
-                              : "/profile"
-                          }
-                          className="link"
-                        >
-                          Update Now
-                        </Link>
-                      </span>
-                    </div>
-                  )}
-                </>
-              )}
+        <div className="flex flex-col justify-between items-center mt-12 gap-8">
+          <Card
+            as={"form"}
+            className="grid p-4 grid-cols-2 gap-4 w-full"
+            onSubmit={(e) => {
+              e.preventDefault();
+              formik.handleSubmit;
+            }}
+          >
+            {isPhone !== "false" && (
               <>
-                <div className="form-control col-span-2">
-                  <label htmlFor="name" className="label">
-                    <span className="label-text">Patient Name</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    className="input input-bordered"
-                    placeholder="Patient Name"
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                  />
-                </div>
-                <div className="form-control col-span-2">
-                  <label htmlFor="phone" className="label">
-                    <span className="label-text">Patient Phone</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="phone"
-                    name="phone"
-                    className="input input-bordered"
-                    placeholder="Patient phone"
-                    value={formik.values.phone}
-                    onChange={formik.handleChange}
-                    disabled
-                  />
-                  <label className="label">
-                    <span className="label-text-alt">
-                      Patient number will be same as registered by the user
-                    </span>
-                  </label>
-                </div>
-                {/* patient age */}
-                <div className="form-control col-span-2 md:col-span-1">
-                  <label htmlFor="age" className="label">
-                    <span className="label-text">Patient Age</span>
-                  </label>
-                  <input
-                    type="number"
-                    className="input input-bordered"
-                    name="age"
-                    placeholder="Patient Age"
-                    value={formik.values.age}
-                    onChange={formik.handleChange}
-                  />
-                </div>
-              </>
-
-              <>
-                <div className="form-control col-span-2 md:col-span-1">
-                  <label className="label">
-                    <span className="label-text">Select Appointment Date</span>
-                  </label>
-                  <input
-                    type="date"
-                    name="appointmentdate"
-                    className="input input-bordered"
-                    placeholder="Select Date"
-                    min={new Date().toISOString().split("T")[0]}
-                    onChange={formik.handleChange}
-                    value={formik.values.appointmentdate}
-                    required
-                  />
-                </div>
-                <div className="form-control col-span-2">
-                  <label className="label">
-                    <span className="label-text">Select Tests</span>
-                  </label>
-                  <div className="m max-h-36 overflow-y-scroll">
-                    {tests
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map((test, index) => (
-                        <div
-                          className="flex items-center justify-between"
-                          key={index}
-                        >
-                          <label className="label cursor-pointer flex-row-reverse justify-end gap-4">
-                            <span className="label-text">{test.name}</span>
-                            <input
-                              type="checkbox"
-                              className="checkbox checked:checkbox-primary"
-                              name="testids"
-                              value={test._id}
-                              onChange={formik.handleChange}
-                            />
-                          </label>
-                          <button
-                            className="btn btn-sm btn-circle"
-                            type="button"
-                            onClick={() => fetchSelectedTest(test._id)}
-                          >
-                            <IconInfoCircleFilled
-                              className={`${
-                                selectedTest._id === test._id
-                                  ? "text-info"
-                                  : "text-gray-500"
-                              } h-6 w-6`}
-                            />
-                          </button>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-                {selectedTest && selectedTest.name && (
-                  <div className="stats bg-base-300 col-span-full w-full">
-                    <div className="stat">
-                      <div className="stat-title">Test Name</div>
-                      <div className="stat-value text-2xl">
-                        {selectedTest.name}
-                      </div>
-                      <div className="stat-actions">
-                        <div className="btn btn-sm btn-success">Available</div>
-                      </div>
-                    </div>
-
-                    <div className="stat">
-                      <div className="stat-title flex items-center justify-between">
-                        <span>Current price</span>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-ghost btn-circle"
-                          onClick={() => setSelectedTest({} as Tests)}
-                        >
-                          <IconXboxXFilled />
-                        </button>
-                      </div>
-                      <div className="stat-value text-2xl">
-                        {selectedTest.price
-                          .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      </div>
-                      <div className="stat-actions">
-                        <div className="btn btn-sm">
-                          {selectedTest.duration}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div className="form-control col-span-2">
-                  <button
-                    className="btn btn-primary w-full"
-                    type="button"
-                    onClick={() => setIsConfirm(true)}
-                    disabled={
-                      formik.values.testids.length < 1 ||
-                      formik.values.appointmentdate === "" ||
-                      formik.values.age === 0 ||
-                      formik.values.name === ""
-                    }
+                {!lUser.name || !calculateAge(lUser.dob || "") ? (
+                  <div
+                    role="alert"
+                    className="alert mt-4 bg-error/20 col-span-full"
                   >
-                    Book Appointment
-                  </button>
-                </div>
+                    <IconInfoCircle className="stroke-danger" />
+                    <span>
+                      {userId ? "User" : "You"} have incomplete profile.{" "}
+                      <NextLink
+                        as={Link}
+                        underline="hover"
+                        color="danger"
+                        to={
+                          userId
+                            ? `/dashboard/users/${lUser._id}/edit`
+                            : "/profile"
+                        }
+                      >
+                        Update Now
+                      </NextLink>
+                    </span>
+                  </div>
+                ) : (
+                  <Card
+                    role="alert"
+                    className="alert mt-4 flex-row col-span-full"
+                    shadow="lg"
+                  >
+                    <IconInfoCircle className="stroke-warning" />
+                    <span>
+                      You can update your profile if below information is not
+                      displayed or incorrect.{" "}
+                      <NextLink
+                        as={Link}
+                        underline="hover"
+                        color="warning"
+                        to={
+                          userId
+                            ? `/dashboard/users/${lUser._id}/edit`
+                            : "/profile"
+                        }
+                      >
+                        Update Now
+                      </NextLink>
+                    </span>
+                  </Card>
+                )}
               </>
-            </form>
-          </div>
-        </div>
-      </div>
-      {isModal && <SubmittedModal onClose={() => setIsModal(false)} />}
-      {isConfirm && (
-        <ConfirmModal
-          onClose={() => setIsConfirm(false)}
-          onConfirm={formik.handleSubmit}
-          isLoading={submitting}
-        />
-      )}
-    </>
-  );
-};
-
-interface ModalProps {
-  onClose: () => void;
-}
-
-// submitted modal
-const SubmittedModal: React.FC<ModalProps> = ({ onClose }) => {
-  const { user } = isLoggedIn();
-  return (
-    <>
-      <div
-        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
-        role="dialog"
-      >
-        <div className="modal-box w-full sm:max-w-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold text-lg">
-              Appointment Booked Successfully!
-            </h3>
-            <button className="rounded-2xl" onClick={onClose}>
-              <SquareCrossIcon className="h-8 w-8" />
-            </button>
-          </div>
-          <p className="py-4">
-            Your appointment has been booked successfully. You can check your
-            appointment history by clicking the button below.
-          </p>
-          <div className="modal-action">
-            <Link
-              to={`${
-                user?.role === "admin" || user?.role === "member"
-                  ? "/dashboard/tests?status=booked"
-                  : "/appointment/history"
-              }`}
-              className="btn btn-primary w-full"
-            >
-              View Appointment History
-            </Link>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-interface ConfirmModalProps {
-  onClose: () => void;
-  onConfirm: () => void;
-  isLoading?: boolean;
-}
-
-// confirm modal
-const ConfirmModal: React.FC<ConfirmModalProps> = ({
-  onClose,
-  onConfirm,
-  isLoading,
-}) => {
-  return (
-    <>
-      <div
-        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
-        role="dialog"
-      >
-        <div className="modal-box w-full sm:max-w-sm">
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold text-lg">Confirm Appointment</h3>
-          </div>
-          <p className="py-4">
-            Are you sure you want to book this appointment? Please confirm.
-          </p>
-          <div className="modal-action flex flex-col xs:flex-row gap-2">
-            <button
-              className="btn btn-primary flex-1"
-              onClick={() => {
-                onConfirm();
-              }}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <span className="loading loading-dots loading-sm"></span>
-              ) : (
-                "Confirm"
+            )}
+            <>
+              <div className="col-span-2">
+                <Input
+                  type="text"
+                  id="name"
+                  name="name"
+                  label="Patient Name"
+                  placeholder="Patient name"
+                  variant="bordered"
+                  value={formik.values.name}
+                  onChange={formik.handleChange}
+                />
+              </div>
+              <div className="col-span-2">
+                <Input
+                  type="text"
+                  id="phone"
+                  name="phone"
+                  label="Patient Phone"
+                  placeholder="Patient phone"
+                  variant="bordered"
+                  value={formik.values.phone}
+                  onChange={formik.handleChange}
+                  isDisabled
+                  description="Patient phone number will be same as registered by the user"
+                />
+              </div>
+              <div className="col-span-2 md:col-span-1">
+                <Input
+                  type="number"
+                  name="age"
+                  id="age"
+                  label="Patient Age"
+                  placeholder="Patient Age"
+                  variant="bordered"
+                  // @ts-ignore
+                  value={formik.values.age}
+                  onChange={formik.handleChange}
+                />
+              </div>
+            </>
+            <>
+              <div className="col-span-2 md:col-span-1">
+                <DatePicker
+                  name="appointmentdate"
+                  label="Appointment Date"
+                  variant="bordered"
+                  value={parseDate(formik.values.appointmentdate)}
+                  minValue={today(getLocalTimeZone())}
+                  onChange={(date) => {
+                    formik.setFieldValue(
+                      "appointmentdate",
+                      date.toString().split("T")[0]
+                    );
+                  }}
+                  isRequired
+                />
+              </div>
+              <div className="form-control col-span-2">
+                <label className="label">
+                  <span className="label-text">Select Tests</span>
+                </label>
+                <div className="max-h-36 overflow-y-scroll">
+                  {tests
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((test, index) => (
+                      <div
+                        className="flex items-center justify-between"
+                        key={index}
+                      >
+                        <Checkbox
+                          name="testids"
+                          value={test._id}
+                          onChange={formik.handleChange}
+                        >
+                          <span className="w flex whitespace-nowrap text-ellipsis max-w-[280px] sm:max-w-[400px] overflow-hidden">
+                            {test.name}
+                          </span>
+                        </Checkbox>
+                        <Button
+                          variant="flat"
+                          size="sm"
+                          isIconOnly
+                          radius="full"
+                          onClick={() => fetchSelectedTest(test._id)}
+                        >
+                          <IconInfoCircleFilled
+                            className={`${
+                              selectedTest._id === test._id
+                                ? "text-info"
+                                : "text-gray-500"
+                            } h-6 w-6`}
+                          />
+                        </Button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+              {selectedTest && selectedTest.name && (
+                <Card
+                  className="mx-auto mt-8 col-span-full border-small border-default-100 p-3"
+                  shadow="sm"
+                >
+                  <CardBody className="px-4 pb-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex max-w-[80%] flex-col gap-1">
+                        <p className="text-sm sm:text-medium font-medium">
+                          {selectedTest.name}
+                        </p>
+                        <Chip>
+                          NPR{" "}
+                          {selectedTest.price
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                        </Chip>
+                      </div>
+                      <Button
+                        variant="flat"
+                        size="sm"
+                        isIconOnly
+                        radius="full"
+                        onClick={() => setSelectedTest({} as Tests)}
+                      >
+                        <IconXboxX />
+                      </Button>
+                    </div>
+                  </CardBody>
+                  <CardFooter className="justify-between gap-2">
+                    <Button size="sm" variant="faded">
+                      Done within {selectedTest.duration}
+                    </Button>
+                    <Chip color="success" variant="dot">
+                      Available
+                    </Chip>
+                  </CardFooter>
+                </Card>
               )}
-            </button>
-            <button
-              className="btn flex-1"
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              Cancel
-            </button>
-          </div>
+              <div className="form-control col-span-2">
+                <Button
+                  variant="flat"
+                  color="primary"
+                  onClick={confirmModal.onOpenChange}
+                  isDisabled={
+                    formik.values.testids.length < 1 ||
+                    formik.values.appointmentdate === "" ||
+                    formik.values.age === 0 ||
+                    formik.values.name === ""
+                  }
+                >
+                  Book Appointment
+                </Button>
+              </div>
+            </>
+          </Card>
         </div>
       </div>
+
+      <Modal
+        isOpen={confirmModal.isOpen}
+        onOpenChange={confirmModal.onOpenChange}
+        backdrop="blur"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                <p>Are you sure you want to book this appointment?</p>
+              </ModalHeader>
+              <ModalBody></ModalBody>
+              <ModalFooter className="flex-col-reverse sm:flex-row">
+                <Button
+                  color="default"
+                  fullWidth
+                  variant="flat"
+                  onPress={onClose}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color="primary"
+                  variant="flat"
+                  fullWidth
+                  isDisabled={formik.isSubmitting}
+                  isLoading={formik.isSubmitting}
+                  onPress={() => {
+                    formik.handleSubmit();
+                  }}
+                >
+                  Confirm
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 };

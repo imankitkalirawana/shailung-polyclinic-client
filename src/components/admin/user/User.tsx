@@ -1,18 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_BASE_URL, Roles } from "../../../utils/config";
+import { API_BASE_URL } from "../../../utils/config";
 import axios from "axios";
 import { toast } from "sonner";
 import { isLoggedIn } from "../../../utils/auth";
 import NotFound from "../../NotFound";
 import { Helmet } from "react-helmet-async";
 import { UploadSingleFile } from "../../../utils/FileHandling";
+import {
+  Card,
+  CardHeader,
+  Badge,
+  Button,
+  Avatar,
+  CardBody,
+  Input,
+  DatePicker,
+  Textarea,
+  CardFooter,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@nextui-org/react";
+import { IconPencil } from "@tabler/icons-react";
+import { parseDate } from "@internationalized/date";
 
 const User = () => {
   const navigate = useNavigate();
   const { user } = isLoggedIn();
   const [file, setFile] = useState<File | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const deleteAccountModal = useDisclosure();
 
   if (user?.role !== "admin") {
     return (
@@ -32,6 +54,9 @@ const User = () => {
       });
       const data = response.data;
       formik.setValues(data);
+      if (data.dob == 0) {
+        formik.setFieldValue("dob", "2000-01-01");
+      }
     };
     fetchUser();
   }, []);
@@ -45,7 +70,7 @@ const User = () => {
       bio: "",
       role: "",
       gender: "",
-      dob: "",
+      dob: "2000-01-01",
       phone: "",
       address: "",
       confirmemail: "",
@@ -95,23 +120,21 @@ const User = () => {
     }
   };
 
-  console.log(formik.values);
-
   const handleDelete = async () => {
     try {
-      const response = await axios.delete(
-        `${API_BASE_URL}/api/admin/user/${id}`,
-        {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      toast.success(response.data.message);
+      setIsDeleting(true);
+      await axios.delete(`${API_BASE_URL}/api/admin/user/${id}`, {
+        headers: {
+          Authorization: `${localStorage.getItem("token")}`,
+        },
+      });
+      toast.success(`${formik.values.name} was deleted successfully`);
       navigate("/dashboard/users");
     } catch (error: any) {
       console.log(error.message);
       toast.error(error.message);
+    } finally {
+      setIsDeleting(false);
     }
   };
   return (
@@ -131,274 +154,183 @@ const User = () => {
           href={`https://report.shailungpolyclinic.com/admin/user/${id}/edit`}
         />
       </Helmet>
-      <div className="col-span-full lg:col-span-9">
-        <form className="px-4 sm:px-0" onSubmit={formik.handleSubmit}>
-          <div>
-            <h2 className="text-base font-semibold leading-7 text-base-content">
-              Update User
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-base-neutral">
-              Update user details
-            </p>
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="col-span-full">
-                <label
+
+      <Card className="w-full p-2">
+        <CardHeader className="flex flex-col items-start px-4 pb-0 pt-4">
+          <p className="text-large">Account Details</p>
+          <div className="flex gap-4 py-4">
+            <input
+              id="photo"
+              name="photo"
+              type="file"
+              className="hidden"
+              accept="image/*"
+              onChange={(e) => handleFileChange(e)}
+            />
+            <Badge
+              classNames={{
+                badge: "w-5 h-5",
+              }}
+              color="primary"
+              content={
+                <Button
+                  isIconOnly
+                  className="p-0 text-primary-foreground"
+                  radius="full"
+                  size="sm"
+                  variant="light"
+                  as={"label"}
                   htmlFor="photo"
-                  className="block text-sm font-medium leading-6"
                 >
-                  Photo
-                </label>
-                <div className="mt-2 flex items-center gap-x-3">
-                  <img
-                    src={
-                      formik.values.previewPhoto
-                        ? formik.values.previewPhoto
-                        : `${API_BASE_URL}/api/upload/single/${formik.values.photo}`
-                    }
-                    className="h-12 w-12 rounded-full aspect-square object-cover"
-                    alt={formik.values.name}
-                    title="profile"
-                    width={40}
-                    height={40}
-                    loading="eager"
-                  />
-                  <label
-                    htmlFor="photo"
-                    className="btn btn-outline hover:btn-primary btn-sm"
-                  >
-                    Change
-                  </label>
-                  <input
-                    id="photo"
-                    name="photo"
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange(e)}
-                  />
-                </div>
-              </div>
-
-              <div className="col-span-full">
-                <label htmlFor="bio" className="label">
-                  <span className="label-text">bio</span>
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    id="bio"
-                    name="bio"
-                    rows={3}
-                    className="textarea textarea-bordered block w-full h-28 bg-base-100 py-1.5 text-base-content shadow-sm placeholder:text-neutral focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    onChange={formik.handleChange}
-                    value={formik.values.bio}
-                  />
-                </div>
-                <div className="label">
-                  <span className="label-text-alt">
-                    Write a few sentences bio yourself.
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="divider"></div>
-            <div className="pb-12">
-              <h1 className="text-base font-semibold leading-7 text-base-content">
-                Personal Information
-              </h1>
-              <p className="mt-1 text-sm leading-6 text-base-neutral">
-                Use a permanent address where you can receive mail.
-              </p>
-
-              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                <div className="col-span-6 sm:col-span-3">
-                  <label htmlFor="name" className="label">
-                    <span className="label-text">Full Name</span>
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="name"
-                      id="name"
-                      autoComplete="given-name"
-                      className="input input-bordered w-full"
-                      onChange={formik.handleChange}
-                      value={formik.values.name}
-                    />
-                  </div>
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label htmlFor="email" className="label">
-                    <span className="label-text">Email address</span>
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      className="input input-bordered w-full"
-                      onChange={formik.handleChange}
-                      value={formik.values.email}
-                    />
-                  </div>
-                </div>
-                <div className="col-span-6 sm:col-span-3 lg:col-span-3">
-                  <label htmlFor="dob" className="label">
-                    <span className="label-text">Date of Birth</span>
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="dob"
-                      name="dob"
-                      type="date"
-                      className="input input-bordered w-full"
-                      onChange={formik.handleChange}
-                      value={formik.values.dob}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="col-span-6 sm:col-span-2">
-                  <label htmlFor="gender" className="label">
-                    <span className="label-text">Gender</span>
-                  </label>
-                  <select
-                    className="select select-bordered w-full mt-2"
-                    name="gender"
-                    onChange={formik.handleChange}
-                    value={formik.values.gender}
-                  >
-                    <option disabled>Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-
-                <div className="col-span-6 sm:col-span-2">
-                  <label htmlFor="role" className="label">
-                    <span className="label-text">Role</span>
-                  </label>
-                  <select
-                    className="select select-bordered w-full mt-2"
-                    name="role"
-                    onChange={formik.handleChange}
-                    value={formik.values.role}
-                  >
-                    <option disabled>Select Role</option>
-                    {Roles.map((role, index) => (
-                      <option value={role.value} key={index}>
-                        {role.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="col-span-6 sm:col-span-3">
-                  <label htmlFor="phone" className="label">
-                    <span className="label-text">Phone</span>
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="phone"
-                      id="phone"
-                      autoComplete="phone"
-                      className="input input-bordered w-full"
-                      onChange={formik.handleChange}
-                      value={formik.values.phone}
-                    />
-                  </div>
-                </div>
-
-                <div className="col-span-6 sm:col-span-3 lg:col-span-3">
-                  <label htmlFor="address" className="label">
-                    <span className="label-text">Address</span>
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      id="address"
-                      name="address"
-                      type="address"
-                      autoComplete="address"
-                      className="input input-bordered w-full"
-                      onChange={formik.handleChange}
-                      value={formik.values.address}
-                    />
-                  </div>
-                </div>
-                <div className="col-span-6 sm:col-span-3 lg:col-span-3 hidden flex-row-reverse justify-end">
-                  <label htmlFor="isDoctor" className="label">
-                    <span className="label-text">Assign as Doctor</span>
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="checkbox"
-                      name="isDoctor"
-                      id="isDoctor"
-                      className="checkbox checked:checkbox-primary"
-                      onChange={formik.handleChange}
-                      checked={formik.values.isDoctor}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-2">
-            <button
-              type="button"
-              className="btn btn-error btn-outline hover:btn-primary btn-sm"
+                  <IconPencil size={12} />
+                </Button>
+              }
+              placement="bottom-right"
+              shape="circle"
             >
-              <label htmlFor="delete_modal">Delete Account</label>
-            </button>
-            <div className="flex gap-2">
-              <button type="submit" className="btn btn-primary btn-sm">
-                Update
-              </button>
-            </div>
-          </div>
-          <input type="checkbox" id="delete_modal" className="modal-toggle" />
-          <div className="modal" role="dialog">
-            <div className="modal-box w-full sm:max-w-sm">
-              <label htmlFor="city" className="label">
-                <span className="label-text">
-                  Enter <b>{formik.values.email}</b> to delete
-                </span>
-              </label>
-              <input
-                type="text"
-                id="delete_confirmation"
-                name="confirmemail"
-                className="input input-bordered w-full placeholder:text-base-content/40"
-                placeholder={formik.values.email}
-                // disabled={isDeleting}
-                onChange={formik.handleChange}
-                value={formik.values.confirmemail}
+              <Avatar
+                className="h-14 w-14"
+                src={
+                  formik.values.previewPhoto
+                    ? formik.values.previewPhoto
+                    : `${API_BASE_URL}/api/upload/single/${formik.values.photo}`
+                }
               />
-              <div className="flex modal-action">
-                <button
-                  className="btn btn-primary flex-1"
-                  type="button"
-                  disabled={formik.values.confirmemail !== formik.values.email}
-                  onClick={handleDelete}
-                >
-                  Delete
-                </button>
-                <label className="btn flex-1" htmlFor="delete_modal">
-                  Cancel
-                </label>
-              </div>
+            </Badge>
+            <div className="flex flex-col items-start justify-center">
+              <p className="font-medium">{formik.values.name}</p>
+              <span className="text-small text-default-500">
+                {formik.values.email}
+              </span>
             </div>
-
-            <label className="modal-backdrop" htmlFor="delete_modal">
-              Close
-            </label>
           </div>
-        </form>
-      </div>
+          <p className="text-small text-default-400">
+            The photo will be used for your profile, and will be visible to
+            other users of the platform.
+          </p>
+        </CardHeader>
+        <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <Input
+            label="Full Name"
+            placeholder="Enter your name"
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            name="name"
+          />
+          <Input
+            label="Email"
+            placeholder="Enter email"
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            name="email"
+          />
+          <Input
+            label="Phone Number"
+            placeholder="Enter phone number"
+            value={formik.values.phone}
+            onChange={formik.handleChange}
+            name="phone"
+          />
+
+          <Input
+            label="Address"
+            placeholder="Enter address"
+            value={formik.values.address}
+            onChange={formik.handleChange}
+            name="address"
+          />
+          <DatePicker
+            label="Date of Birth"
+            onChange={(date) => {
+              formik.setFieldValue("dob", date.toString().split("T")[0]);
+            }}
+            value={parseDate(formik.values.dob)}
+            name="dob"
+          />
+          <Textarea
+            label="Bio"
+            placeholder="Write a few sentences bio yourself."
+            value={formik.values.bio}
+            onChange={formik.handleChange}
+            name="bio"
+            className="col-span-full"
+          />
+        </CardBody>
+        <CardFooter className="mt-4 justify-between gap-2">
+          <Button
+            variant="light"
+            onClick={deleteAccountModal.onOpenChange}
+            // disabled={isDeleting}
+            // isLoading={isDeleting}
+            color="danger"
+          >
+            Delete Account
+          </Button>
+          <Button
+            color="primary"
+            variant="flat"
+            onPress={() => formik.handleSubmit()}
+            disabled={formik.isSubmitting}
+            isLoading={formik.isSubmitting}
+          >
+            Save Changes
+          </Button>
+        </CardFooter>
+      </Card>
+      {/* <Security /> */}
       <div className="divider my-12"></div>
       {<Security id={id} />}
+      <Modal
+        isOpen={deleteAccountModal.isOpen}
+        onOpenChange={deleteAccountModal.onOpenChange}
+        backdrop="blur"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                <p>Delete Your Account</p>
+              </ModalHeader>
+              <ModalBody>
+                <Input
+                  type="text"
+                  name="confirmemail"
+                  onChange={formik.handleChange}
+                  value={formik.values.confirmemail}
+                  placeholder={formik.values.email}
+                  label={`Enter ${formik.values.email} to delete`}
+                  isRequired
+                />
+              </ModalBody>
+              <ModalFooter className="flex-col-reverse sm:flex-row">
+                <Button
+                  color="default"
+                  fullWidth
+                  variant="flat"
+                  onPress={onClose}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  fullWidth
+                  isDisabled={
+                    formik.values.confirmemail !== formik.values.email ||
+                    isDeleting
+                  }
+                  isLoading={isDeleting}
+                  onPress={() => {
+                    handleDelete();
+                  }}
+                >
+                  Delete Account
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 };
@@ -410,10 +342,10 @@ interface SecurityProps {
 const Security = ({ id }: SecurityProps) => {
   const formik = useFormik({
     initialValues: {
-      oldPassword: "",
       newPassword: "",
       confirmPassword: "",
     },
+
     onSubmit: async (values) => {
       try {
         const res = await axios.put(
@@ -435,6 +367,8 @@ const Security = ({ id }: SecurityProps) => {
       const errors: any = {};
       if (values.newPassword !== values.confirmPassword) {
         errors.confirmPassword = "Passwords do not match";
+      } else if (values.newPassword.length < 6) {
+        errors.newPassword = "Password must be at least 6 characters long";
       }
       return errors;
     },
@@ -442,60 +376,66 @@ const Security = ({ id }: SecurityProps) => {
 
   return (
     <>
-      <form className="px-4 sm:px-0" onSubmit={formik.handleSubmit}>
-        <h2 className="text-base font-semibold leading-7 text-base-content">
-          Security
-        </h2>
-        <p className="mt-1 text-sm leading-6 text-base-neutral">
-          Update User's Password
-        </p>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-full md:col-span-1">
-            <label htmlFor="new_password" className="label">
-              <span className="label-text">New Password</span>
-            </label>
-            <input
-              id="new_password"
-              type="password"
-              name="newPassword"
-              required
-              className="input input-bordered w-full"
-              onChange={formik.handleChange}
-              value={formik.values.newPassword}
-            />
-          </div>
-          <div className="col-span-full md:col-span-1">
-            <label htmlFor="confirm_password" className="label">
-              <span className="label-text">Confirm Password</span>
-            </label>
-            <input
-              id="confirm_password"
-              name="confirmPassword"
-              type="password"
-              required
-              className={`input input-bordered w-full ${
-                formik.errors.confirmPassword && formik.touched.confirmPassword
-                  ? "input-error"
-                  : ""
-              }`}
-              onChange={formik.handleChange}
-              value={formik.values.confirmPassword}
-            />
-            {formik.errors.confirmPassword &&
-              formik.touched.confirmPassword && (
-                <p className="mt-1 text-xs text-error">
-                  {formik.errors.confirmPassword}
-                </p>
-              )}
-          </div>
-        </div>
-        <div className="divider my-10"></div>
-        <div className="mt-6 flex items-center justify-end gap-2">
-          <button type="submit" className="btn btn-primary btn-sm">
-            Update
-          </button>
-        </div>
-      </form>
+      <Card className="w-full p-2">
+        <CardHeader className="flex flex-col items-start px-4 pb-0 pt-4">
+          <p className="text-large">Security Settings</p>
+
+          <p className="text-small text-default-400">
+            Manage your security preferences
+          </p>
+        </CardHeader>
+        <CardBody className="grid grid-cols-2 gap-4">
+          <Input
+            id="new_password"
+            label="New Password"
+            placeholder="Enter new password"
+            type="password"
+            name="newPassword"
+            isRequired
+            onChange={formik.handleChange}
+            value={formik.values.newPassword}
+            isInvalid={
+              formik.errors.newPassword && formik.touched.newPassword
+                ? true
+                : false
+            }
+            errorMessage={formik.errors.newPassword}
+          />
+
+          <Input
+            id="confirm_password"
+            label="Confirm Password"
+            placeholder="Confirm your password"
+            name="confirmPassword"
+            type="password"
+            isRequired
+            onChange={formik.handleChange}
+            value={formik.values.confirmPassword}
+            isInvalid={
+              formik.errors.confirmPassword && formik.touched.confirmPassword
+                ? true
+                : false
+            }
+            errorMessage={formik.errors.confirmPassword}
+          />
+        </CardBody>
+        <CardFooter className="mt-4 justify-end">
+          <Button
+            color="primary"
+            variant="flat"
+            type="submit"
+            onPress={() => formik.handleSubmit()}
+            isLoading={formik.isSubmitting}
+            isDisabled={
+              formik.errors.confirmPassword || formik.errors.newPassword
+                ? true
+                : false || formik.isSubmitting
+            }
+          >
+            Update Password
+          </Button>
+        </CardFooter>
+      </Card>
     </>
   );
 };

@@ -8,6 +8,23 @@ import { PlusIcon, XIcon } from "../../icons/Icons";
 import { isLoggedIn } from "../../../utils/auth";
 import { getAllDoctors } from "../../../functions/get";
 import { Doctor } from "../../../interface/interface";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Checkbox,
+  Input,
+  Select,
+  SelectItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  Textarea,
+} from "@nextui-org/react";
 
 const EditAvailableTest = () => {
   const { user } = isLoggedIn();
@@ -68,7 +85,7 @@ const EditAvailableTest = () => {
           },
         });
         toast.success("Updated Successfully");
-        // navigate("/dashboard/tests/available-tests");
+        navigate("/dashboard/tests/available-tests");
       } catch (error: any) {
         console.log(error.message);
         toast.error(error.message);
@@ -99,8 +116,8 @@ const EditAvailableTest = () => {
 
   return (
     <>
-      <div>
-        <form onSubmit={formik.handleSubmit}>
+      <form onSubmit={formik.handleSubmit}>
+        <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
               <h2
@@ -113,131 +130,105 @@ const EditAvailableTest = () => {
                 Update your Test information.
               </p>
             </div>
-            <button
+            <Button
               type="submit"
-              className="btn btn-primary btn-sm"
-              disabled={formik.isSubmitting}
+              isLoading={formik.isSubmitting}
+              isDisabled={formik.isSubmitting}
+              variant="flat"
+              color="primary"
             >
               Update
-            </button>
+            </Button>
           </div>
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div className="col-span-6 sm:col-span-2">
-              <label htmlFor="name" className="label">
-                <span className="label-text">Name</span>
-              </label>
-              <div className="mt-2">
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  autoComplete="given-name"
-                  className="input input-bordered w-full"
-                  onChange={formik.handleChange}
-                  value={formik.values.name}
-                />
-              </div>
+              <Input
+                type="text"
+                name="name"
+                id="name"
+                label="Test Name"
+                placeholder="Enter Test Name"
+                autoComplete="given-name"
+                onChange={formik.handleChange}
+                value={formik.values.name}
+                isRequired
+              />
             </div>
             <div className="col-span-6 sm:col-span-2">
-              <label htmlFor="price" className="label">
-                <span className="label-text">Price</span>
-              </label>
-              <div className="mt-2">
-                <input
-                  type="text"
-                  name="price"
-                  id="price"
-                  className="input input-bordered w-full"
-                  onChange={formik.handleChange}
-                  value={formik.values.price}
-                />
-              </div>
+              <Input
+                type="text"
+                name="price"
+                id="price"
+                label="Test Price"
+                placeholder="Enter Price"
+                onChange={formik.handleChange}
+                value={formik.values.price}
+                isRequired
+              />
             </div>
             <div className="col-span-6 sm:col-span-2">
-              <label htmlFor="duration" className="label">
-                <span className="label-text">Duration</span>
-              </label>
-              <div className="mt-2">
-                <input
-                  type="text"
-                  name="duration"
-                  id="duration"
-                  autoComplete="duration"
-                  className="input input-bordered w-full"
-                  onChange={formik.handleChange}
-                  value={formik.values.duration}
-                />
-              </div>
+              <Input
+                type="text"
+                name="duration"
+                id="duration"
+                label="Test Duration"
+                placeholder="Enter Duration"
+                autoComplete="duration"
+                onChange={formik.handleChange}
+                value={formik.values.duration}
+              />
             </div>
 
             <div className="col-span-6">
-              <label htmlFor="description" className="label">
-                <span className="label-text">Description</span>
-              </label>
-              <div className="mt-2">
-                <textarea
-                  id="description"
-                  name="description"
-                  className="textarea textarea-bordered w-full"
-                  onChange={formik.handleChange}
-                  value={formik.values.description}
-                />
-              </div>
+              <Textarea
+                id="description"
+                name="description"
+                label="Description"
+                placeholder="Enter Description"
+                onChange={formik.handleChange}
+                value={formik.values.description}
+              />
             </div>
             <div className="col-span-6">
-              <label htmlFor="summary" className="label">
-                <span className="label-text">Test Information</span>
-              </label>
-              <div className="mt-2">
-                <textarea
-                  id="summary"
-                  name="summary"
-                  className="textarea textarea-bordered w-full"
-                  onChange={formik.handleChange}
-                  value={formik.values.summary}
-                />
-              </div>
+              <Textarea
+                id="summary"
+                name="summary"
+                label="Summary"
+                placeholder="Enter Summary"
+                onChange={formik.handleChange}
+                value={formik.values.summary}
+              />
             </div>
             <div className="col-span-6 md:col-span-2">
-              <label htmlFor="status" className="label">
-                <span className="label-text">Status</span>
-              </label>
-              <div className="mt-2">
-                <select
-                  id="status"
-                  name="status"
-                  className="select select-bordered w-full"
-                  onChange={formik.handleChange}
-                  value={formik.values.status}
-                >
-                  <option value="active">Available</option>
-                  <option value="inactive">Not Available</option>
-                </select>
-              </div>
+              <Select
+                id="status"
+                name="status"
+                label="Test Status"
+                onChange={formik.handleChange}
+                selectedKeys={[formik.values.status]}
+              >
+                <SelectItem key="active">Available</SelectItem>
+                <SelectItem key="inactive">Not Available</SelectItem>
+              </Select>
             </div>
             <div className="col-span-2">
               <label htmlFor="doctors" className="label">
                 <span className="label-text">Doctors</span>
               </label>
-              <div className="max-h-48 overflow-y-scroll">
+              <div className="max-h-48 p-2 overflow-y-scroll">
                 {doctors.map((doctor: Doctor, index) => (
                   <div className="form-control" key={index}>
-                    <label
-                      key={doctor._id}
-                      className="cursor-pointer label flex-row-reverse justify-end gap-2"
+                    <Checkbox
+                      name="doctors"
+                      className="mb-1"
+                      value={doctor._id}
+                      isSelected={formik.values.doctors.includes(
+                        doctor._id as string
+                      )}
+                      onChange={formik.handleChange}
                     >
-                      <span className="label-text">{doctor.name}</span>
-                      <input
-                        type="checkbox"
-                        className="checkbox"
-                        name="doctors"
-                        value={doctor._id}
-                        onChange={formik.handleChange}
-                        checked={formik.values.doctors.includes(
-                          doctor._id as string
-                        )}
-                      />
-                    </label>
+                      {doctor.name}
+                    </Checkbox>
                   </div>
                 ))}
                 {formik.errors.doctors && (
@@ -249,102 +240,91 @@ const EditAvailableTest = () => {
                 )}
               </div>
             </div>
-            <div className="form-control col-span-full">
-              <label htmlFor="testProps" className="label">
-                <span className="label-text">Test Properties</span>
-              </label>
-              <div className="flex flex-col">
-                <div className="border rounded-lg overflow-hidden border-base-content/30">
-                  <table className="divide-y divide-base-content w-full">
-                    <thead>
-                      <tr>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-start text-xs font-medium uppercase"
-                        >
-                          Investigation
-                        </th>
-                        <th
-                          scope="col"
-                          className="text-start text-xs font-medium uppercase"
-                        >
-                          Reference Value
-                        </th>
-                        <th
-                          scope="col"
-                          className="text-start text-xs font-medium uppercase"
-                        >
-                          Unit
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-base-content/30">
-                      {formik.values.testProps.map((testProp, index) => (
-                        <tr
-                          key={index}
-                          className="divide-x divide-base-content/30 group"
-                        >
-                          <td className="whitespace-nowrap text-sm font-medium">
-                            <input
-                              type="text"
-                              className="input focus:outline-none focus:border-none rounded-none w-full"
-                              name={`testProps[${index}].investigation`}
-                              id="investigation"
-                              placeholder="Hemoglobin"
-                              onChange={formik.handleChange}
-                              value={testProp.investigation}
-                            />
-                          </td>
-                          <td className="whitespace-nowrap text-sm font-medium">
-                            <textarea
-                              className="input focus:outline-none focus:border-none rounded-none w-full"
-                              name={`testProps[${index}].referenceValue`}
-                              id="referenceValue"
-                              placeholder="13.0 - 17.0"
-                              onChange={formik.handleChange}
-                              value={testProp.referenceValue}
-                            />
-                          </td>
-                          <td className="whitespace-nowrap text-end text-sm font-medium flex items-center">
-                            <input
-                              type="text"
-                              className="input focus:outline-none focus:border-none rounded-none w-full"
-                              name={`testProps[${index}].unit`}
-                              id="unit"
-                              placeholder="g/dL"
-                              onChange={formik.handleChange}
-                              value={testProp.unit}
-                            />
-                            {formik.values.testProps.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeRow(index)}
-                                className="btn btn-sm btn-ghost btn-circle opacity-0 mr-1 group-hover:opacity-100"
-                              >
-                                <XIcon className="w-5 h-5" />
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="flex justify-end mt-2">
-                  <button
-                    type="button"
-                    onClick={addNewRow}
-                    className="btn btn-sm hover:btn-primary btn-circle tooltip tooltip-bottom flex items-center justify-center tooltip-primary"
-                    data-tip="Add Row"
-                  >
-                    <PlusIcon className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
-        </form>
-      </div>
+        </Card>
+        <Card className="mt-8">
+          <CardHeader className="justify-between">
+            <h2
+              className="text-base font-semibold leading-7 text-base-content"
+              data-tip="Test Title"
+            >
+              Test Properties
+            </h2>
+            <Button
+              isIconOnly
+              variant="flat"
+              radius="full"
+              type="button"
+              onClick={addNewRow}
+              data-tip="Add Row"
+            >
+              <PlusIcon className="w-5 h-5" />
+            </Button>
+          </CardHeader>
+          <CardBody className="flex flex-col">
+            <Table removeWrapper>
+              <TableHeader>
+                <TableColumn key="investigation">Investigation</TableColumn>
+                <TableColumn key="referenceValue">Reference Value</TableColumn>
+                <TableColumn key="unit">Unit</TableColumn>
+              </TableHeader>
+              <TableBody>
+                {formik.values.testProps.map((testProp, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Textarea
+                        type="text"
+                        aria-label="Investigation"
+                        // className="input focus:outline-none focus:border-none rounded-none w-full"
+                        name={`testProps[${index}].investigation`}
+                        id="investigation"
+                        placeholder="Hemoglobin"
+                        onChange={formik.handleChange}
+                        value={testProp.investigation}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Textarea
+                        // className="input focus:outline-none focus:border-none rounded-none w-full"
+                        name={`testProps[${index}].referenceValue`}
+                        aria-label="Reference Value"
+                        id="referenceValue"
+                        placeholder="13.0 - 17.0"
+                        onChange={formik.handleChange}
+                        value={testProp.referenceValue}
+                      />
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-end text-sm font-medium flex items-center">
+                      <Textarea
+                        type="text"
+                        aria-label="Unit"
+                        // className="input focus:outline-none focus:border-none rounded-none w-full"
+                        name={`testProps[${index}].unit`}
+                        id="unit"
+                        placeholder="g/dL"
+                        onChange={formik.handleChange}
+                        value={testProp.unit}
+                      />
+                      {formik.values.testProps.length > 1 && (
+                        <Button
+                          isIconOnly
+                          variant="flat"
+                          radius="full"
+                          type="button"
+                          onClick={() => removeRow(index)}
+                          className="btn btn-sm btn-ghost btn-circle opacity-0 mr-1 group-hover:opacity-100"
+                        >
+                          <XIcon className="w-5 h-5" />
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardBody>
+        </Card>
+      </form>
     </>
   );
 };

@@ -10,8 +10,10 @@ import {
   IconCalendarClock,
   IconChevronDown,
   IconMenu2,
+  IconNewSection,
   IconReportMedical,
   IconStethoscope,
+  IconTableExport,
   IconTestPipe,
   IconUserDollar,
   IconUserEdit,
@@ -21,6 +23,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { Dialog, Disclosure, Popover, Transition } from "@headlessui/react";
+import { Button, Card } from "@nextui-org/react";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -81,7 +84,7 @@ const Navbar = () => {
           aria-label="Global"
         >
           <div className="flex lg:flex-1">
-            <a href="/" className="-m-1.5 p-1.5">
+            <Button as={"a"} variant="light" href="/" className="-m-1.5 p-1.5">
               <span className="sr-only">
                 {websiteData.title || data.websiteData.title}
               </span>
@@ -102,7 +105,7 @@ const Navbar = () => {
                   {websiteData.title || data.websiteData.title}
                 </span>
               </div>
-            </a>
+            </Button>
           </div>
           <div className="flex lg:hidden">
             <button
@@ -111,7 +114,6 @@ const Navbar = () => {
               onClick={() => setMobileMenuOpen(true)}
             >
               <span className="sr-only">Open main menu</span>
-              {/* <Bars3Icon className="h-6 w-6" aria-hidden="true" /> */}
               <IconMenu2 className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
@@ -140,8 +142,8 @@ const Navbar = () => {
                 leaveFrom="opacity-100 translate-y-0"
                 leaveTo="opacity-0 translate-y-1"
               >
-                <Popover.Panel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden bg-base-100 rounded-3xl shadow-2xl ring-1 ring-primary/40">
-                  <div className="p-4">
+                <Popover.Panel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl">
+                  <Card className="p-4" shadow="lg">
                     {appointments.map((item) => (
                       <div
                         key={item.name}
@@ -164,7 +166,7 @@ const Navbar = () => {
                         </div>
                       </div>
                     ))}
-                  </div>
+                  </Card>
                 </Popover.Panel>
               </Transition>
             </Popover>
@@ -186,8 +188,8 @@ const Navbar = () => {
                 leaveFrom="opacity-100 translate-y-0"
                 leaveTo="opacity-0 translate-y-1"
               >
-                <Popover.Panel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden bg-base-100 rounded-3xl shadow-2xl ring-1 ring-primary/40">
-                  <div className="p-4">
+                <Popover.Panel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl shadow-2xl">
+                  <Card className="p-4" shadow="lg">
                     {tests.map((item) => (
                       <div
                         key={item.name}
@@ -210,7 +212,7 @@ const Navbar = () => {
                         </div>
                       </div>
                     ))}
-                  </div>
+                  </Card>
                 </Popover.Panel>
               </Transition>
             </Popover>
@@ -233,8 +235,8 @@ const Navbar = () => {
                   leaveFrom="opacity-100 translate-y-0"
                   leaveTo="opacity-0 translate-y-1"
                 >
-                  <Popover.Panel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden bg-base-100 rounded-3xl shadow-2xl ring-1 ring-primary/40">
-                    <div className="p-4">
+                  <Popover.Panel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl shadow-2xl">
+                    <Card className="p-4" shadow="lg">
                       {users.map((item) => (
                         <div
                           key={item.name}
@@ -257,21 +259,7 @@ const Navbar = () => {
                           </div>
                         </div>
                       ))}
-                    </div>
-                    <div className="grid grid-cols-2 divide-x divide-gray-900/5">
-                      <a
-                        href={"/dashboard/users?action=new"}
-                        className="flex items-center justify-center gap-x-2.5 p-3 text-sm font-semibold leading-6 hover:bg-base-300"
-                      >
-                        Register new user
-                      </a>
-                      <a
-                        href={"/dashboard/users"}
-                        className="flex items-center justify-center gap-x-2.5 p-3 text-sm font-semibold leading-6 hover:bg-base-300"
-                      >
-                        Export users
-                      </a>
-                    </div>
+                    </Card>
                   </Popover.Panel>
                 </Transition>
               </Popover>
@@ -279,12 +267,9 @@ const Navbar = () => {
           </Popover.Group>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             {loggedIn ? (
-              <span
-                className="text-sm font-semibold leading-6 btn btn-ghost hover:text-error btn-sm rounded-full"
-                onClick={handleLogout}
-              >
+              <Button variant="light" onClick={handleLogout}>
                 Logout
-              </span>
+              </Button>
             ) : (
               <a
                 href="/auth/login"
@@ -458,6 +443,7 @@ const Navbar = () => {
           </Dialog.Panel>
         </Dialog>
       </header>
+
       <div className="fixed bottom-8 z-10 right-0 bg-base-300/30 backdrop-blur-xl rounded-l-full">
         <label className="swap swap-rotate btn btn-ghost rounded-r-none btn-circle">
           <input
@@ -526,16 +512,11 @@ const users = [
     href: "/dashboard/users",
     icon: IconUsers,
   },
-  {
-    name: "View All Doctors",
-    description: "View all the doctors registered in the system",
-    href: "/dashboard/doctors",
-    icon: IconUserDollar,
-  },
+
   {
     name: "View All Patients",
     description: "View all the patients registered in the system",
-    href: "/dashboard/users?type=user",
+    href: "/dashboard/users?type=user&phone=true",
     icon: IconUserQuestion,
   },
 ];
@@ -569,6 +550,12 @@ if (user?.role === "admin" || user?.role === "member") {
       icon: IconReportMedical,
     }
   );
+  users.push({
+    name: "Register New User",
+    description: "Register a new user in the system",
+    href: "/dashboard/users?action=new",
+    icon: IconNewSection,
+  });
 } else {
   appointments.unshift({
     name: "New Appointment",
@@ -576,6 +563,23 @@ if (user?.role === "admin" || user?.role === "member") {
     href: `/appointment/new`,
     icon: IconUserEdit,
   });
+}
+
+if (user?.role === "admin") {
+  users.push(
+    {
+      name: "View All Doctors",
+      description: "View all the doctors registered in the system",
+      href: "/dashboard/doctors",
+      icon: IconUserDollar,
+    },
+    {
+      name: "Export Users",
+      description: "Export all the users registered in the system",
+      href: "/dashboard/users?action=export",
+      icon: IconTableExport,
+    }
+  );
 }
 
 export default Navbar;

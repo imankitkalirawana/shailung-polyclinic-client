@@ -7,6 +7,7 @@ import Overview from "./Overview";
 import { useEffect, useState } from "react";
 import { humanReadableDate } from "./user/Users";
 import { getTestStats } from "../../functions/post";
+import { isLoggedIn } from "../../utils/auth";
 
 const timeframes = [
   {
@@ -36,6 +37,7 @@ const timeframes = [
 ];
 
 const Stats = () => {
+  const { user } = isLoggedIn();
   const [timeframe, setTimeframe] = useState("1d");
   const [modal, setModal] = useState(false);
   const [startDate, setStartDate] = useState("");
@@ -56,6 +58,9 @@ const Stats = () => {
     setPreviousData(data2);
   };
   useEffect(() => {
+    if (user?.role !== "admin") {
+      window.location.href = "/auth/login";
+    }
     fetchData();
   }, [timeframe, startDate, endDate]);
 

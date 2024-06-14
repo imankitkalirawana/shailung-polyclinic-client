@@ -145,7 +145,16 @@ function App() {
           </Route>
         </Routes>
       </Router>
-      <Toaster richColors closeButton />
+      <Toaster
+        theme={
+          localStorage.getItem("theme") === "dark"
+            ? "dark"
+            : localStorage.getItem("theme") === "light"
+            ? "light"
+            : "system"
+        }
+        closeButton
+      />
     </>
   );
 }

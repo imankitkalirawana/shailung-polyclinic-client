@@ -10,6 +10,18 @@ import { Helmet } from "react-helmet-async";
 import { calculateAge } from "../../../functions/agecalculator";
 import { User } from "../../../interface/interface";
 
+import {
+  Link as NextLink,
+  Avatar,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  CardFooter,
+} from "@nextui-org/react";
+import { IconPencil } from "@tabler/icons-react";
+
 const ViewUser = () => {
   const { id }: any = useParams();
   const { user } = isLoggedIn();
@@ -33,6 +45,7 @@ const ViewUser = () => {
     };
     fetchUser();
   }, []);
+
   return (
     <>
       <Helmet>
@@ -50,153 +63,95 @@ const ViewUser = () => {
           href={`https://report.shailungpolyclinic.com/admin/user/${id}`}
         />
       </Helmet>
-      <div>
-        <div className="flex justify-between items-center">
-          <div className="px-4 sm:px-0">
-            <h1 className="text-base font-semibold leading-7">
-              User Information
-            </h1>
-            <p className="mt-1 max-w-2xl text-sm leading-6">
-              Personal details and application.
-            </p>
-          </div>
-          {user?.role === "admin" && (
-            <Link
-              to={`/dashboard/users/${id}/edit`}
-              className="btn btn-primary btn-sm"
-            >
-              <EditIcon className="h-5 w-5" />
-              Edit
-            </Link>
-          )}
-        </div>
-        <div className="mt-6">
-          <div>
-            <div className="w-24 h-24 realtive">
-              <img
-                className="object-cover w-full h-full rounded-full"
-                src={
-                  getUser.photo
-                    ? `${API_BASE_URL}/api/upload/single/${getUser.photo}`
-                    : "https://ui-avatars.com/api/?name=" + getUser.name
-                }
-                alt={getUser.name}
-                title="profile"
-                width={40}
-                height={40}
-                loading="eager"
-              />
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Full name</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.name}
-              </dd>
-            </div>
+      <div className="flex h-full  w-full items-start justify-center overflow-scroll">
+        <Card className="my-10 w-[400px]">
+          <CardHeader className="relative flex h-[100px] flex-col justify-end overflow-visible bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400">
+            <Avatar
+              fallback={<EditIcon size={32} />}
+              className="h-20 w-20 translate-y-12"
+              src={`${API_BASE_URL}/api/upload/single/${getUser.photo}`}
+            />
 
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Gender</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.gender}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Age</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.dob && calculateAge(getUser.dob)} years
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Role</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.role}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Email address</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.email}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Phone Number</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.phone}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Bio</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.bio}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Address</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
+            {user?.role === "admin" && (
+              <Button
+                className="absolute right-3 top-3 bg-white/20 text-white dark:bg-black/20"
+                radius="full"
+                size="sm"
+                variant="light"
+                as={Link}
+                isIconOnly
+                to={`/dashboard/users/${id}/edit`}
+              >
+                <IconPencil stroke={1} size={16} />
+              </Button>
+            )}
+          </CardHeader>
+          <CardBody>
+            <div className="pb-4 pt-6">
+              <p className="text-large font-medium">{getUser.name}</p>
+              <p className="text-small text-default-400">
+                <NextLink
+                  href={`mailto:${getUser.email}`}
+                  color="foreground"
+                  target="_BLANK"
+                  size="sm"
+                  className="hover:underline text-default-400"
+                >
+                  {getUser.email}
+                </NextLink>
+                {" | "}
+                <NextLink
+                  href={`tel:${getUser.phone}`}
+                  color="foreground"
+                  target="_BLANK"
+                  size="sm"
+                  className="hover:underline text-default-400"
+                >
+                  {getUser.phone}
+                </NextLink>
+              </p>
+              <div className="flex gap-2 pb-1 pt-2 overflow-scroll">
+                <Chip variant="flat">
+                  {getUser.dob && calculateAge(getUser.dob)} years
+                </Chip>
+                <Chip variant="flat" className="capitalize">
+                  {getUser.role}
+                </Chip>
+                {getUser.gender && getUser.gender !== "-" && (
+                  <Chip variant="flat" className="capitalize">
+                    {getUser.gender}
+                  </Chip>
+                )}
+              </div>
+              <p className="py-2 text-small text-foreground">{getUser.bio}</p>
+              <p className="py-2 text-small text-foreground">
                 {getUser.address}
-              </dd>
+              </p>
+              <div className="flex gap-2">
+                <p>
+                  <span className="text-small text-default-400">
+                    Created on:{" "}
+                    {getUser.addeddate && humanReadableDate(getUser.addeddate)}
+                    {getUser.addedby && " by " + getUser.addedby}
+                  </span>
+                </p>
+              </div>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Registered On</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {humanReadableDate(getUser.addeddate)}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Updated On</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.updatedat
-                  ? humanReadableDate(getUser.updatedat)
-                  : "N/A"}
-              </dd>
-            </div>
-            <div className="hidden">
-              <dt className="text-sm font-medium leading-6">Attachments</dt>
-              <dd className="mt-2 text-sm sm:col-span-2 sm:mt-0">
-                <ul role="list" className="divide-y card border">
-                  <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
-                    <div className="flex w-0 flex-1 items-center">
-                      {/* <PaperClipIcon
-                        className="h-5 w-5 flex-shrink-0"
-                        aria-hidden="true"
-                      /> */}
-                      <div className="ml-4 flex min-w-0 flex-1 gap-2">
-                        <span className="truncate font-medium">
-                          resume_back_end_developer.pdf
-                        </span>
-                        <span className="flex-shrink-0">2.4mb</span>
-                      </div>
-                    </div>
-                    <div className="ml-4 flex-shrink-0">
-                      <a href="#" className="btn btn-ghost btn-sm">
-                        Download
-                      </a>
-                    </div>
-                  </li>
-                  <li className="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
-                    <div className="flex w-0 flex-1 items-center">
-                      {/* <PaperClipIcon
-                        className="h-5 w-5 flex-shrink-0"
-                        aria-hidden="true"
-                      /> */}
-                      <div className="ml-4 flex min-w-0 flex-1 gap-2">
-                        <span className="truncate font-medium">
-                          coverletter_back_end_developer.pdf
-                        </span>
-                        <span className="flex-shrink-0">4.5mb</span>
-                      </div>
-                    </div>
-                    <div className="ml-4 flex-shrink-0">
-                      <a href="#" className="btn btn-ghost btn-sm">
-                        Download
-                      </a>
-                    </div>
-                  </li>
-                </ul>
-              </dd>
-            </div>
-          </div>
-        </div>
+          </CardBody>
+          {(user?.role === "admin" || user?.role === "member") && (
+            <CardFooter>
+              <Button
+                fullWidth
+                color="primary"
+                variant="flat"
+                as={Link}
+                to={`/appointment/new?user=${id}&phone=true`}
+              >
+                New Appointment
+              </Button>
+            </CardFooter>
+          )}
+        </Card>
       </div>
     </>
   );

@@ -1,5 +1,4 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { EditIcon } from "../../icons/Icons";
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../../../utils/config";
 import axios from "axios";
@@ -7,6 +6,20 @@ import { toast } from "sonner";
 import { humanReadableDate } from "../user/Users";
 import { isLoggedIn } from "../../../utils/auth";
 import { AvailableTest } from "../../../interface/interface";
+import {
+  Card,
+  CardHeader,
+  Button,
+  CardBody,
+  Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from "@nextui-org/react";
+import CellValue from "../../cell-value";
 
 const ViewAvailableTest = () => {
   const { id }: any = useParams();
@@ -42,103 +55,85 @@ const ViewAvailableTest = () => {
 
   return (
     <>
-      <div>
-        <div className="flex justify-between items-center">
-          <div className="px-4 sm:px-0">
-            <h3 className="text-base font-semibold leading-7">Test Details</h3>
-            <p className="mt-1 max-w-2xl text-sm leading-6">
-              Test details and application.
+      <Card className="w-full mx-auto p-2">
+        <CardHeader className="justify-between px-4">
+          <div className="flex flex-col items-start">
+            <p className="text-large">Service Details</p>
+            <p className="text-small text-default-500">
+              Service details and application.
             </p>
           </div>
-          <Link
-            to={`/dashboard/tests/available-tests/${id}/edit`}
-            className="btn btn-primary btn-sm"
-          >
-            <EditIcon className="h-5 w-5" />
-            Edit
-          </Link>
-        </div>
-        <div className="mt-6">
-          <dl className="">
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Name</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {test.name}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Description</dt>
-              <dd className="mt-1 text-sm whitespace-pre-wrap leading-6 sm:col-span-2 sm:mt-0">
-                {test.description}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Price</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                NPR{" "}
-                {test.price &&
-                  test.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Duration</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {test.duration}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Status</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {test.status === "active" ? "Available" : "Not Available"}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">
-                Test Information
-              </dt>
-              <dd className="mt-1 text-sm whitespace-pre-wrap leading-6 sm:col-span-2 sm:mt-0">
-                {test.summary || "-"}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Added On</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {humanReadableDate(test.addeddate)}
-              </dd>
-            </div>
-
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Test Properties</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0"></dd>
-            </div>
-            <div className={`w-full overflow-x-auto card`}>
-              <table className="w-full whitespace-no-wrap">
-                <thead>
-                  <tr className="text-xs font-semibold tracking-wide text-left uppercase border-b bg-primary/20">
-                    <th className="px-4 py-3">Investigation</th>
-                    <th className="px-4 py-3">Reference Value</th>
-                    <th className="px-4 py-3">Unit</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-primary/10 divide-y">
-                  {test.testProps &&
-                    test.testProps.map((testProp, index) => (
-                      <tr key={index}>
-                        <td className="px-4 py-3 text-sm">
-                          {testProp.investigation}
-                        </td>
-                        <td className="px-4 py-3 whitespace-pre-wrap text-sm">
-                          {testProp.referenceValue}
-                        </td>
-                        <td className="px-4 py-3 text-sm">{testProp.unit}</td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </dl>
-        </div>
-      </div>
+          {user?.role === "admin" && (
+            <Button
+              as={Link}
+              to={`/dashboard/tests/available-tests/${id}/edit`}
+              color="primary"
+              variant="flat"
+            >
+              Edit
+            </Button>
+          )}
+        </CardHeader>
+        <CardBody className="space-y-2 px-6">
+          <CellValue label="Test Name" value={test.name} />
+          <CellValue
+            className={"hidden sm:flex justify-between"}
+            label="Description"
+            value={test.description}
+          />
+          <CellValue
+            label="Price"
+            value={`NPR ${
+              test.price &&
+              test.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            }`}
+          />
+          <CellValue label="Duration" value={test.duration} />
+          <CellValue
+            label="Status"
+            value={
+              <Chip
+                variant="dot"
+                color={test.status === "active" ? "success" : "danger"}
+              >
+                {test.status}
+              </Chip>
+            }
+          />
+          <CellValue
+            className={"hidden sm:flex justify-between"}
+            label="Test Information"
+            value={test.summary}
+          />
+          <CellValue
+            label="Added On"
+            value={humanReadableDate(test.addeddate)}
+          />
+        </CardBody>
+      </Card>
+      <Card className="bg-transparent">
+        <Table className="mt-8 max-w-6xl mx-auto" aria-label="Available Tests">
+          <TableHeader>
+            <TableColumn>Investigation</TableColumn>
+            <TableColumn>Reference Value</TableColumn>
+            <TableColumn>Unit</TableColumn>
+          </TableHeader>
+          <TableBody>
+            {test.testProps &&
+              test.testProps.map((testProp) => (
+                <TableRow key={testProp.investigation}>
+                  <TableCell className="whitespace-pre-wrap">
+                    <p className="whitespace-pre-wrap">
+                      {testProp.investigation}
+                    </p>
+                  </TableCell>
+                  <TableCell>{testProp.referenceValue}</TableCell>
+                  <TableCell>{testProp.unit}</TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </Card>
     </>
   );
 };

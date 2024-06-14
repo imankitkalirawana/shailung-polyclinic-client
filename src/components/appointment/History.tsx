@@ -5,22 +5,42 @@ import axios from "axios";
 import { API_BASE_URL } from "../../utils/config";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
-import { SearchIcon } from "../icons/Icons";
 import { isLoggedIn } from "../../utils/auth";
 import { testStatus } from "../admin/tests/Tests";
 import NotFound from "../NotFound";
 import { Helmet } from "react-helmet-async";
-import { IconPlus } from "@tabler/icons-react";
+import { IconSearch } from "@tabler/icons-react";
 import { Test } from "../../interface/interface";
+import { parseDate } from "@internationalized/date";
+import { getLocalTimeZone, today } from "@internationalized/date";
+
+import {
+  Button,
+  Card,
+  Chip,
+  DatePicker,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@nextui-org/react";
 
 const History = () => {
   const { loggedIn, user } = isLoggedIn();
   const [tests, setTests] = useState<Test[]>([]);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [scheduleModal, setScheduleModal] = useState(false);
   const [selected, setSelected] = useState<Test | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const navigate = useNavigate();
+  const deleteTestModal = useDisclosure();
+  const scheduleTestModal = useDisclosure();
+
   if (!loggedIn) {
     window.location.href = "/auth/login";
   }
@@ -29,21 +49,21 @@ const History = () => {
     // setSelected(test);
     // setDeleteModal(true);
   };
+  const fetchTests = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/test/my`, {
+        headers: {
+          Authorization: `${localStorage.getItem("token")}`,
+        },
+      });
+      const data = response.data;
+      setTests(data.reverse());
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
-    const fetchTests = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/test/my`, {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        });
-        const data = response.data;
-        setTests(data.reverse());
-      } catch (error) {
-        console.log(error);
-      }
-    };
     fetchTests();
     if (user?.role === "admin" || user?.role === "member") {
       navigate("/dashboard/reports");
@@ -75,6 +95,27 @@ const History = () => {
     return false;
   };
 
+  const handleDelete = async (test: any) => {
+    try {
+      await axios.put(
+        `${API_BASE_URL}/api/test/status/${test._id}`,
+        {
+          status: "cancelled",
+        },
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      fetchTests();
+      toast.success("Appointment Cancelled Successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to Cancel Appointment!");
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -92,45 +133,43 @@ const History = () => {
           href="https://report.shailungpolyclinic.com/appointment/history"
         />
       </Helmet>
-      <div className="container mx-auto max-w-6xl my-24 px-4">
+      <div className="mx-auto max-w-6xl my-24">
         <div className="flex mb-4 justify-between items-center">
           <h1 className="my-6 sm:text-2xl w-full font-semibold">
             Your Appointment History
           </h1>
           <div className="flex gap-2 flex-row-reverse">
-            <Link
+            <Button
+              variant="flat"
+              color="primary"
+              as={Link}
               to="/appointment/new"
-              className="btn hidden sm:flex btn-primary btn-sm"
+              className="hidden sm:flex"
             >
               New Appointment
-            </Link>
-            <Link
-              to="/appointment/new"
-              className="btn sm:hidden flex items-center justify-center btn-secondary btn-circle btn-sm tooltip tooltip-left tooltip-primary"
-              data-tip="New Appointment"
-            >
-              <IconPlus />
-            </Link>
+            </Button>
           </div>
         </div>
         <div role="tablist" className="tabs tabs-boxed bg-transparent">
           <div className="relative w-full max-w-md mb-4">
-            <input
+            <Input
               type="text"
-              className="input input-bordered ml-1 w-full"
               placeholder="Search by name, doctor, date, status"
               onChange={(e) => {
                 setSearchQuery(e.target.value);
               }}
+              endContent={<IconSearch />}
             />
-            <SearchIcon className="absolute top-3 right-4 w-6 h-6 text-primary" />
           </div>
-          <Link
+          <Button
+            as={Link}
+            variant="flat"
+            color="primary"
             to={"/appointment/new"}
-            className="btn sm:hidden btn-primary my-4"
+            className="sm:hidden"
           >
             New Appointment
-          </Link>
+          </Button>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {tests.length > 0 ? (
               tests
@@ -138,18 +177,7 @@ const History = () => {
                   return handleSearch(test);
                 })
                 .map((test) => (
-                  <div
-                    className={`h-56 ${
-                      test.status === "cancelled"
-                        ? "from-error/20 to-error/30"
-                        : test.status === "completed"
-                        ? "from-success/20 to-success/30"
-                        : test.status === "overdue"
-                        ? "from-pink-300 to-pink-400"
-                        : "from-base-300/80 to-base-300"
-                    } bg-gradient-to-br  rounded-xl relative shadow-2xl`}
-                    key={test._id}
-                  >
+                  <Card key={test._id}>
                     <div className="w-full p-8">
                       <div className="flex justify-between">
                         <div>
@@ -158,9 +186,19 @@ const History = () => {
                             {test.testDetail.userData.name}
                           </p>
                         </div>
-                        <div className="badge badge-primary text-end text-nowrap overflow-hidden text-ellipsis">
+                        <Chip
+                          size="sm"
+                          variant="flat"
+                          // @ts-ignore
+                          // color={
+                          //   TestStatus.find(
+                          //     (status) => status.value === test.status
+                          //   )?.color
+                          // }
+                          className="text-end text-nowrap overflow-hidden text-ellipsis"
+                        >
                           {test.testDetail.testData.name}
-                        </div>
+                        </Chip>
                       </div>
 
                       <div className="mt-4">
@@ -181,61 +219,58 @@ const History = () => {
                                 View Report
                               </Link>
                             )}
-                            <div className="dropdown dropdown-left">
-                              <p
-                                role="button"
-                                tabIndex={0}
-                                className={`badge tooltip tooltip-left ${
-                                  TestStatus.find(
-                                    (status) => status.value === test.status
-                                  )?.color
-                                }`}
-                                data-tip={test.status}
-                                onClick={() => {
-                                  if (test.status === "overdue") {
-                                    setScheduleModal(true);
-                                    setSelected(test);
-                                  } else if (
-                                    test.status !== "cancelled" &&
-                                    test.status !== "completed"
-                                  ) {
-                                    handleDeleteClick();
-                                  } else {
-                                    toast.error(
-                                      "Appointment is already completed or cancelled"
-                                    );
+                            <Dropdown>
+                              <DropdownTrigger>
+                                <Chip
+                                  variant="dot"
+                                  // @ts-ignore
+                                  color={
+                                    TestStatus.find(
+                                      (status) => status.value === test.status
+                                    )?.color
                                   }
-                                }}
-                              ></p>
+                                  role="button"
+                                  tabIndex={0}
+                                  onClick={() => {
+                                    if (test.status === "overdue") {
+                                      setSelected(test);
+                                      scheduleTestModal.onOpenChange();
+                                    } else if (
+                                      test.status !== "cancelled" &&
+                                      test.status !== "completed"
+                                    ) {
+                                      handleDeleteClick();
+                                    } else {
+                                      toast.error(
+                                        "Appointment is already completed or cancelled"
+                                      );
+                                    }
+                                  }}
+                                ></Chip>
+                              </DropdownTrigger>
                               {test.status != "completed" &&
                                 test.status !== "overdue" &&
                                 test.status !== "cancelled" && (
-                                  <select
-                                    tabIndex={0}
-                                    className="dropdown-content z-[1] menu p-2 select select-bordered shadow bg-base-100 rounded-box w-52"
-                                    value={""}
-                                    onChange={(e) => {
-                                      if (e.target.value === "reschedule") {
-                                        setScheduleModal(true);
+                                  <DropdownMenu aria-label="Status">
+                                    <DropdownItem
+                                      onClick={() => {
                                         setSelected(test);
-                                      } else if (
-                                        e.target.value === "cancelled"
-                                      ) {
-                                        setDeleteModal(true);
-                                        setSelected(test);
-                                      }
-                                    }}
-                                  >
-                                    <option value="" disabled>
-                                      Select Action
-                                    </option>
-                                    <option value="reschedule">
+                                        scheduleTestModal.onOpenChange();
+                                      }}
+                                    >
                                       Reschedule
-                                    </option>
-                                    <option value="cancelled">Cancel</option>
-                                  </select>
+                                    </DropdownItem>
+                                    <DropdownItem
+                                      onClick={() => {
+                                        setSelected(test);
+                                        deleteTestModal.onOpenChange();
+                                      }}
+                                    >
+                                      Cancel
+                                    </DropdownItem>
+                                  </DropdownMenu>
                                 )}
-                            </div>
+                            </Dropdown>
                           </div>
                         </div>
                         <div className="flex justify-between items-center">
@@ -247,7 +282,7 @@ const History = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 ))
             ) : (
               <div className="col-span-full">
@@ -257,119 +292,70 @@ const History = () => {
           </div>
         </div>
       </div>
-      {deleteModal && selected && (
-        <DeleteModal
-          test={selected}
-          onClose={() => {
-            setDeleteModal(false);
-            setSelected(null);
-          }}
-          setTests={setTests}
-          modalDate={{
-            title: "Cancel Appointment",
-            message: `Are you sure you want to cancel ${selected.testDetail.userData.name}'s ${selected.testDetail.testData.name} appointment?`,
-            button: "Cancel Appointment",
-          }}
-        />
-      )}
-      {scheduleModal && selected && (
+      <Modal
+        isOpen={deleteTestModal.isOpen}
+        onOpenChange={deleteTestModal.onOpenChange}
+        backdrop="blur"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                <p>
+                  Are you sure you want to cancel your appointment for{" "}
+                  {selected?.testDetail.testData.name}
+                </p>
+              </ModalHeader>
+              <ModalBody></ModalBody>
+              <ModalFooter className="flex-col-reverse sm:flex-row">
+                <Button
+                  color="default"
+                  fullWidth
+                  variant="flat"
+                  onPress={onClose}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  fullWidth
+                  onPress={() => {
+                    handleDelete(selected);
+                    deleteTestModal.onClose();
+                  }}
+                >
+                  Cancel Appointment
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {selected && (
         <ScheduleModal
           test={selected}
-          onClose={() => {
-            setScheduleModal(false);
-            setSelected(null);
-          }}
+          scheduleTestModal={scheduleTestModal}
           setTests={setTests}
         />
       )}
-    </>
-  );
-};
-
-interface DeleteModalProps {
-  test: Test;
-  onClose: () => void;
-  setTests: any;
-  modalDate: {
-    title: string;
-    message: string;
-    button: string;
-  };
-}
-
-const DeleteModal = ({
-  test,
-  onClose,
-  setTests,
-  modalDate,
-}: DeleteModalProps) => {
-  const handleDelete = async () => {
-    try {
-      await axios.put(
-        `${API_BASE_URL}/api/test/status/${test._id}`,
-        {
-          status: "cancelled",
-        },
-        {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      fetchAllTests();
-      onClose();
-      toast.success("Appointment Cancelled Successfully");
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to Cancel Appointment!");
-    }
-  };
-
-  const fetchAllTests = async () => {
-    const response = await axios.get(`${API_BASE_URL}/api/test/my`, {
-      headers: {
-        Authorization: `${localStorage.getItem("token")}`,
-      },
-    });
-    const data = response.data;
-    setTests(data.reverse());
-  };
-
-  return (
-    <>
-      <div
-        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
-        role="dialog"
-      >
-        <div className="modal-box w-full sm:max-w-sm">
-          <h3 className="font-bold text-lg text-center">{modalDate.title}</h3>
-          <p className="py-4">{modalDate.message}</p>
-          <div className="modal-action flex flex-col xs:flex-row gap-2">
-            <button
-              className="btn btn-error flex-1 whitespace-nowrap"
-              onClick={() => handleDelete()}
-            >
-              {modalDate.button}
-            </button>
-            <button className="btn flex-1" onClick={onClose}>
-              Close!
-            </button>
-          </div>
-        </div>
-      </div>
     </>
   );
 };
 
 interface ScheduleModalProps {
   test: Test;
-  onClose: () => void;
   setTests: any;
+  scheduleTestModal: any;
 }
 
-const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
-  const [date, setDate] = useState<string>("");
+const ScheduleModal = ({
+  test,
+  setTests,
+  scheduleTestModal,
+}: ScheduleModalProps) => {
+  const [date, setDate] = useState<string>(test.appointmentdate.split("T")[0]);
   const handleSchedule = async () => {
     try {
       if (test.status === "overdue") {
@@ -387,7 +373,9 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
         }
       );
       toast.success("Appointment Scheduled Successfully");
+      scheduleTestModal.onClose();
     } catch (err) {
+      toast.error("Failed to Schedule Appointment");
       console.log(err);
     } finally {
       const response = await axios.get(`${API_BASE_URL}/api/test/my`, {
@@ -397,44 +385,57 @@ const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
       });
       const data = response.data;
       setTests(data.reverse());
-      setTests(data);
-      onClose();
     }
   };
   return (
-    <div
-      className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
-      role="dialog"
+    <Modal
+      isOpen={scheduleTestModal.isOpen}
+      onOpenChange={scheduleTestModal.onOpenChange}
+      backdrop="blur"
     >
-      <div className="modal-box w-full sm:max-w-sm">
-        <h3 className="font-bold text-lg text-center">
-          Schedule {test.testDetail.userData.name}'s{" "}
-          {test.testDetail.testData.name}
-        </h3>
-        <p className="py-4">
-          <input
-            type="date"
-            className="input input-bordered w-full"
-            placeholder="Select Date"
-            min={new Date().toISOString().split("T")[0]}
-            onChange={(e) => {
-              setDate(e.target.value);
-            }}
-          />
-        </p>
-        <div className="modal-action flex flex-col xs:flex-row gap-2">
-          <button
-            className="btn btn-info flex-1"
-            onClick={() => handleSchedule()}
-          >
-            Schedule
-          </button>
-          <button className="btn flex-1" onClick={onClose}>
-            Close!
-          </button>
-        </div>
-      </div>
-    </div>
+      <ModalContent
+        as="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSchedule();
+        }}
+      >
+        {(onClose) => (
+          <>
+            <ModalHeader>
+              <p>
+                Reschedule your appointment for {test?.testDetail.testData.name}
+              </p>
+            </ModalHeader>
+            <ModalBody>
+              <DatePicker
+                fullWidth
+                isRequired
+                label="Select Date"
+                value={parseDate(date)}
+                minValue={today(getLocalTimeZone())}
+                onChange={(date) => {
+                  setDate(date.toString());
+                }}
+              />
+            </ModalBody>
+            <ModalFooter className="flex-col-reverse sm:flex-row">
+              <Button
+                color="default"
+                fullWidth
+                variant="flat"
+                onPress={onClose}
+              >
+                Cancel
+              </Button>
+              <Button color="primary" variant="flat" type="submit" fullWidth>
+                Reschedule
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 

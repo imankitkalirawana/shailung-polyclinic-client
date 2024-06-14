@@ -1,11 +1,12 @@
 import { Helmet } from "react-helmet-async";
 import { isLoggedIn } from "../../../utils/auth";
 import { Link, useParams } from "react-router-dom";
-import { EditIcon } from "../../icons/Icons";
 import { useEffect, useState } from "react";
 import { Doctor } from "../../../interface/interface";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
+import { Card, CardHeader, Button, CardBody, Image } from "@nextui-org/react";
+import CellValue from "../../cell-value";
 
 const ViewDoctor = () => {
   const { id }: any = useParams();
@@ -51,76 +52,39 @@ const ViewDoctor = () => {
           href={`https://report.shailungpolyclinic.com/admin/user/${id}`}
         />
       </Helmet>
-      <div>
-        <div className="flex justify-between items-center">
-          <div className="px-4 sm:px-0">
-            <h1 className="text-base font-semibold leading-7">
-              Doctor Information
-            </h1>
-            <p className="mt-1 max-w-2xl text-sm leading-6">
-              Personal details and application.
+
+      <Card className="w-full mx-auto max-w-lg p-2">
+        <CardHeader className="justify-between px-4">
+          <div className="flex flex-col items-start">
+            <p className="text-large">Service Details</p>
+            <p className="text-small text-default-500">
+              Service details and application.
             </p>
           </div>
-          {user?.role === "admin" && (
-            <Link
-              to={`/dashboard/doctors/${id}/edit`}
-              className="btn btn-primary btn-sm"
-            >
-              <EditIcon className="h-5 w-5" />
-              Edit
-            </Link>
-          )}
-        </div>
-        <div className="mt-6">
-          <div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Full name</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.name}
-              </dd>
-            </div>
-
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Designation</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.designation}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Reg. No</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.regno} years
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Phone</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.phone}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Email address</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                {getUser.email}
-              </dd>
-            </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-sm font-medium leading-6">Signature</dt>
-              <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0 bg-base-300 w-fit rounded-xl">
-                <img
-                  src={`${API_BASE_URL}/api/upload/single/${getUser.sign}`}
-                  className="object-contain w-auto aspect-square h-48 card mix-blend-darken"
-                  alt={getUser.name}
-                  title="sign"
-                  width={40}
-                  height={40}
-                  loading="lazy"
-                />
-              </dd>
-            </div>
+          <Button
+            as={Link}
+            to={`/dashboard/doctors/${id}/edit`}
+            color="primary"
+            variant="flat"
+          >
+            Edit
+          </Button>
+        </CardHeader>
+        <CardBody className="space-y-2 px-6">
+          <CellValue label="Test Name" value={getUser.name} />
+          <CellValue label="Designation" value={getUser.designation} />
+          <CellValue label="RegNo" value={getUser.regno} />
+          <CellValue label="Email" value={`${getUser.email}`} />
+          <CellValue label="Phone" value={getUser.phone} />
+          <div className="flex justify-end">
+            <Image
+              width={200}
+              height={200}
+              src={`${API_BASE_URL}/api/upload/single/${getUser.sign}`}
+            />
           </div>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
     </>
   );
 };

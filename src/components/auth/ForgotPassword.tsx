@@ -5,9 +5,17 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { ExternalLinkIcon } from "../icons/Icons";
 import { toast } from "sonner";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Input,
+  Link as NextLink,
+} from "@nextui-org/react";
 
 const ForgotPassword = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const formik = useFormik({
     initialValues: {
@@ -15,7 +23,6 @@ const ForgotPassword = () => {
     },
     onSubmit: async (values) => {
       try {
-        setIsSubmitting(true);
         await axios
           .post(`${API_BASE_URL}/api/user/forgot-password/`, {
             id: values.id,
@@ -33,53 +40,51 @@ const ForgotPassword = () => {
       } catch (error: any) {
         toast.error("Error:", error.response.data.error);
         console.log(error.response.data.error);
-      } finally {
-        setIsSubmitting(false);
       }
     },
   });
 
   return (
     <>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            className="mx-auto h-24 w-auto"
-            src="/logo.webp"
-            alt="Shailung"
-          />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight">
-            Forgot Password
-          </h2>
-        </div>
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form>
-            <div>
-              <label htmlFor="id" className="label">
-                <span className="label-text">Email / Phone Number</span>
-              </label>
-              <input
+      <main className="flex h-screen items-center justify-center p-8">
+        <div className="max-w-md mx-auto">
+          <Card className="p-4 min-w-96">
+            <CardHeader className="flex-col">
+              <div className="block text-primary">
+                <span className="sr-only">Home</span>
+                <img
+                  className="mx-auto h-24 w-auto"
+                  src="/logo.webp"
+                  alt="Shailung Polyclinic"
+                />
+              </div>
+              <h1 className="mt-6 text-2xl text-center">Forgot Password</h1>
+            </CardHeader>
+            <CardBody className="flex flex-col gap-3">
+              <Input
                 id="id"
                 type="id"
-                required
+                isRequired
                 onChange={formik.handleChange}
                 value={formik.values.id}
-                className="input input-bordered w-full"
-                disabled={isSent || isSubmitting}
+                isDisabled={isSent || formik.isSubmitting}
+                fullWidth
+                label="Email or Phone"
+                placeholder="Enter your email or phone"
+                variant="bordered"
               />
-              <label className="label">
-                <Link to="/auth/login" className="label-text-alt link">
+              <p className="text-end text-small">
+                <NextLink size="sm" as={Link} to="/auth/login">
                   Back to Login
-                </Link>
-              </label>
-            </div>
-            <div className="mt-6">
-              <button
+                </NextLink>
+              </p>
+            </CardBody>
+            <CardFooter className="mt-6">
+              <Button
                 type="submit"
-                className="btn btn-primary w-full"
-                disabled={isSubmitting}
-                onClick={() => {
-                  if (isSubmitting) return;
+                isDisabled={formik.isSubmitting}
+                onPress={() => {
+                  if (formik.isSubmitting) return;
                   else if (isSent)
                     window.open(
                       "https://mail.google.com/mail/u/0/#inbox",
@@ -87,10 +92,12 @@ const ForgotPassword = () => {
                     );
                   else formik.handleSubmit();
                 }}
+                fullWidth
+                variant="flat"
+                color="primary"
+                isLoading={formik.isSubmitting}
               >
-                {isSubmitting ? (
-                  <span className="loading loading-dots loading-sm"></span>
-                ) : isSent ? (
+                {isSent ? (
                   <>
                     <ExternalLinkIcon className="h-4 w-4" />
                     <span>View Mail</span>
@@ -98,11 +105,11 @@ const ForgotPassword = () => {
                 ) : (
                   "Send Reset Link"
                 )}
-              </button>
-            </div>
-          </form>
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
-      </div>
+      </main>
     </>
   );
 };

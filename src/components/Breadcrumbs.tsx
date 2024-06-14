@@ -1,5 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
-import { SmartHomeIcon } from "./icons/Icons";
+import {
+  Breadcrumbs as NextUiBreadCrumb,
+  BreadcrumbItem,
+} from "@nextui-org/react";
 
 const Breadcrumbs = () => {
   const location = useLocation();
@@ -9,22 +12,13 @@ const Breadcrumbs = () => {
     return { label: segment, link: path };
   });
 
-  //   let lastItem = breadcrumbItems?.slice(-1)[0];
-
   return (
     <>
       <div className="text-sm breadcrumbs select-none items-center cursor-default flex mb-4">
-        <ul>
-          <li>
-            <Link
-              to={"/dashboard"}
-              className="btn btn-sm btn-circle btn-ghost -mr-2"
-            >
-              <SmartHomeIcon className="w-4 h-4" />
-            </Link>
-          </li>
+        <NextUiBreadCrumb variant="solid">
+          <BreadcrumbItem href="/">Home</BreadcrumbItem>
           {breadcrumbItems?.map((item, index) => (
-            <li key={index}>
+            <BreadcrumbItem key={item.label}>
               {index !== breadcrumbItems.length - 1 ? (
                 <>
                   <Link to={item.link}>
@@ -36,9 +30,9 @@ const Breadcrumbs = () => {
                   {item.label.charAt(0).toUpperCase() + item.label.slice(1)}
                 </span>
               )}
-            </li>
+            </BreadcrumbItem>
           ))}
-        </ul>
+        </NextUiBreadCrumb>
       </div>
     </>
   );

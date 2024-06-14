@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
-import {
-  CalendarTimeIcon,
-  DownloadIcon,
-  LeftAngle,
-  RightAngle,
-  SearchIcon,
-  TrashXIcon,
-} from "../../icons/Icons";
+import { ExportTableIcon } from "../../icons/Icons";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { humanReadableDate } from "../user/Users";
 import { TestStatus } from "../../../utils/config";
-import NotFound from "../../NotFound";
 import { toast } from "sonner";
 import { getAllTests } from "../../../functions/get";
 import { isLoggedIn } from "../../../utils/auth";
@@ -20,7 +12,39 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Test } from "../../../interface/interface";
 import { useFormik } from "formik";
-import { IconEdit } from "@tabler/icons-react";
+import {
+  IconCalendarClock,
+  IconDotsVertical,
+  IconDownload,
+  IconPencil,
+  IconSearch,
+  IconTrash,
+} from "@tabler/icons-react";
+import { parseDate } from "@internationalized/date";
+import { getLocalTimeZone, today } from "@internationalized/date";
+import {
+  Button,
+  Chip,
+  DatePicker,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  useDisclosure,
+} from "@nextui-org/react";
 
 export const testStatus = async (testId: any, status: string) => {
   try {
@@ -45,27 +69,19 @@ const Tests = () => {
   const [tests, setTests] = useState<Test[]>([]);
   const { user } = isLoggedIn();
   const [searchQuery, setSearchQuery] = useState("");
-  const offset = 10;
-  const [initialItem, setInitialItem] = useState(0);
-  const [finalItem, setFinalItem] = useState(offset);
   const [selected, setSelected] = useState<Test | null>(null);
-  const [isDelete, setIsDelete] = useState(false);
-  const [isSchedule, setIsSchedule] = useState(false);
-  const [isExport, setIsExport] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const queryStatus = searchParams.get("status");
+  const scheduleTestModal = useDisclosure();
+  const deleteTestModal = useDisclosure();
+  const exportModal = useDisclosure();
 
   useEffect(() => {
     if (user?.role !== "admin" && user?.role !== "member") {
       navigate("/dashboard");
     }
   }, [user]);
-
-  const handleDeleteClick = (test: Test) => {
-    setSelected(test);
-    setIsDelete(true);
-  };
 
   const handleStatusChange = async (test: Test, status: string) => {
     try {
@@ -144,8 +160,6 @@ const Tests = () => {
     }
   };
 
-  // handle sorting
-
   return (
     <>
       <Helmet>
@@ -163,297 +177,271 @@ const Tests = () => {
           href={`https://report.shailungpolyclinic.com/admin/tests`}
         />
       </Helmet>
-      <div className="container mx-auto p-4">
+      <div className="mx-auto">
         <div className="w-full card shadow-xs">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold">Tests</h1>
             <div className="flex gap-2 flex-row-reverse">
-              <Link
+              <Button
+                variant="flat"
+                color="primary"
+                as={Link}
                 to="/dashboard/tests/appointment"
-                className="btn btn-primary btn-sm"
               >
                 New Test
-              </Link>
-              <button
-                className="btn btn-outline btn-sm hover:btn-primary"
-                onClick={() => setIsExport(true)}
-                // onClick={exportToExcel}
-              >
-                Export to Excel
-              </button>
+              </Button>
+
+              <Tooltip content="Export to Excel">
+                <Button
+                  radius="full"
+                  variant="bordered"
+                  data-tip="Export to Excel"
+                  onClick={() => {
+                    exportModal.onOpenChange();
+                  }}
+                  isIconOnly
+                >
+                  <ExportTableIcon className="w-4 h-4" />
+                </Button>
+              </Tooltip>
             </div>
           </div>
           <div className="flex gap-4 my-8 overflow-x-scroll">
-            <Link
-              className={`btn btn-sm ${
-                queryStatus === "all" ? "btn-primary" : "btn-outline"
-              }`}
+            <Chip
+              as={Link}
+              color={queryStatus === "all" ? "primary" : "default"}
+              variant={queryStatus === "all" ? "flat" : "bordered"}
               to={`/dashboard/tests?status=all`}
             >
               All
-            </Link>
+            </Chip>
             {TestStatus.sort((a, b) => (a.value > b.value ? 1 : -1)).map(
               (status, index) => (
-                <Link
+                <Chip
+                  as={Link}
                   key={index}
-                  className={`btn btn-sm  ${
-                    queryStatus === status.value ? "btn-primary" : "btn-outline"
-                  }`}
+                  color={queryStatus === status.value ? "primary" : "default"}
+                  variant={queryStatus === status.value ? "flat" : "bordered"}
                   to={`/dashboard/tests?status=${status.value}`}
                 >
                   {status.label}
-                </Link>
+                </Chip>
               )
             )}
           </div>
           <div className="relative w-full max-w-md mb-4">
-            <input
+            <Input
               type="text"
-              className="input input-bordered ml-1 w-full"
               placeholder={`Search by name, phone, test`}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
               }}
+              value={searchQuery}
+              endContent={<IconSearch size={16} />}
             />
-
-            <button className="absolute top-0 -right-1 rounded-l-none btn btn-primary">
-              <SearchIcon className="w-5 h-5" />
-            </button>
           </div>
 
-          {tests.length > 0 ? (
-            <div className={`w-full card overflow-x-auto overflow-y-hidden`}>
-              <table className="w-full whitespace-no-wrap">
-                <thead>
-                  <tr className="text-xs font-semibold tracking-wide uppercase text-left border-b bg-primary/20">
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Test</th>
-                    <th className="px-4 py-3">Patient</th>
-                    <th className="px-4 py-3">Patient Number</th>
-                    <th className="px-4 py-3">Added By</th>
-                    <th className="px-4 py-3">Added On</th>
-                    <th className="px-4 py-3">Appointment Date</th>
-                    <th className="px-4 py-3">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-primary/10 divide-y">
-                  {tests
-                    .filter((test) => {
-                      return handleSearch(test);
-                    })
-                    .slice(initialItem, finalItem)
-                    .map((test, index) => (
-                      <tr key={index}>
-                        <td className="px-4 py-3 pt-5 text-sm h-full dropdown">
-                          <span
-                            role="button"
-                            tabIndex={0}
-                            className={`badge tooltip tooltip-right ${
+          <Table aria-label="Tests" className="w-full whitespace-no-wrap">
+            <TableHeader>
+              <TableColumn>Status</TableColumn>
+              <TableColumn>Test</TableColumn>
+              <TableColumn>Patient</TableColumn>
+              <TableColumn>Patient Number</TableColumn>
+              <TableColumn>Added By</TableColumn>
+              <TableColumn>Added On</TableColumn>
+              <TableColumn>Appointment Date</TableColumn>
+              <TableColumn>Actions</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent={"No Test to display"}>
+              {tests
+                .filter((test) => {
+                  return handleSearch(test);
+                })
+                .map((test, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Dropdown>
+                        <DropdownTrigger>
+                          <Chip
+                            variant="dot"
+                            // @ts-ignore
+                            color={
                               TestStatus.find(
                                 (status) => status.value === test.status
                               )?.color
-                            }`}
-                            data-tip={
-                              TestStatus.find(
-                                (status) => status.value === test.status
-                              )?.label
                             }
                             onClick={() => {
                               if (test.status === "overdue") {
                                 setSelected(test);
-                                setIsSchedule(true);
+                                scheduleTestModal.onOpenChange();
                               }
                             }}
-                          ></span>
-                          {test.status != "completed" &&
-                            test.status !== "overdue" &&
-                            test.status !== "hold" && (
-                              <select
-                                tabIndex={0}
-                                className="dropdown-content z-[1] menu p-2 select select-bordered shadow bg-base-100 rounded-box w-52"
-                                value={test.status}
-                                onChange={(e) => {
-                                  handleStatusChange(test, e.target.value);
-                                }}
-                              >
-                                {TestStatus.filter(
-                                  (status) =>
-                                    status.value !== "overdue" &&
-                                    status.value !== "hold"
-                                ).map((status, index) => (
-                                  <option key={index} value={status.value}>
-                                    {status.label}
-                                  </option>
-                                ))}
-                              </select>
-                            )}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-nowrap">
-                          {test.testDetail.testData.name}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-nowrap">
-                          {test.testDetail.userData.name}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-nowrap">
-                          {test.testDetail.userData.phone}
-                        </td>
-                        <td className={`px-4 py-3 text-sm text-nowrap`}>
-                          {test.addedby}
-                        </td>
-
-                        <td className="px-4 py-3 text-sm text-nowrap">
-                          {humanReadableDate(test.addeddate)}
-                        </td>
-                        <td className="px-4 py-3 text-sm text-nowrap">
-                          {test.appointmentdate
-                            ? humanReadableDate(test.appointmentdate)
-                            : "Not Scheduled"}
-                        </td>
-                        <td className="px-4 py-3 text-sm modify justify-end flex gap-2">
-                          {test.status !== "completed" &&
-                            test.status !== "cancelled" &&
-                            test.status !== "hold" && (
-                              <button
-                                className={`btn btn-sm btn-circle hover:btn-outline tooltip flex ${
-                                  test.appointmentdate
-                                    ? "tooltip-warning btn-ghost"
-                                    : "tooltip-info"
-                                } items-center justify-center`}
-                                aria-label="Schedule"
-                                data-tip={`${
-                                  test.appointmentdate ||
-                                  test.status === "overdue"
-                                    ? "Re"
-                                    : ""
-                                }Schedule Date`}
-                                onClick={() => {
-                                  setSelected(test);
-                                  setIsSchedule(true);
-                                }}
-                              >
-                                <CalendarTimeIcon className="w-4 h-4 button" />
-                              </button>
-                            )}
-
-                          {test.status === "completed" && (
-                            <Link
-                              to={`/report/${test.reportId}/download`}
-                              className="btn btn-sm btn-circle btn-ghost flex items-center justify-center tooltip tooltip-success"
-                              data-tip="Download"
+                          >
+                            {test.status}
+                          </Chip>
+                        </DropdownTrigger>
+                        {test.status != "completed" &&
+                          test.status !== "overdue" &&
+                          test.status !== "hold" && (
+                            <DropdownMenu aria-label="Test Status">
+                              {TestStatus.filter(
+                                (status) =>
+                                  status.value !== "overdue" &&
+                                  status.value !== "hold"
+                              ).map((status, index) => (
+                                <DropdownItem
+                                  key={index}
+                                  onClick={() => {
+                                    handleStatusChange(test, status.value);
+                                  }}
+                                >
+                                  {status.label}
+                                </DropdownItem>
+                              ))}
+                            </DropdownMenu>
+                          )}
+                      </Dropdown>
+                    </TableCell>
+                    <TableCell>{test.testDetail.testData.name}</TableCell>
+                    <TableCell>{test.testDetail.userData.name}</TableCell>
+                    <TableCell>{test.testDetail.userData.phone}</TableCell>
+                    <TableCell>{test.addedby}</TableCell>
+                    <TableCell>{humanReadableDate(test.addeddate)}</TableCell>
+                    <TableCell>
+                      {test.appointmentdate
+                        ? humanReadableDate(test.appointmentdate)
+                        : "Not Scheduled"}
+                    </TableCell>
+                    <TableCell className="flex items-center">
+                      {(test.status !== "cancelled" ||
+                        user?.role === "admin") && (
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <Button
+                              variant="light"
+                              isIconOnly
+                              radius="full"
+                              aria-label="Actions"
+                              size="sm"
                             >
-                              <DownloadIcon className="w-4 h-4" />
-                            </Link>
-                          )}
-                          {test.status === "hold" && (
-                            <Link
-                              to={`/dashboard/tests/complete/report/${test._id}`}
-                              className="btn btn-sm btn-circle btn-ghost flex items-center justify-center tooltip tooltip-success"
-                              data-tip="Edit"
+                              <IconDotsVertical size={16} />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu
+                            aria-label="Test Actions"
+                            disabledKeys={
+                              test.status === "completed" ||
+                              test.status === "cancelled"
+                                ? ["schedule", "edit"]
+                                : test.status === "hold"
+                                ? ["schedule"]
+                                : ["edit"]
+                            }
+                          >
+                            <DropdownItem
+                              className={`${
+                                test.status === "hold" ? "" : "hidden"
+                              }`}
+                              key="edit"
+                              startContent={<IconPencil size={16} />}
+                              onClick={() => {
+                                navigate(
+                                  `/dashboard/tests/complete/report/${test._id}`
+                                );
+                              }}
+                              textValue="Edit Test"
                             >
-                              <IconEdit className="w-4 h-4" stroke={1} />
-                            </Link>
-                          )}
-                          {user?.role === "admin" && (
-                            <>
-                              <div className="divider divider-horizontal mx-0"></div>
-                              <button
-                                className="btn btn-sm btn-circle btn-ghost hover:btn-outline tooltip flex tooltip-error items-center justify-center"
-                                aria-label="Delete"
-                                onClick={() => handleDeleteClick(test)}
-                                data-tip="Delete"
-                              >
-                                <TrashXIcon className="w-4 h-4 button" />
-                              </button>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  <tr className="bg-primary/20">
-                    <td className="px-4 py-3 text-sm" colSpan={7}>
-                      Showing {initialItem + 1}-{finalItem} of{" "}
-                      {
-                        tests.filter((test) => {
-                          return handleSearch(test);
-                        }).length
-                      }
-                    </td>
-                    <td className="px-4 py-3 text-sm flex justify-end">
-                      <button
-                        className="btn btn-sm btn-ghost btn-circle"
-                        aria-label="Previous"
-                        onClick={() => {
-                          if (initialItem > 0) {
-                            setInitialItem(initialItem - offset);
-                            setFinalItem(finalItem - offset);
-                          }
-                        }}
-                      >
-                        <LeftAngle className="w-4 h-4 fill-current" />
-                      </button>
-                      <button
-                        className="btn btn-sm btn-ghost btn-circle"
-                        aria-label="Next"
-                        onClick={() => {
-                          if (finalItem < tests.length) {
-                            setInitialItem(initialItem + offset);
-                            setFinalItem(finalItem + offset);
-                          }
-                        }}
-                      >
-                        <RightAngle className="w-4 h-4 fill-current" />
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <NotFound message="No tests found" />
-          )}
+                              Edit Test
+                            </DropdownItem>
+                            <DropdownItem
+                              className={`${
+                                test.status === "completed" ? "" : "hidden"
+                              }`}
+                              key="download"
+                              startContent={<IconDownload size={16} />}
+                              onClick={() => {
+                                navigate(`/report/${test.reportId}/download`);
+                              }}
+                              textValue="Download Report"
+                            >
+                              Download Report
+                            </DropdownItem>
+                            <DropdownItem
+                              className={`${
+                                test.status === "completed" ||
+                                test.status === "cancelled" ||
+                                test.status === "hold"
+                                  ? "hidden"
+                                  : ""
+                              }`}
+                              key={"schedule"}
+                              onClick={() => {
+                                setSelected(test);
+                                scheduleTestModal.onOpenChange();
+                              }}
+                              startContent={<IconCalendarClock size={16} />}
+                              textValue="Schedule Date"
+                            >
+                              {test.appointmentdate || test.status === "overdue"
+                                ? "Re-"
+                                : ""}
+                              Schedule Date
+                            </DropdownItem>
+                            <DropdownItem
+                              className={`text-danger ${
+                                user?.role === "admin" ? "" : "hidden"
+                              }`}
+                              key="delete"
+                              color="danger"
+                              startContent={<IconTrash size={16} />}
+                              onClick={() => {
+                                setSelected(test);
+                                deleteTestModal.onOpenChange();
+                              }}
+                              textValue="Delete Test"
+                            >
+                              Delete Test
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
-      {(selected && isDelete && (
-        <DeleteModal
-          test={selected}
-          onClose={() => {
-            setSelected(null);
-            setIsDelete(false);
-          }}
-          setTests={setTests}
-        />
-      )) ||
-        (selected && isSchedule && (
-          <ScheduleModal
+      <>
+        {selected && (
+          <DeleteModal
             test={selected}
-            onClose={() => {
-              setSelected(null);
-              setIsSchedule(false);
-            }}
+            deleteTestModal={deleteTestModal}
             setTests={setTests}
           />
-        ))}
-      {isExport && (
-        <ExportModal
-          tests={tests}
-          onClose={() => {
-            setIsExport(false);
-          }}
+        )}
+      </>
+      {selected && (
+        <ScheduleModal
+          test={selected}
+          setTests={setTests}
+          scheduleTestModal={scheduleTestModal}
         />
       )}
+      <ExportModal tests={tests} exportModal={exportModal} />
     </>
   );
 };
 
 interface ExportModalProps {
   tests: Test[];
-  onClose: () => void;
+  exportModal: any;
 }
 interface FormValues {
   testIds: string[];
 }
 
-const ExportModal = ({ tests, onClose }: ExportModalProps) => {
+const ExportModal = ({ tests, exportModal }: ExportModalProps) => {
   const formik = useFormik<FormValues>({
     initialValues: {
       testIds: [],
@@ -472,7 +460,6 @@ const ExportModal = ({ tests, onClose }: ExportModalProps) => {
             responseType: "blob",
           }
         );
-        console.log(response.data);
         const blob = new Blob([response.data], {
           type: response.headers["content-type"],
         });
@@ -489,8 +476,8 @@ const ExportModal = ({ tests, onClose }: ExportModalProps) => {
           toast.success("Tests exported successfully", {
             id: "exporting-tests",
           });
-          onClose();
         }, 2000);
+        exportModal.onClose();
       } catch (error) {
         console.log(error);
       }
@@ -499,35 +486,37 @@ const ExportModal = ({ tests, onClose }: ExportModalProps) => {
 
   return (
     <>
-      <div
-        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
-        role="dialog"
+      <Modal
+        isOpen={exportModal.isOpen}
+        onOpenChange={exportModal.onOpenChange}
+        backdrop="blur"
+        scrollBehavior="inside"
       >
-        <div className="modal-box w-full sm:max-w-sm">
-          <h3 className="font-bold text-lg text-center">Export Tests</h3>
-          <div className="py-4 max-h-48 overflow-y-scroll">
-            {/* checkbox to select all */}
-            <div className="form-control">
-              <label className="label cursor-pointer">
-                <span className="label-text">Select All</span>
-                <input
-                  type="checkbox"
-                  className="checkbox"
-                  name="selectAll"
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      formik.setFieldValue(
-                        "testIds",
-                        tests.map((test) => test._id)
-                      );
-                    } else {
-                      formik.setFieldValue("testIds", []);
-                    }
-                  }}
-                  checked={formik.values.testIds.length === tests.length}
-                />
-              </label>
-            </div>
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1 pb-0">
+            <p>Export Tests</p>
+            <label className="label cursor-pointer">
+              <span className="label-text">Select All</span>
+              <input
+                type="checkbox"
+                className="checkbox"
+                name="selectAll"
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    formik.setFieldValue(
+                      "testIds",
+                      tests.map((test) => test._id)
+                    );
+                  } else {
+                    formik.setFieldValue("testIds", []);
+                  }
+                }}
+                checked={formik.values.testIds.length === tests.length}
+              />
+            </label>
+            <div className="divider my-0"></div>
+          </ModalHeader>
+          <ModalBody className="gap-0">
             {tests
               .sort((a, b) =>
                 a.testDetail.userData.name.localeCompare(
@@ -551,42 +540,47 @@ const ExportModal = ({ tests, onClose }: ExportModalProps) => {
                   </label>
                 </div>
               ))}
-          </div>
-          <div className="modal-action flex flex-col xs:flex-row">
-            <button
-              className="btn btn-info flex-1"
+          </ModalBody>
+          <ModalFooter className="flex-col-reverse sm:flex-row">
+            <Button
+              fullWidth
+              onClick={() => {
+                exportModal.onClose();
+              }}
+              isDisabled={formik.isSubmitting}
+            >
+              Close!
+            </Button>
+            <Button
+              color="primary"
+              variant="flat"
               type="submit"
+              fullWidth
               onClick={() => {
                 formik.handleSubmit();
                 toast.success("Exporting tests", {
                   id: "exporting-tests",
                 });
               }}
+              isLoading={formik.isSubmitting}
+              isDisabled={formik.isSubmitting}
             >
               Export
-            </button>
-            <button
-              className="btn flex-1"
-              onClick={() => {
-                onClose();
-              }}
-            >
-              Close!
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
 
 interface DeleteModalProps {
   test: Test;
-  onClose: () => void;
   setTests: any;
+  deleteTestModal: any;
 }
 
-const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
+const DeleteModal = ({ test, setTests, deleteTestModal }: DeleteModalProps) => {
   const [processing, setProcessing] = useState(false);
   const handleDelete = async () => {
     setProcessing(true);
@@ -605,7 +599,7 @@ const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
       }
       fetchTests();
       toast.success("Test deleted successfully");
-      onClose();
+      deleteTestModal.onClose();
     } catch (err) {
       console.log(err);
       toast.error("Failed to delete test");
@@ -620,134 +614,171 @@ const DeleteModal = ({ test, onClose, setTests }: DeleteModalProps) => {
 
   return (
     <>
-      <div
-        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
-        role="dialog"
+      <Modal
+        isOpen={deleteTestModal.isOpen}
+        onOpenChange={deleteTestModal.onOpenChange}
+        backdrop="blur"
       >
-        <div className="modal-box w-full sm:max-w-sm">
-          <h3 className="font-bold text-lg text-center">
-            Delete {test.testDetail.userData.name}'s{" "}
-            {test.testDetail.testData.name}
-          </h3>
-          <p className="py-4">
-            Are you sure you want to delete this test? This action cannot be
-            undone.
-          </p>
-          <div className="modal-action flex flex-col xs:flex-row gap-2">
-            <button
-              className="btn btn-error flex-1"
-              onClick={() => handleDelete()}
-              disabled={processing}
-            >
-              {processing ? (
-                <span className="loading loading-dots loading-sm"></span>
-              ) : (
-                "Delete"
-              )}
-            </button>
-            <button
-              className="btn flex-1"
-              onClick={onClose}
-              disabled={processing}
-            >
-              Close!
-            </button>
-          </div>
-        </div>
-      </div>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                <p>
+                  Are you sure you want to delete{" "}
+                  {test?.testDetail.testData.name}
+                </p>
+              </ModalHeader>
+              <ModalBody></ModalBody>
+              <ModalFooter className="flex-col-reverse sm:flex-row">
+                <Button
+                  color="default"
+                  fullWidth
+                  variant="flat"
+                  onPress={onClose}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  fullWidth
+                  onPress={() => {
+                    handleDelete();
+                  }}
+                  isLoading={processing}
+                  isDisabled={processing}
+                >
+                  Delete Test
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 };
 
 interface ScheduleModalProps {
   test: Test;
-  onClose: () => void;
   setTests: any;
+  scheduleTestModal: any;
 }
 
-const ScheduleModal = ({ test, onClose, setTests }: ScheduleModalProps) => {
-  const [searchParams] = useSearchParams();
-  const queryStatus = searchParams.get("status");
-
-  const [date, setDate] = useState<string>("");
-  const [processing, setProcessing] = useState(false);
-  const handleSchedule = async () => {
-    setProcessing(true);
-    try {
-      if (test.status === "overdue") {
-        await testStatus(test._id, "confirmed");
+const ScheduleModal = ({
+  test,
+  setTests,
+  scheduleTestModal,
+}: ScheduleModalProps) => {
+  const formik = useFormik({
+    initialValues: {
+      appointmentdate: test.appointmentdate.split("T")[0],
+    },
+    validate: (values) => {
+      const errors: any = {};
+      if (!values.appointmentdate) {
+        errors.appointmentdate = "Please select a date";
+      } else if (
+        today(getLocalTimeZone()) > parseDate(values.appointmentdate)
+      ) {
+        errors.appointmentdate = "Please select a date in the future";
       }
-      await axios.put(
-        `${API_BASE_URL}/api/test/schedule/${test._id}`,
-        {
-          appointmentdate: date,
-        },
-        {
+      return errors;
+    },
+    onSubmit: async (values) => {
+      try {
+        if (test.status === "overdue") {
+          await testStatus(test._id, "confirmed");
+        }
+        await axios.put(
+          `${API_BASE_URL}/api/test/schedule/${test._id}`,
+          {
+            appointmentdate: values.appointmentdate,
+          },
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        toast.success("Appointment Scheduled Successfully");
+        scheduleTestModal.onClose();
+      } catch (err) {
+        toast.error("Failed to Schedule Appointment");
+        console.log(err);
+      } finally {
+        const response = await axios.get(`${API_BASE_URL}/api/test/my`, {
           headers: {
             Authorization: `${localStorage.getItem("token")}`,
           },
-        }
-      );
-      toast.message("Appointment scheduled successfully", {
-        description: `On ${date}`,
-      });
-    } catch (err) {
-      toast.error("Failed to schedule appointment");
-      console.log(err);
-    } finally {
-      const data = await getAllTests(queryStatus);
-      setTests(data);
-      onClose();
-      setProcessing(false);
-    }
-  };
+        });
+        const data = response.data;
+        setTests(data.reverse());
+      }
+    },
+  });
 
   return (
-    <>
-      <div
-        className="modal modal-open modal-bottom xs:modal-middle backdrop-blur-sm"
-        role="dialog"
+    <Modal
+      isOpen={scheduleTestModal.isOpen}
+      onOpenChange={scheduleTestModal.onOpenChange}
+      backdrop="blur"
+    >
+      <ModalContent
+        as="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          formik.handleSubmit();
+        }}
       >
-        <div className="modal-box w-full sm:max-w-sm">
-          <h3 className="font-bold text-lg text-center">
-            Schedule {test.testDetail.userData.name}'s{" "}
-            {test.testDetail.testData.name}
-          </h3>
-          <p className="py-4">
-            <input
-              type="date"
-              className="input input-bordered w-full"
-              placeholder="Select Date"
-              min={new Date().toISOString().split("T")[0]}
-              onChange={(e) => {
-                setDate(e.target.value);
-              }}
-            />
-          </p>
-          <div className="modal-action flex flex-col xs:flex-row gap-2">
-            <button
-              className="btn btn-info flex-1"
-              type="submit"
-              disabled={processing || !date}
-              onClick={() => handleSchedule()}
-            >
-              {processing ? (
-                <span className="loading loading-dots loading-sm"></span>
-              ) : (
-                "Schedule"
-              )}
-            </button>
-            <button
-              className="btn flex-1"
-              onClick={onClose}
-              disabled={processing}
-            >
-              Close!
-            </button>
-          </div>
-        </div>
-      </div>
-    </>
+        {(onClose) => (
+          <>
+            <ModalHeader>
+              <p>
+                Reschedule your appointment for {test?.testDetail.testData.name}
+              </p>
+            </ModalHeader>
+            <ModalBody>
+              <DatePicker
+                fullWidth
+                isRequired
+                aria-label="Select Date"
+                label="Select Date"
+                value={parseDate(formik.values.appointmentdate)}
+                // minValue={today(getLocalTimeZone())}
+                // set minvalue to a day before today
+                minValue={today(getLocalTimeZone())}
+                onChange={(date) => {
+                  formik.setFieldValue("appointmentdate", date.toString());
+                }}
+                isInvalid={formik.errors.appointmentdate ? true : false}
+                errorMessage={formik.errors.appointmentdate}
+              />
+            </ModalBody>
+            <ModalFooter className="flex-col-reverse sm:flex-row">
+              <Button
+                color="default"
+                fullWidth
+                variant="flat"
+                onPress={onClose}
+              >
+                Cancel
+              </Button>
+              <Button
+                color="primary"
+                variant="flat"
+                type="submit"
+                isLoading={formik.isSubmitting}
+                isDisabled={formik.isSubmitting}
+                fullWidth
+              >
+                Reschedule
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   );
 };
 
