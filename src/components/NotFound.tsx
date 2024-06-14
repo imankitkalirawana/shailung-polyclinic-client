@@ -2,7 +2,7 @@ import React from "react";
 import { FaceErrorIcon } from "./icons/Icons";
 
 interface NotFoundProps {
-  message: string;
+  message?: string;
 }
 
 const NotFound: React.FC<NotFoundProps> = ({ message }) => {

@@ -262,7 +262,9 @@ const Download = () => {
                                 <h3 className="text-xs font-semibold">
                                   Test Information:
                                 </h3>
-                                <p className="text-xs">{report?.summary}</p>
+                                <p className="text-xs whitespace-pre-wrap">
+                                  {report?.summary}
+                                </p>
                               </div>
                             )}
                             <footer className="absolute bottom-24 left-[50%] translate-x-[-50%]">

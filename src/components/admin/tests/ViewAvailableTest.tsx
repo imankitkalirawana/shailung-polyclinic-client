@@ -75,6 +75,7 @@ const ViewAvailableTest = () => {
           )}
         </CardHeader>
         <CardBody className="space-y-2 px-6">
+          <CellValue label="Test Unique ID" value={test.uniqueid || "-"} />
           <CellValue label="Test Name" value={test.name} />
           <CellValue
             className={"hidden sm:flex justify-between"}

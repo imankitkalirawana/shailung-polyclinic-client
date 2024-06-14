@@ -8,7 +8,7 @@ import { API_BASE_URL } from "../../utils/config";
 import { isLoggedIn } from "../../utils/auth";
 import { Helmet } from "react-helmet-async";
 import { calculateAge } from "../../functions/agecalculator";
-import { User } from "../../interface/interface";
+import { AvailableTest, User } from "../../interface/interface";
 import { parseDate } from "@internationalized/date";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
@@ -37,6 +37,7 @@ import {
   CardBody,
   CardFooter,
 } from "@nextui-org/react";
+import test from "node:test";
 
 interface Tests {
   _id: string;
@@ -55,6 +56,7 @@ const New = () => {
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user");
   const isPhone = searchParams.get("phone");
+  const [searchQuery, setSearchQuery] = useState("");
   const confirmModal = useDisclosure();
 
   useEffect(() => {
@@ -201,6 +203,19 @@ const New = () => {
     }
   };
 
+  const handleSearch = (test: any) => {
+    if (searchQuery === "") return true;
+    if (
+      (test.name &&
+        test.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (test.uniqueid &&
+        test.uniqueid.toLowerCase().includes(searchQuery.toLowerCase()))
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <>
       <Helmet>
@@ -318,6 +333,7 @@ const New = () => {
                   variant="bordered"
                   value={formik.values.name}
                   onChange={formik.handleChange}
+                  isRequired
                 />
               </div>
               <div className="col-span-2">
@@ -342,6 +358,7 @@ const New = () => {
                   label="Patient Age"
                   placeholder="Patient Age"
                   variant="bordered"
+                  isRequired
                   // @ts-ignore
                   value={formik.values.age}
                   onChange={formik.handleChange}
@@ -366,44 +383,60 @@ const New = () => {
                 />
               </div>
               <div className="form-control col-span-2">
-                <label className="label">
-                  <span className="label-text">Select Tests</span>
-                </label>
-                <div className="max-h-36 overflow-y-scroll">
-                  {tests
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map((test, index) => (
-                      <div
-                        className="flex items-center justify-between"
-                        key={index}
-                      >
-                        <Checkbox
-                          name="testids"
-                          value={test._id}
-                          onChange={formik.handleChange}
-                        >
-                          <span className="w flex whitespace-nowrap text-ellipsis max-w-[280px] sm:max-w-[400px] overflow-hidden">
-                            {test.name}
-                          </span>
-                        </Checkbox>
-                        <Button
-                          variant="flat"
-                          size="sm"
-                          isIconOnly
-                          radius="full"
-                          onClick={() => fetchSelectedTest(test._id)}
-                        >
-                          <IconInfoCircleFilled
-                            className={`${
-                              selectedTest._id === test._id
-                                ? "text-info"
-                                : "text-gray-500"
-                            } h-6 w-6`}
-                          />
-                        </Button>
-                      </div>
-                    ))}
-                </div>
+                <Input
+                  type="text"
+                  placeholder="Search Tests By Name, Unique ID"
+                  variant="bordered"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {tests.filter((test) => handleSearch(test)).length < 1 ? (
+                  <p className="text-sm mt-4 text-center text-gray-500">
+                    No tests available
+                  </p>
+                ) : (
+                  <>
+                    <label className="label">
+                      <span className="label-text">Select Tests</span>
+                    </label>
+                    <div className="max-h-36 overflow-y-scroll">
+                      {tests
+                        .filter((test) => handleSearch(test))
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((test, index) => (
+                          <div
+                            className="flex items-center justify-between"
+                            key={index}
+                          >
+                            <Checkbox
+                              name="testids"
+                              value={test._id}
+                              onChange={formik.handleChange}
+                            >
+                              <span className="w flex whitespace-nowrap text-ellipsis max-w-[280px] sm:max-w-[400px] overflow-hidden">
+                                {test.name}
+                              </span>
+                            </Checkbox>
+                            <Button
+                              variant="flat"
+                              size="sm"
+                              isIconOnly
+                              radius="full"
+                              onClick={() => fetchSelectedTest(test._id)}
+                            >
+                              <IconInfoCircleFilled
+                                className={`${
+                                  selectedTest._id === test._id
+                                    ? "text-info"
+                                    : "text-gray-500"
+                                } h-6 w-6`}
+                              />
+                            </Button>
+                          </div>
+                        ))}
+                    </div>
+                  </>
+                )}
               </div>
               {selectedTest && selectedTest.name && (
                 <Card

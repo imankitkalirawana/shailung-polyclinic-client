@@ -43,6 +43,7 @@ import {
 
 interface Test {
   _id: string;
+  uniqueid: string;
   name: string;
   description: string;
   price: number;
@@ -123,12 +124,9 @@ const AvailableTests = () => {
             selectionMode="single"
           >
             <TableHeader>
-              <TableColumn allowsSorting key="status">
-                Status
-              </TableColumn>
-              <TableColumn allowsSorting key="name">
-                Name
-              </TableColumn>
+              <TableColumn key="status">Status</TableColumn>
+              <TableColumn key="uniqueid">Unique ID</TableColumn>
+              <TableColumn key="name">Name</TableColumn>
               <TableColumn key="price">Price</TableColumn>
               <TableColumn key="duration">Duration</TableColumn>
               <TableColumn key="date">Added On</TableColumn>
@@ -147,6 +145,7 @@ const AvailableTests = () => {
                       {test.status}
                     </Chip>
                   </TableCell>
+                  <TableCell>{test.uniqueid || "-"}</TableCell>
                   <TableCell>{test.name}</TableCell>
                   <TableCell>{test.price}</TableCell>
                   <TableCell>{test.duration}</TableCell>
@@ -275,6 +274,7 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
   const formik = useFormik({
     initialValues: {
       name: "",
+      uniqueid: "",
       description: "",
       price: "",
       duration: "",
@@ -341,6 +341,15 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">New Service</ModalHeader>
           <ModalBody>
+            <Input
+              type="text"
+              name="uniqueid"
+              id="uniqueid"
+              label="Unique Test ID"
+              placeholder="eg: 001"
+              onChange={formik.handleChange}
+              value={formik.values.uniqueid}
+            />
             <Input
               type="text"
               name="name"

@@ -52,6 +52,7 @@ export interface User {
 
 export interface AvailableTest {
   _id: string;
+  uniqueid: string;
   name: string;
   description: string;
   price: number;

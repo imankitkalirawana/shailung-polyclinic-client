@@ -57,6 +57,7 @@ const EditAvailableTest = () => {
   const formik = useFormik({
     initialValues: {
       _id: "",
+      uniqueid: "",
       name: "",
       description: "",
       price: "0",
@@ -141,6 +142,17 @@ const EditAvailableTest = () => {
             </Button>
           </div>
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+            <div className="col-span-6 sm:col-span-2">
+              <Input
+                type="text"
+                name="uniqueid"
+                id="uniqueid"
+                label="Unique Test ID"
+                placeholder="eg: 001"
+                onChange={formik.handleChange}
+                value={formik.values.uniqueid}
+              />
+            </div>
             <div className="col-span-6 sm:col-span-2">
               <Input
                 type="text"
