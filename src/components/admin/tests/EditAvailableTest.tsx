@@ -25,6 +25,28 @@ import {
   TableRow,
   Textarea,
 } from "@nextui-org/react";
+import FormTable from "./FormTable";
+import DynamicTable from "./Table";
+
+interface AvailableTest {
+  _id: string;
+  uniqueid: string;
+  name: string;
+  description: string;
+  price: number;
+  duration: string;
+  status: string;
+  addeddate: string;
+  updatedat: string;
+  doctors: string[];
+  summary: string;
+  tableref: string;
+  testProps: [
+    {
+      [key: string]: any;
+    }
+  ];
+}
 
 const EditAvailableTest = () => {
   const { user } = isLoggedIn();
@@ -51,6 +73,7 @@ const EditAvailableTest = () => {
       const res2 = await getAllDoctors();
       setDoctors(res2);
     };
+
     fetchUser();
   }, []);
 
@@ -65,6 +88,7 @@ const EditAvailableTest = () => {
       status: "active",
       doctors: [] as string[],
       summary: "",
+      tableref: "",
       testProps: Array.from({ length: 1 }, () => ({
         investigation: "",
         referenceValue: "",
@@ -94,25 +118,20 @@ const EditAvailableTest = () => {
     },
   });
 
-  const addNewRow = () => {
-    formik.setValues((prevValues) => ({
-      ...prevValues,
-      testProps: [
-        ...prevValues.testProps,
+  const handleTableSubmit = async (values: any) => {
+    try {
+      const response = await axios.put(
+        `${API_BASE_URL}/api/service/${formik.values.tableref}`,
         {
-          investigation: "",
-          referenceValue: "",
-          unit: "",
-        },
-      ],
-    }));
-  };
-
-  const removeRow = (index: number) => {
-    formik.setValues((prevValues) => ({
-      ...prevValues,
-      testProps: prevValues.testProps.filter((_, i) => i !== index),
-    }));
+          data: values,
+        }
+      );
+      toast.success("Data submitted successfully");
+      console.log("Data submitted successfully:", response.data);
+    } catch (error) {
+      toast.error("Failed to submit data");
+      console.error("Error submitting data:", error);
+    }
   };
 
   return (
@@ -254,7 +273,8 @@ const EditAvailableTest = () => {
             </div>
           </div>
         </Card>
-        <Card className="mt-8">
+      </form>
+      {/* <Card className="mt-8">
           <CardHeader className="justify-between">
             <h2
               className="text-base font-semibold leading-7 text-base-content"
@@ -335,8 +355,18 @@ const EditAvailableTest = () => {
               </TableBody>
             </Table>
           </CardBody>
-        </Card>
-      </form>
+        </Card> */}
+
+      <Card className="mt-8 p-4">
+        {formik.values.tableref && (
+          <FormTable
+            tableid={formik.values.tableref}
+            // onSubmit={}
+            onSubmit={handleTableSubmit}
+          />
+          // <DynamicTable tableid={formik.values.tableref} />
+        )}
+      </Card>
     </>
   );
 };

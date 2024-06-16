@@ -12,11 +12,18 @@ import {
   CardHeader,
   Input,
 } from "@nextui-org/react";
+import { useEffect } from "react";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get("token");
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/auth/forgot-password");
+    }
+  }, []);
 
   const formik = useFormik({
     initialValues: {

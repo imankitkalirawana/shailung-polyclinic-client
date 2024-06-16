@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { humanReadableDate } from "../user/Users";
 import { toast } from "sonner";
@@ -40,6 +40,7 @@ import {
   IconPencil,
   IconTrash,
 } from "@tabler/icons-react";
+import FormTable from "./FormTable";
 
 interface Test {
   _id: string;
@@ -251,6 +252,8 @@ interface AddTestProps {
 }
 
 const AddTest = ({ newServiceModal }: AddTestProps) => {
+  const formTableRef = useRef(null);
+
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -280,23 +283,22 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
       duration: "",
       summary: "",
       doctors: [] as string[],
-      testProps: Array.from({ length: 1 }, () => ({
-        investigation: "",
-        referenceValue: "",
-        unit: "",
-      })),
+      tableref: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
-        await axios.post(`${API_BASE_URL}/api/available-test/`, values, {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        });
-        toast.success("Test added successfully");
-        newServiceModal.onClose();
-        navigate(0);
+        await axios
+          .post(`${API_BASE_URL}/api/available-test/`, values, {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          })
+          .then(() => {
+            toast.success("Test added successfully");
+            newServiceModal.onClose();
+            navigate(0);
+          });
       } catch (error: any) {
         toast.error(error.response.data.error);
         console.log(error);
@@ -304,25 +306,24 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
     },
   });
 
-  const addNewRow = () => {
-    formik.setValues((prevValues) => ({
-      ...prevValues,
-      testProps: [
-        ...prevValues.testProps,
-        {
-          investigation: "",
-          referenceValue: "",
-          unit: "",
-        },
-      ],
-    }));
+  const handleTableSubmit = async (values: any) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/service`, {
+        data: values,
+      });
+      toast.success("Data submitted successfully");
+      console.log("Data submitted successfully:", response.data);
+    } catch (error: any) {
+      toast.error("Error submitting data");
+      console.error("Error submitting data:", error);
+    }
   };
 
-  const removeRow = (index: number) => {
-    formik.setValues((prevValues) => ({
-      ...prevValues,
-      testProps: prevValues.testProps.filter((_, i) => i !== index),
-    }));
+  const handleAddService = () => {
+    formTableRef.current.submitForm().then((res) => {
+      console.log("Form submitted successfully:", res);
+      formik.handleSubmit();
+    });
   };
 
   return (
@@ -331,16 +332,17 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
         isOpen={newServiceModal.isOpen}
         onOpenChange={newServiceModal.onOpenChange}
         backdrop="blur"
+        size="5xl"
         scrollBehavior="inside"
         as="form"
         onSubmit={(e) => {
           e.preventDefault();
-          formik.handleSubmit();
+          handleAddService();
         }}
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">New Service</ModalHeader>
-          <ModalBody>
+          <ModalBody className="grid sm:grid-cols-2">
             <Input
               type="text"
               name="uniqueid"
@@ -361,16 +363,6 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
               value={formik.values.name}
               isInvalid={formik.touched.name && !!formik.errors.name}
               errorMessage={formik.errors.name}
-            />
-
-            <Textarea
-              name="description"
-              id="description"
-              label="Description"
-              placeholder="eg: Done on Automated Chemiluminescence ANALYER By CLA Method"
-              description="This will be displayed on top of the investigation report table in the report. (Just after the patient details)"
-              onChange={formik.handleChange}
-              value={formik.values.description}
             />
 
             <Input
@@ -394,6 +386,15 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
               placeholder="eg: 1hr 30mins"
               onChange={formik.handleChange}
               value={formik.values.duration}
+            />
+            <Textarea
+              name="description"
+              id="description"
+              label="Description"
+              placeholder="eg: Done on Automated Chemiluminescence ANALYER By CLA Method"
+              description="This will be displayed on top of the investigation report table in the report. (Just after the patient details)"
+              onChange={formik.handleChange}
+              value={formik.values.description}
             />
 
             <Textarea
@@ -429,77 +430,8 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
               <div className="text-danger">{formik.errors.doctors}</div>
             )}
 
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text">Test Properties</span>
-                <Tooltip content="Add new row" color="primary">
-                  <Button
-                    isIconOnly
-                    variant="flat"
-                    radius="full"
-                    type="button"
-                    onClick={addNewRow}
-                  >
-                    <PlusIcon className="w-5 h-5" />
-                  </Button>
-                </Tooltip>
-              </label>
-              <Table removeWrapper aria-label="Investigation table">
-                <TableHeader>
-                  <TableColumn key={"investigation"}>Investigation</TableColumn>
-                  <TableColumn key={"reference-value"}>
-                    Reference Value
-                  </TableColumn>
-                  <TableColumn key={"unit"}>Unit</TableColumn>
-                </TableHeader>
-                <TableBody>
-                  {formik.values.testProps.map((testProp, index) => (
-                    <TableRow key={index}>
-                      <TableCell className="p-1">
-                        <Textarea
-                          type="text"
-                          name={`testProps[${index}].investigation`}
-                          id="investigation"
-                          placeholder="Hemoglobin"
-                          onChange={formik.handleChange}
-                          value={testProp.investigation}
-                        />
-                      </TableCell>
-                      <TableCell className="p-1">
-                        <Textarea
-                          name={`testProps[${index}].referenceValue`}
-                          id="referenceValue"
-                          placeholder="13.0 - 17.0"
-                          onChange={formik.handleChange}
-                          value={testProp.referenceValue}
-                        />
-                      </TableCell>
-                      <TableCell className="flex p-1 items-center">
-                        <Textarea
-                          type="text"
-                          name={`testProps[${index}].unit`}
-                          id="unit"
-                          placeholder="g/dL"
-                          onChange={formik.handleChange}
-                          value={testProp.unit}
-                        />
-                        {formik.values.testProps.length > 1 && (
-                          <Button
-                            isIconOnly
-                            radius="full"
-                            variant="light"
-                            type="button"
-                            onClick={() => removeRow(index)}
-                            className="opacity-0 mr-1 group-hover:opacity-100"
-                          >
-                            <XIcon className="w-5 h-5" />
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div className="form-control col-span-full">
+              <FormTable onSubmit={handleTableSubmit} />
             </div>
           </ModalBody>
           <ModalFooter className="flex-col-reverse sm:flex-row">

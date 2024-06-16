@@ -34,6 +34,7 @@
     "react-helmet-async": "^2.0.4",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.22.3",
+    "rowstack": "^0.0.25",
     "sonner": "^1.4.41",
     "xlsx": "^0.18.5",
     "yarn": "^1.22.22",

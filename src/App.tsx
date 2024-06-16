@@ -119,6 +119,7 @@ function App() {
                     <Route
                       path="tests/available-tests/:id/edit"
                       element={<EditAvailableTest />}
+                      // element={<DynamicTable />}
                     />
                     <Route path="appointments/" element={<Outlet />}>
                       <Route path="new" element={<NewAppointment />} />

@@ -62,6 +62,7 @@ export interface AvailableTest {
   updatedat: string;
   doctors: string[];
   summary: string;
+  tableref: string;
   testProps: [
     {
       investigation: string;

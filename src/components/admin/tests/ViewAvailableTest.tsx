@@ -5,21 +5,10 @@ import axios from "axios";
 import { toast } from "sonner";
 import { humanReadableDate } from "../user/Users";
 import { isLoggedIn } from "../../../utils/auth";
-import { AvailableTest } from "../../../interface/interface";
-import {
-  Card,
-  CardHeader,
-  Button,
-  CardBody,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@nextui-org/react";
+import { Card, CardHeader, Button, CardBody, Chip } from "@nextui-org/react";
 import CellValue from "../../cell-value";
+import DynamicTable from "./Table";
+import { AvailableTest } from "@/interface/interface";
 
 const ViewAvailableTest = () => {
   const { id }: any = useParams();
@@ -51,7 +40,7 @@ const ViewAvailableTest = () => {
       }
     };
     fetchUser();
-  }, []);
+  }, [id]);
 
   return (
     <>
@@ -112,28 +101,35 @@ const ViewAvailableTest = () => {
           />
         </CardBody>
       </Card>
-      <Card className="bg-transparent">
-        <Table className="mt-8 max-w-6xl mx-auto" aria-label="Available Tests">
-          <TableHeader>
-            <TableColumn>Investigation</TableColumn>
-            <TableColumn>Reference Value</TableColumn>
-            <TableColumn>Unit</TableColumn>
-          </TableHeader>
-          <TableBody>
+      <Card className="overflow-x-auto mt-4">
+        {/* <table className="table">
+          <thead>
+            <tr>
+              {test.testProps &&
+                Object.keys(test.testProps[0]).map((key) => (
+                  <th className="capitalize" key={key}>
+                    {key}
+                  </th>
+                ))}
+            </tr>
+          </thead>
+          <tbody>
             {test.testProps &&
-              test.testProps.map((testProp) => (
-                <TableRow key={testProp.investigation}>
-                  <TableCell className="whitespace-pre-wrap">
-                    <p className="whitespace-pre-wrap">
-                      {testProp.investigation}
-                    </p>
-                  </TableCell>
-                  <TableCell>{testProp.referenceValue}</TableCell>
-                  <TableCell>{testProp.unit}</TableCell>
-                </TableRow>
+              test.testProps.map((prop, propIndex) => (
+                <tr key={propIndex}>
+                  {Object.keys(prop).map((key) => (
+                    <td
+                      className="whitespace-pre-line"
+                      key={`${propIndex}-${key}`}
+                    >
+                      {prop[key]}
+                    </td>
+                  ))}
+                </tr>
               ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table> */}
+        <DynamicTable tableid={test.tableref} />
       </Card>
     </>
   );
