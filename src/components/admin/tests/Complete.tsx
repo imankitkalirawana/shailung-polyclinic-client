@@ -38,7 +38,7 @@ const Complete = () => {
 
   useEffect(() => {
     if (test?.isDone) {
-      window.location.href = "/dashboard/tests";
+      navigate("/dashboard/tests?status=completed");
       toast.error("Test already completed");
     }
   }, [test]);
@@ -134,7 +134,7 @@ const Complete = () => {
             },
           });
           toast.success("Report saved as draft");
-          navigate("/dashboard/tests");
+          navigate("/dashboard/tests?status=completed");
           // setIsDrafting(false);
         } else {
           // setProcessing(true);
@@ -162,7 +162,7 @@ const Complete = () => {
         }
         await new Promise((resolve) => setTimeout(resolve, 2000));
         toast.success("Report uploaded successfully");
-        navigate("/dashboard/tests");
+        navigate("/dashboard/tests?status=completed");
       } catch (error) {
         toast.error("Failed to upload report");
         console.error(error);

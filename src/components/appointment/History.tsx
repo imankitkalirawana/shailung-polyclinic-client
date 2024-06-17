@@ -66,7 +66,7 @@ const History = () => {
   useEffect(() => {
     fetchTests();
     if (user?.role === "admin" || user?.role === "member") {
-      navigate("/dashboard/tests");
+      navigate("/dashboard/reports");
     }
   }, []);
 

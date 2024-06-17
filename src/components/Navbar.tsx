@@ -540,7 +540,7 @@ if (user?.role === "admin" || user?.role === "member") {
     {
       name: "View All Tests",
       description: "View all the tests registered in the system",
-      href: "/dashboard/tests",
+      href: "/dashboard/tests?status=all",
       icon: IconStethoscope,
     },
     {

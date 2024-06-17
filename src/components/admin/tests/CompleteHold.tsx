@@ -39,7 +39,7 @@ const CompleteHold = () => {
 
   useEffect(() => {
     if (test?.isDone) {
-      window.location.href = "/dashboard/tests";
+      navigate("/dashboard/tests?status=completed");
       toast.error("Test already completed");
     }
   }, [test]);
@@ -196,7 +196,7 @@ const CompleteHold = () => {
         }
         await new Promise((resolve) => setTimeout(resolve, 2000));
         toast.success("Report uploaded successfully");
-        navigate("/dashboard/tests");
+        navigate("/dashboard/tests?status=completed");
       } catch (error) {
         toast.error("Failed to upload report");
         console.error(error);
