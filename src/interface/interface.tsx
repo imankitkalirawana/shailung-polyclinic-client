@@ -12,6 +12,7 @@ export interface Test {
   addedby: string;
   doctors: string[];
   labId: string;
+  collectiondate: string;
   testDetail: {
     testData: {
       _id: string;
@@ -62,7 +63,7 @@ export interface AvailableTest {
   updatedat: string;
   doctors: string[];
   summary: string;
-  tableref: string;
+  serviceid: string;
   testProps: [
     {
       investigation: string;
@@ -96,10 +97,12 @@ export interface Report {
   testname: string;
   reportType: string;
   reportDate: string;
+  collectiondate: string;
   testType: string;
   status: string;
   addedby: string;
   testid: string;
+  reportid: string;
   summary: string;
   labId: string;
   doctors: [

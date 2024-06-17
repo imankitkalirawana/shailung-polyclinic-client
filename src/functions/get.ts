@@ -69,7 +69,7 @@ export const getAllDoctors = async () => {
     return data.reverse();
 }
 
-export const getDoctorsWithIds = async (doctorIds: string[]) => {
+export const getDoctorsWithIds = async (doctorIds: any) => {
     const response = await axios.post(`${API_BASE_URL}/api/doctor/doctors`, { doctorIds }, {
         headers: {
             Authorization: `${localStorage.getItem("token")}`,
@@ -79,6 +79,14 @@ export const getDoctorsWithIds = async (doctorIds: string[]) => {
     return data;
 }
 
+export const getDoctorWithId = async (id: string) => {
+    const response = await axios.get(`${API_BASE_URL}/api/doctor/doctor/${id}`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    return response.data;
+}
 
 export const getAllTests = async (status: any) => {
     const response = await axios.get(`${API_BASE_URL}/api/test/status/${status}`, {

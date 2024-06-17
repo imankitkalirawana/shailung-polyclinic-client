@@ -8,7 +8,7 @@ import { API_BASE_URL } from "../../utils/config";
 import { isLoggedIn } from "../../utils/auth";
 import { Helmet } from "react-helmet-async";
 import { calculateAge } from "../../functions/agecalculator";
-import { AvailableTest, User } from "../../interface/interface";
+import { User } from "../../interface/interface";
 import { parseDate } from "@internationalized/date";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
@@ -37,7 +37,6 @@ import {
   CardBody,
   CardFooter,
 } from "@nextui-org/react";
-import test from "node:test";
 
 interface Tests {
   _id: string;

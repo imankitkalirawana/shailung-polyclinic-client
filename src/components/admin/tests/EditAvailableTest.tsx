@@ -4,49 +4,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../../utils/config";
-import { PlusIcon, XIcon } from "../../icons/Icons";
 import { isLoggedIn } from "../../../utils/auth";
 import { getAllDoctors } from "../../../functions/get";
 import { Doctor } from "../../../interface/interface";
 import {
-  Button,
   Card,
-  CardBody,
-  CardHeader,
   Checkbox,
   Input,
   Select,
   SelectItem,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
   Textarea,
 } from "@nextui-org/react";
 import FormTable from "./FormTable";
-import DynamicTable from "./Table";
-
-interface AvailableTest {
-  _id: string;
-  uniqueid: string;
-  name: string;
-  description: string;
-  price: number;
-  duration: string;
-  status: string;
-  addeddate: string;
-  updatedat: string;
-  doctors: string[];
-  summary: string;
-  tableref: string;
-  testProps: [
-    {
-      [key: string]: any;
-    }
-  ];
-}
 
 const EditAvailableTest = () => {
   const { user } = isLoggedIn();
@@ -88,12 +57,7 @@ const EditAvailableTest = () => {
       status: "active",
       doctors: [] as string[],
       summary: "",
-      tableref: "",
-      testProps: Array.from({ length: 1 }, () => ({
-        investigation: "",
-        referenceValue: "",
-        unit: "",
-      })),
+      serviceid: "",
     },
     validate: (values) => {
       const errors: any = {};
@@ -120,14 +84,28 @@ const EditAvailableTest = () => {
 
   const handleTableSubmit = async (values: any) => {
     try {
-      const response = await axios.put(
-        `${API_BASE_URL}/api/service/${formik.values.tableref}`,
+      await handleFormikSubmit(values, formik.values);
+    } catch (error) {
+      toast.error("Failed to submit data");
+      console.error("Error submitting data:", error);
+    }
+  };
+
+  const handleFormikSubmit = async (values: any, formikData: any) => {
+    try {
+      await axios.put(
+        `${API_BASE_URL}/api/available-test/${formikData._id}`,
         {
           data: values,
+          values: formikData,
+        },
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
         }
       );
       toast.success("Data submitted successfully");
-      console.log("Data submitted successfully:", response.data);
     } catch (error) {
       toast.error("Failed to submit data");
       console.error("Error submitting data:", error);
@@ -150,7 +128,7 @@ const EditAvailableTest = () => {
                 Update your Test information.
               </p>
             </div>
-            <Button
+            {/* <Button
               type="submit"
               isLoading={formik.isSubmitting}
               isDisabled={formik.isSubmitting}
@@ -158,7 +136,7 @@ const EditAvailableTest = () => {
               color="primary"
             >
               Update
-            </Button>
+            </Button> */}
           </div>
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div className="col-span-6 sm:col-span-2">
@@ -274,98 +252,14 @@ const EditAvailableTest = () => {
           </div>
         </Card>
       </form>
-      {/* <Card className="mt-8">
-          <CardHeader className="justify-between">
-            <h2
-              className="text-base font-semibold leading-7 text-base-content"
-              data-tip="Test Title"
-            >
-              Test Properties
-            </h2>
-            <Button
-              isIconOnly
-              variant="flat"
-              radius="full"
-              type="button"
-              onClick={addNewRow}
-              data-tip="Add Row"
-            >
-              <PlusIcon className="w-5 h-5" />
-            </Button>
-          </CardHeader>
-          <CardBody className="flex flex-col">
-            <Table removeWrapper>
-              <TableHeader>
-                <TableColumn key="investigation">Investigation</TableColumn>
-                <TableColumn key="referenceValue">Reference Value</TableColumn>
-                <TableColumn key="unit">Unit</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {formik.values.testProps.map((testProp, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <Textarea
-                        type="text"
-                        aria-label="Investigation"
-                        // className="input focus:outline-none focus:border-none rounded-none w-full"
-                        name={`testProps[${index}].investigation`}
-                        id="investigation"
-                        placeholder="Hemoglobin"
-                        onChange={formik.handleChange}
-                        value={testProp.investigation}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Textarea
-                        // className="input focus:outline-none focus:border-none rounded-none w-full"
-                        name={`testProps[${index}].referenceValue`}
-                        aria-label="Reference Value"
-                        id="referenceValue"
-                        placeholder="13.0 - 17.0"
-                        onChange={formik.handleChange}
-                        value={testProp.referenceValue}
-                      />
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap text-end text-sm font-medium flex items-center">
-                      <Textarea
-                        type="text"
-                        aria-label="Unit"
-                        // className="input focus:outline-none focus:border-none rounded-none w-full"
-                        name={`testProps[${index}].unit`}
-                        id="unit"
-                        placeholder="g/dL"
-                        onChange={formik.handleChange}
-                        value={testProp.unit}
-                      />
-                      {formik.values.testProps.length > 1 && (
-                        <Button
-                          isIconOnly
-                          variant="flat"
-                          radius="full"
-                          type="button"
-                          onClick={() => removeRow(index)}
-                          className="btn btn-sm btn-ghost btn-circle opacity-0 mr-1 group-hover:opacity-100"
-                        >
-                          <XIcon className="w-5 h-5" />
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardBody>
-        </Card> */}
 
       <Card className="mt-8 p-4">
-        {formik.values.tableref && (
-          <FormTable
-            tableid={formik.values.tableref}
-            // onSubmit={}
-            onSubmit={handleTableSubmit}
-          />
-          // <DynamicTable tableid={formik.values.tableref} />
-        )}
+        {/* {formik.values.serviceid && ( */}
+        <FormTable
+          tableid={formik.values.serviceid || ""}
+          onSubmit={handleTableSubmit}
+        />
+        {/* )} */}
       </Card>
     </>
   );

@@ -6,7 +6,7 @@ import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
 import { IconPlus, IconX } from "@tabler/icons-react";
 
-interface FormTableProps {
+interface ReportTableProps {
   tableid?: string;
   onSubmit?: (values: any) => void;
   onSecondarySubmit?: (values: any) => void;
@@ -14,13 +14,13 @@ interface FormTableProps {
   colCount?: number;
 }
 
-const FormTable = ({
+const ReportTable = ({
   tableid,
   onSubmit,
   onSecondarySubmit,
   rowCount,
   colCount,
-}: FormTableProps) => {
+}: ReportTableProps) => {
   const [rows, setRows] = useState<number>(rowCount || 3);
   const [cols, setCols] = useState<number>(colCount || 3);
   const [initialValues, setInitialValues] = useState<{ [key: string]: string }>(
@@ -31,7 +31,7 @@ const FormTable = ({
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/api/service/${tableid}`
+          `${API_BASE_URL}/api/report/report-row/${tableid}`
         );
         const data = response.data.data;
 
@@ -116,7 +116,6 @@ const FormTable = ({
     for (let col = 0; col < cols; col++) {
       newValues[`cell-${rowIndex}-${col}`] = "";
     }
-
     setRows(rows + 1);
     setValues(newValues);
   };
@@ -338,4 +337,4 @@ const FormTable = ({
   );
 };
 
-export default FormTable;
+export default ReportTable;

@@ -5,22 +5,41 @@ import { toast } from "sonner";
 import { PDFExport } from "@progress/kendo-react-pdf";
 import { Link, useParams } from "react-router-dom";
 import { DownloadIcon, SmartHomeIcon } from "../../icons/Icons";
-import { Report } from "../../../interface/interface";
+import { Doctor, Report } from "../../../interface/interface";
+import DynamicTable from "./DisplayReportTable";
+import { getDoctorsWithIds, getDoctorWithId } from "../../../functions/get";
 
 const Download = () => {
   const { reportId }: any = useParams();
   const [report, setReport] = useState<Report | null>(null);
+  const [reportRows, setReportRows] = useState<any[]>([]);
   const pdfExportComponent = useRef(null);
   const [loading, setLoading] = useState(true);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
 
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const { data } = await axios.get(
-          `${API_BASE_URL}/api/report/${reportId}`
-        );
-        setReport(data);
-        setLoading(false);
+        await axios
+          .get(`${API_BASE_URL}/api/report/${reportId}`)
+          .then(async ({ data }) => {
+            try {
+              const res = await axios.get(
+                `${API_BASE_URL}/api/report/report-row/${data.reportid}`
+              );
+              if (res) {
+                await getDoctorsWithIds(data.doctors).then((response) => {
+                  setDoctors(response);
+                });
+                setReportRows(res.data.data);
+              }
+            } catch (e) {
+              console.log(e);
+            }
+
+            setReport(data);
+            setLoading(false);
+          });
       } catch (error) {
         toast.error("Failed to fetch report");
         console.error(error);
@@ -45,12 +64,8 @@ const Download = () => {
     try {
       const response = await axios.post(
         `${API_BASE_URL}/api/upload/download`,
-        {
-          filenames,
-        },
-        {
-          responseType: "blob",
-        }
+        { filenames },
+        { responseType: "blob" }
       );
       const blob = new Blob([response.data], { type: "application/zip" });
       const url = window.URL.createObjectURL(blob);
@@ -66,7 +81,24 @@ const Download = () => {
     }
   };
 
-  const chunkArray = (array: any, size: any) => {
+  const convertReportRows = (reportRows: any) => {
+    const rowsArray: any[] = [];
+    const rowKeys = Object.keys(reportRows).reduce((acc: any, key: string) => {
+      const [_, row, col] = key.split("-");
+      acc[row] = acc[row] || {};
+      acc[row][col] = reportRows[key];
+      return acc;
+    }, {});
+
+    Object.keys(rowKeys).forEach((row) => {
+      const { 0: title, 1: value, 2: unit, 3: reference } = rowKeys[row];
+      rowsArray.push({ title, value, unit, reference });
+    });
+
+    return rowsArray;
+  };
+
+  const chunkArray = (array: any[], size: number) => {
     const result = [];
     for (let i = 0; i < array.length; i += size) {
       result.push(array.slice(i, i + size));
@@ -74,6 +106,7 @@ const Download = () => {
     return result;
   };
 
+  const convertedRows = convertReportRows(reportRows || {});
   return (
     <>
       <div className="max-w-6xl mx-auto my-24">
@@ -85,7 +118,7 @@ const Download = () => {
                 className="btn btn-sm btn-circle btn-ghost -mr-2"
               >
                 <SmartHomeIcon className="w-4 h-4" />
-              </Link>{" "}
+              </Link>
             </li>
             <li>
               <Link to="/appointment/history">Reports</Link>
@@ -104,77 +137,83 @@ const Download = () => {
               ref={pdfExportComponent}
               fileName={report?.name + "-" + report?.reportDate + "-Report"}
             >
-              {chunkArray(report?.reportRows || [], 12).map(
-                (chunk, pageIndex) => (
-                  <div
-                    key={pageIndex}
-                    className="relative mx-auto h-full mb-8 object-cover flex flex-col justify-between"
-                    data-theme="light"
-                    style={{
-                      width: "21cm",
-                      height: "29.7cm",
-                    }}
-                  >
-                    <img src="/report.webp" loading="eager" />
-                    {pageIndex === 0 && (
-                      <img
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${report?._id}/download`}
-                        className="w-[85px] h-[85px] absolute bottom-[52px] right-[18px]"
-                        alt=""
-                      />
-                    )}
-                    <div className="absolute flex flex-col justify-between pb-24 top-0 left-0 w-full h-full pt-48">
-                      <main className="px-8 mt-4">
-                        {pageIndex === 0 && (
-                          <div className="space-y-4 font-roboto flex flex-col gap-4">
-                            <div className="flex justify-between">
-                              <div className="flex gap-4">
-                                <div className="flex flex-col">
-                                  <span>Name :</span>
-                                  <span>Address :</span>
-                                  <span>Ref. By :</span>
-                                  <span>Lab ID :</span>
-                                </div>
-                                <div className="flex flex-col">
-                                  <span>{report?.name}</span>
-                                  <span>{report?.address}</span>
-                                  <span>
-                                    {report?.doctors && report?.doctors[0].name}
-                                  </span>
-                                  <span>{report?.labId || "-"}</span>
-                                </div>
+              {chunkArray(
+                // @ts-ignore
+                convertedRows.length > 0 ? convertedRows : report?.reportRows,
+                12
+              ).map((_chunk, pageIndex) => (
+                <div
+                  key={pageIndex}
+                  className="relative mx-auto h-full mb-8 object-cover flex flex-col justify-between"
+                  data-theme="light"
+                  style={{
+                    width: "21cm",
+                    height: "29.7cm",
+                  }}
+                >
+                  <img src="/report.webp" loading="eager" />
+                  {pageIndex === 0 && (
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${report?._id}/download`}
+                      className="w-[85px] h-[85px] absolute bottom-[52px] right-[18px]"
+                      alt=""
+                    />
+                  )}
+                  <div className="absolute flex flex-col justify-between pb-24 top-0 left-0 w-full h-full pt-48">
+                    <main className="px-8 mt-4">
+                      {pageIndex === 0 && (
+                        <div className="space-y-4 font-roboto flex flex-col gap-4">
+                          <div className="flex justify-between">
+                            <div className="flex gap-4">
+                              <div className="flex flex-col">
+                                <span>Name :</span>
+                                <span>Address :</span>
+                                <span>Ref. By :</span>
+                                <span>Lab ID:</span>
                               </div>
-                              <div className="flex gap-4">
-                                <div className="flex flex-col">
-                                  <span>Age/Sex :</span>
-                                  <span>Report Date :</span>
-                                  <span>Report ID :</span>
-                                </div>
-                                <div className="flex flex-col">
-                                  <span className="capitalize">
-                                    {report?.age + " Yrs/" + report?.gender}
-                                  </span>
-                                  <span>{report?.reportDate}</span>
-                                  <span>{report?._id}</span>
-                                </div>
+                              <div className="flex flex-col">
+                                <span>{report?.name || "-"}</span>
+                                <span>{report?.address || "-"}</span>
+                                <span>____________________</span>
+                                <span>{report?.labId || "-"}</span>
                               </div>
                             </div>
-                            <div className="space-y-2">
-                              <div className="space-y-1">
-                                <h3 className="text-lg text-center font-semibold leading-none">
-                                  {report?.testname}
-                                </h3>
-                                <p className="c text-center text-sm">
-                                  {report?.description}
-                                </p>
+                            <div className="flex gap-4">
+                              <div className="flex flex-col">
+                                <span>Age/Sex :</span>
+                                <span>Report Date :</span>
+                                <span>Collection Date :</span>
+                                <span>Report ID :</span>
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="capitalize">
+                                  {report?.age + " Yrs/" + report?.gender}
+                                </span>
+                                <span>{report?.reportDate || "-"}</span>
+                                <span>{report?.collectiondate || "-"}</span>
+                                <span>{report?._id}</span>
                               </div>
                             </div>
                           </div>
-                        )}
-                        <div className="flex flex-col">
-                          <div className="-m-1.5 overflow-x-auto">
-                            <div className="p-1.5 min-w-full inline-block align-middle">
-                              <div className="overflow-hidden">
+                          <div className="space-y-2">
+                            <div className="space-y-1">
+                              <h3 className="text-lg text-center font-semibold leading-none">
+                                {report?.testname}
+                              </h3>
+                              <p className="c text-center text-sm">
+                                {report?.description}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex flex-col">
+                        <div className="-m-1.5 overflow-x-auto">
+                          <div className="p-1.5 min-w-full inline-block align-middle">
+                            <div className="overflow-hidden">
+                              {convertedRows.length > 0 ? (
+                                <DynamicTable tableid={report?.reportid} />
+                              ) : (
                                 <table className="min-w-full divide-y divide-black">
                                   <thead>
                                     <tr className=" bg-slate-500 text-white">
@@ -205,14 +244,14 @@ const Download = () => {
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-black">
-                                    {chunk
+                                    {_chunk
                                       .filter(
-                                        (row: any) =>
+                                        (row) =>
                                           row.value !== null &&
                                           row.value !== undefined &&
                                           row.value !== ""
                                       )
-                                      .map((row: any, index: number) => {
+                                      .map((row, index) => {
                                         const referenceValues =
                                           row.reference.split(" - ");
                                         const minValue = parseFloat(
@@ -249,60 +288,64 @@ const Download = () => {
                                       })}
                                   </tbody>
                                 </table>
-                              </div>
+                              )}
                             </div>
                           </div>
                         </div>
-                        {pageIndex ===
-                          chunkArray(report?.reportRows || [], 12).length -
-                            1 && (
-                          <div className="space-y-2">
-                            {report?.summary && (
-                              <div>
-                                <h3 className="text-xs font-semibold">
-                                  Test Information:
-                                </h3>
-                                <p className="text-xs whitespace-pre-wrap">
-                                  {report?.summary}
-                                </p>
-                              </div>
-                            )}
-                            <footer className="absolute bottom-24 left-[50%] translate-x-[-50%]">
-                              <div className="flex justify-evenly text-center">
-                                {report?.doctors
-                                  ?.slice(0, 2)
-                                  .map((doc, index) => (
-                                    <div key={index}>
-                                      <span className="flex items-center justify-center">
-                                        <img
-                                          src={`${API_BASE_URL}/api/upload/single/${doc.sign}`}
-                                          className="w-16 aspect-[4/3] object-contain"
-                                        />
-                                      </span>
-                                      <p className="text-xs font-semibold">
-                                        {doc && doc.name}
-                                        <br />
-                                        {doc && doc.designation} <br />
-                                        {doc && doc.regno}
-                                      </p>
-                                    </div>
-                                  ))}
-                              </div>
-                            </footer>
-                          </div>
-                        )}
-                      </main>
-                    </div>
-                    {pageIndex <
-                      chunkArray(report?.reportRows || [], 12).length - 1 && (
-                      <div
-                        className="page-break"
-                        style={{ pageBreakAfter: "always" }}
-                      ></div>
-                    )}
+                      </div>
+                      {pageIndex ===
+                        chunkArray(
+                          // @ts-ignore
+                          convertedRows.length > 0
+                            ? convertedRows
+                            : report?.reportRows,
+                          12
+                        ).length -
+                          1 && (
+                        <div className="space-y-2">
+                          {report?.summary && (
+                            <div>
+                              <h3 className="text-xs font-semibold">
+                                Test Information:
+                              </h3>
+                              <p className="text-xs whitespace-pre-wrap">
+                                {report?.summary}
+                              </p>
+                            </div>
+                          )}
+                          <footer className="absolute bottom-24 left-[50%] translate-x-[-50%]">
+                            <div className="flex justify-evenly gap-4 text-center">
+                              {doctors?.slice(0, 2).map((doc, index) => (
+                                <div key={index}>
+                                  <span className="flex items-center justify-center">
+                                    <img
+                                      src={`${API_BASE_URL}/api/upload/single/${doc.sign}`}
+                                      className="w-16 aspect-[4/3] object-contain"
+                                    />
+                                  </span>
+                                  <p className="text-xs font-semibold">
+                                    {doc && doc.name}
+                                    <br />
+                                    {doc && doc.designation}
+                                    <br />
+                                    {doc && doc.regno}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </footer>
+                        </div>
+                      )}
+                    </main>
                   </div>
-                )
-              )}
+                  {pageIndex < chunkArray(convertedRows, 12).length - 1 && (
+                    <div
+                      className="page-break"
+                      style={{ pageBreakAfter: "always" }}
+                    ></div>
+                  )}
+                </div>
+              ))}
             </PDFExport>
             <div className="flex flex-col justify-center items-center mt-8">
               {report?.reportFile &&

@@ -16,7 +16,7 @@ const DynamicTable = ({ tableid }: DynamicTableProps) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/api/service/${tableid}`
+          `${API_BASE_URL}/api/report/report-row/${tableid}`
         );
         const data = response.data.data;
 

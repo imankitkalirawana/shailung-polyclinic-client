@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { XIcon } from "../../icons/Icons";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
@@ -8,29 +7,22 @@ import { useFormik } from "formik";
 import { UploadMultipleFiles } from "../../../utils/FileHandling";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { Test } from "../../../interface/interface";
+import { Doctor, Test } from "../../../interface/interface";
 import { parseDate } from "@internationalized/date";
 
 import {
-  Button,
   Card,
   CardBody,
-  CardFooter,
   CardHeader,
+  Checkbox,
   DatePicker,
   Input,
   Select,
   SelectItem,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
   Textarea,
-  Tooltip,
 } from "@nextui-org/react";
-import { IconPlus } from "@tabler/icons-react";
+import FormTable from "./FormTable";
+import { getAllDoctors } from "../../../functions/get";
 
 const Complete = () => {
   const { loggedIn } = isLoggedIn();
@@ -39,8 +31,10 @@ const Complete = () => {
 
   const [test, setTest] = useState<Test | null>(null);
   const [files, setFiles] = useState<FileList | null>(null);
-  const [processing, setProcessing] = useState<boolean>(false);
-  const [isDrafting, setIsDrafting] = useState<boolean>(false);
+  // const [processing, setProcessing] = useState<boolean>(false);
+  // const [isDrafting, setIsDrafting] = useState<boolean>(false);
+  const [tableid, setTableid] = useState<string>("");
+  const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
     if (test?.isDone) {
@@ -89,18 +83,11 @@ const Complete = () => {
                 }
               )
               .then(({ data }) => {
-                formik.setValues((previousData) => ({
-                  ...previousData,
-                  reportRows: data.testProps.map((prop: any) => ({
-                    title: prop.investigation,
-                    reference: prop.referenceValue,
-                    unit: prop.unit,
-                    value: "",
-                    isDisabled: true,
-                  })),
-                }));
+                setTableid(data.serviceid);
               });
           });
+        const res2 = await getAllDoctors();
+        setDoctors(res2);
       } catch (error) {
         toast.error("Failed to fetch tests");
         console.error(error);
@@ -127,26 +114,20 @@ const Complete = () => {
       testname: "",
       reportType: "text",
       reportDate: new Date().toISOString().split("T")[0],
+      collectiondate: new Date().toISOString().split("T")[0],
       testid: "",
       userid: "",
       labId: "",
       addedby: "",
       isDraft: false,
       status: "neutral",
-      reportRows: Array.from({ length: 1 }, () => ({
-        title: "",
-        value: "",
-        unit: "",
-        reference: "",
-        isDisabled: false,
-      })),
       reportFile: [""],
-      doctors: [],
+      doctors: [] as string[],
     },
     onSubmit: async (values) => {
       try {
         if (values.isDraft) {
-          setIsDrafting(true);
+          // setIsDrafting(true);
           await axios.post(`${API_BASE_URL}/api/report/draft`, values, {
             headers: {
               Authorization: `${localStorage.getItem("token")}`,
@@ -154,9 +135,9 @@ const Complete = () => {
           });
           toast.success("Report saved as draft");
           navigate("/dashboard/tests");
-          setIsDrafting(false);
+          // setIsDrafting(false);
         } else {
-          setProcessing(true);
+          // setProcessing(true);
 
           if (files) {
             const filenames = Array.from(files).map(
@@ -177,7 +158,7 @@ const Complete = () => {
               }
             });
           }
-          setProcessing(false);
+          // setProcessing(false);
         }
         await new Promise((resolve) => setTimeout(resolve, 2000));
         toast.success("Report uploaded successfully");
@@ -188,6 +169,8 @@ const Complete = () => {
       }
     },
   });
+
+  console.log("formik", formik.values);
 
   const uploadReport = async (values: any) => {
     try {
@@ -203,33 +186,71 @@ const Complete = () => {
     }
   };
 
-  const addNewRow = () => {
-    formik.setValues((prevValues) => ({
-      ...prevValues,
-      reportRows: [
-        ...prevValues.reportRows,
+  const handleTableSubmit = async (values: any) => {
+    try {
+      await handleFormikSubmit(values, formik.values);
+    } catch (error) {
+      toast.error("Failed to submit data");
+      console.error("Error submitting data:", error);
+    }
+  };
+
+  const handleDraftTableSubmit = async (values: any) => {
+    try {
+      await handleDraftSubmit(values, formik.values);
+    } catch (error) {
+      toast.error("Failed to submit data");
+      console.error("Error submitting data:", error);
+    }
+  };
+
+  const handleDraftSubmit = async (values: any, formikData: any) => {
+    try {
+      // setIsDrafting(true);
+      await axios.post(
+        `${API_BASE_URL}/api/report/draft`,
         {
-          title: "",
-          value: "",
-          unit: "",
-          reference: "",
-          isDisabled: false,
+          data: values,
+          values: formikData,
         },
-      ],
-    }));
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      toast.success("Report saved as draft");
+      // navigate("/dashboard/tests");
+      // setIsDrafting(false);
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
   };
 
-  const removeRow = (index: number) => {
-    formik.setValues((prevValues) => ({
-      ...prevValues,
-      reportRows: prevValues.reportRows.filter((_, i) => i !== index),
-    }));
+  const handleFormikSubmit = async (values: any, formikData: any) => {
+    try {
+      await axios.post(
+        `${API_BASE_URL}/api/report/`,
+        {
+          data: values,
+          values: formikData,
+        },
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      toast.success("Data submitted successfully");
+    } catch (error) {
+      toast.error("Failed to submit data");
+      console.error("Error submitting data:", error);
+    }
   };
-
   return (
     <>
       <div className="mx-auto">
-        <form onSubmit={formik.handleSubmit} className="w-full card shadow-xs">
+        <div className="w-full card shadow-xs">
           <div className="flex justify-between items-center">
             <h2 className="my-6 text-2xl font-semibold">Upload Report</h2>
           </div>
@@ -351,15 +372,6 @@ const Complete = () => {
               </div>
 
               <div className="col-span-full md:col-span-2">
-                {/* <input
-                  type="date"
-                  className="input input-bordered w-full"
-                  name="reportDate"
-                  id="reportDate"
-                  required
-                  onChange={formik.handleChange}
-                  value={formik.values.reportDate}
-                /> */}
                 <DatePicker
                   label="Report Date"
                   onChange={(date) => {
@@ -369,7 +381,20 @@ const Complete = () => {
                     );
                   }}
                   value={parseDate(formik.values.reportDate)}
-                  name="dob"
+                  name="reportDate"
+                />
+              </div>
+              <div className="col-span-full md:col-span-2">
+                <DatePicker
+                  label="Collection Date"
+                  onChange={(date) => {
+                    formik.setFieldValue(
+                      "collectiondate",
+                      date.toString().split("T")[0]
+                    );
+                  }}
+                  value={parseDate(formik.values.collectiondate)}
+                  name="collectiondate"
                 />
               </div>
               <div className="col-span-full md:col-span-2">
@@ -401,6 +426,35 @@ const Complete = () => {
                   <SelectItem key="file">Only File</SelectItem>
                   <SelectItem key="both">Both Text & File</SelectItem>
                 </Select>
+              </div>
+              <div className="col-span-2">
+                <label htmlFor="doctors" className="label">
+                  <span className="label-text">Doctors</span>
+                </label>
+                <div className="max-h-48 p-2 overflow-y-scroll">
+                  {doctors.map((doctor: Doctor, index) => (
+                    <div className="form-control" key={index}>
+                      <Checkbox
+                        name="doctors"
+                        className="mb-1"
+                        value={doctor._id}
+                        isSelected={formik.values.doctors.includes(
+                          doctor._id as string
+                        )}
+                        onChange={formik.handleChange}
+                      >
+                        {doctor.name}
+                      </Checkbox>
+                    </div>
+                  ))}
+                  {formik.errors.doctors && (
+                    <label htmlFor="doctors" className="label">
+                      <span className="label-text text-error">
+                        {formik.errors.doctors}
+                      </span>
+                    </label>
+                  )}
+                </div>
               </div>
 
               {formik.values.reportType !== "text" && (
@@ -469,102 +523,17 @@ const Complete = () => {
               <>
                 <CardHeader className="flex justify-between items-start px-4 pb-0 pt-4">
                   <p className="text-large">Investigation Data</p>
-                  <Tooltip color="primary" content={"Add new row"}>
-                    <Button
-                      isIconOnly
-                      variant="flat"
-                      radius="full"
-                      type="button"
-                      onClick={addNewRow}
-                    >
-                      <IconPlus size={16} />
-                    </Button>
-                  </Tooltip>
                 </CardHeader>
                 <CardBody className="flex flex-col md:col-span-full">
-                  <Table aria-label="Report Data" removeWrapper>
-                    <TableHeader>
-                      <TableColumn>Investigation</TableColumn>
-                      <TableColumn>Value</TableColumn>
-                      <TableColumn>Reference</TableColumn>
-                      <TableColumn>Unit</TableColumn>
-                    </TableHeader>
-                    <TableBody>
-                      {formik.values.reportRows.map((_row, index) => (
-                        <TableRow key={index}>
-                          <TableCell>
-                            <Textarea
-                              onChange={(e) => {
-                                formik.setFieldValue(
-                                  `reportRows[${index}].title`,
-                                  e.target.value
-                                );
-                              }}
-                              value={formik.values.reportRows[index].title}
-                              isDisabled={
-                                formik.values.reportRows[index].isDisabled
-                              }
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Textarea
-                              onChange={(e) => {
-                                formik.setFieldValue(
-                                  `reportRows[${index}].value`,
-                                  e.target.value
-                                );
-                              }}
-                              value={formik.values.reportRows[index].value}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Textarea
-                              onChange={(e) => {
-                                formik.setFieldValue(
-                                  `reportRows[${index}].reference`,
-                                  e.target.value
-                                );
-                              }}
-                              value={formik.values.reportRows[index].reference}
-                              isDisabled={
-                                formik.values.reportRows[index].isDisabled
-                              }
-                            />
-                          </TableCell>
-                          <TableCell className="whitespace-nowrap text-end text-sm font-medium flex items-center">
-                            <Textarea
-                              onChange={(e) => {
-                                formik.setFieldValue(
-                                  `reportRows[${index}].unit`,
-                                  e.target.value
-                                );
-                              }}
-                              value={formik.values.reportRows[index].unit}
-                              isDisabled={
-                                formik.values.reportRows[index].isDisabled
-                              }
-                            />
-                            {formik.values.reportRows.length > 1 && (
-                              <Button
-                                type="button"
-                                isIconOnly
-                                variant="light"
-                                radius="full"
-                                onClick={() => removeRow(index)}
-                                className="opacity-0 mr-1 group-hover:opacity-100"
-                              >
-                                <XIcon className="w-5 h-5" />
-                              </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                  <FormTable
+                    tableid={tableid}
+                    onSubmit={handleTableSubmit}
+                    onSecondarySubmit={handleDraftTableSubmit}
+                  />
                 </CardBody>
               </>
             )}
-            <CardFooter className="col-span-full flex gap-4 justify-end">
+            {/* <CardFooter className="col-span-full flex gap-4 justify-end">
               <Button
                 type="button"
                 onClick={() => {
@@ -590,9 +559,9 @@ const Complete = () => {
               >
                 Upload Report
               </Button>
-            </CardFooter>
+            </CardFooter> */}
           </Card>
-        </form>
+        </div>
       </div>
     </>
   );

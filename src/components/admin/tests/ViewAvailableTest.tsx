@@ -129,7 +129,7 @@ const ViewAvailableTest = () => {
               ))}
           </tbody>
         </table> */}
-        <DynamicTable tableid={test.tableref} />
+        <DynamicTable tableid={test.serviceid} />
       </Card>
     </>
   );

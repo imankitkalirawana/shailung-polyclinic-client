@@ -1,14 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { humanReadableDate } from "../user/Users";
 import { toast } from "sonner";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
-import { PlusIcon, XIcon } from "../../icons/Icons";
 import { useFormik } from "formik";
 import { getAllAvailableTests, getAllDoctors } from "../../../functions/get";
 import { isLoggedIn } from "../../../utils/auth";
-import { Doctor } from "../../../interface/interface";
+import { Doctor, AvailableTest as Test } from "../../../interface/interface";
 import * as Yup from "yup";
 import {
   Button,
@@ -31,7 +30,6 @@ import {
   TableHeader,
   TableRow,
   Textarea,
-  Tooltip,
   useDisclosure,
 } from "@nextui-org/react";
 import {
@@ -41,24 +39,6 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import FormTable from "./FormTable";
-
-interface Test {
-  _id: string;
-  uniqueid: string;
-  name: string;
-  description: string;
-  price: number;
-  duration: string;
-  status: string;
-  updatedat: string;
-  testProps: [
-    {
-      investigation: string;
-      referenceValue: string;
-      unit: string;
-    }
-  ];
-}
 
 const AvailableTests = () => {
   const { user } = isLoggedIn();
@@ -252,8 +232,6 @@ interface AddTestProps {
 }
 
 const AddTest = ({ newServiceModal }: AddTestProps) => {
-  const formTableRef = useRef(null);
-
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -283,7 +261,7 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
       duration: "",
       summary: "",
       doctors: [] as string[],
-      tableref: "",
+      serviceid: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -308,22 +286,32 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
 
   const handleTableSubmit = async (values: any) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/service`, {
-        data: values,
-      });
+      await handleFormikSubmit(values, formik.values);
+    } catch (error: any) {
+      toast.error("Error submitting data");
+      console.error("Error submitting data:", error);
+    }
+  };
+  const handleFormikSubmit = async (values: any, formikData: any) => {
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/api/available-test`,
+        {
+          data: values,
+          values: formikData,
+        },
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        }
+      );
       toast.success("Data submitted successfully");
       console.log("Data submitted successfully:", response.data);
     } catch (error: any) {
       toast.error("Error submitting data");
       console.error("Error submitting data:", error);
     }
-  };
-
-  const handleAddService = () => {
-    formTableRef.current.submitForm().then((res) => {
-      console.log("Form submitted successfully:", res);
-      formik.handleSubmit();
-    });
   };
 
   return (
@@ -334,11 +322,6 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
         backdrop="blur"
         size="5xl"
         scrollBehavior="inside"
-        as="form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleAddService();
-        }}
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">New Service</ModalHeader>
@@ -434,25 +417,6 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
               <FormTable onSubmit={handleTableSubmit} />
             </div>
           </ModalBody>
-          <ModalFooter className="flex-col-reverse sm:flex-row">
-            <Button
-              fullWidth
-              variant="flat"
-              onClick={newServiceModal.onOpenChange}
-            >
-              Cancel
-            </Button>
-            <Button
-              color="primary"
-              variant="flat"
-              type="submit"
-              isLoading={formik.isSubmitting}
-              isDisabled={formik.isSubmitting}
-              fullWidth
-            >
-              Add Service
-            </Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
     </>
