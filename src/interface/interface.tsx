@@ -1,6 +1,6 @@
 export interface Test {
   _id: string;
-  testid: string;
+  testids: string;
   userid: string;
   doneby: string;
   status: string;
@@ -14,12 +14,14 @@ export interface Test {
   labId: string;
   collectiondate: string;
   testDetail: {
-    testData: {
-      _id: string;
-      name: string;
-      price: number;
-      duration: number;
-    };
+    testData: [
+      {
+        _id: string;
+        name: string;
+        price: number;
+        duration: number;
+      }
+    ];
     userData: {
       _id: string;
       name: string;
@@ -121,4 +123,5 @@ export interface Report {
     reference: string;
   }[];
   reportFile: string[];
+  refby: string;
 }

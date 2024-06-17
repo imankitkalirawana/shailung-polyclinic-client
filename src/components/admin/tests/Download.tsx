@@ -7,7 +7,7 @@ import { Link, useParams } from "react-router-dom";
 import { DownloadIcon, SmartHomeIcon } from "../../icons/Icons";
 import { Doctor, Report } from "../../../interface/interface";
 import DynamicTable from "./DisplayReportTable";
-import { getDoctorsWithIds, getDoctorWithId } from "../../../functions/get";
+import { getDoctorsWithIds } from "../../../functions/get";
 
 const Download = () => {
   const { reportId }: any = useParams();
@@ -166,24 +166,24 @@ const Download = () => {
                           <div className="flex justify-between">
                             <div className="flex gap-4">
                               <div className="flex flex-col">
-                                <span>Name :</span>
-                                <span>Address :</span>
-                                <span>Ref. By :</span>
-                                <span>Lab ID:</span>
+                                <b>Name :</b>
+                                <b>Address :</b>
+                                <b>Ref. By :</b>
+                                <b>Lab ID:</b>
                               </div>
                               <div className="flex flex-col">
                                 <span>{report?.name || "-"}</span>
                                 <span>{report?.address || "-"}</span>
-                                <span>____________________</span>
+                                <span>{report?.refby || "-"}</span>
                                 <span>{report?.labId || "-"}</span>
                               </div>
                             </div>
                             <div className="flex gap-4">
                               <div className="flex flex-col">
-                                <span>Age/Sex :</span>
-                                <span>Report Date :</span>
-                                <span>Collection Date :</span>
-                                <span>Report ID :</span>
+                                <b>Age/Sex :</b>
+                                <b>Report Date :</b>
+                                <b>Collection Date :</b>
+                                <b>Report ID :</b>
                               </div>
                               <div className="flex flex-col">
                                 <span className="capitalize">

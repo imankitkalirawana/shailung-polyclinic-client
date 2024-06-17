@@ -165,7 +165,8 @@ const New = () => {
               },
             }
           )
-          .then(() => {
+          .then((res) => {
+            console.log(res.data);
             confirmModal.onClose();
             toast("Appointment Booked Succesfully", {
               action: {
@@ -176,7 +177,6 @@ const New = () => {
               },
               duration: Infinity,
             });
-            formik.resetForm();
           })
           .catch((error) => {
             toast.error("Failed to book appointment");

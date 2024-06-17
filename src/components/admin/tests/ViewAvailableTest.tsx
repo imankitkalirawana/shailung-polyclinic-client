@@ -8,7 +8,7 @@ import { isLoggedIn } from "../../../utils/auth";
 import { Card, CardHeader, Button, CardBody, Chip } from "@nextui-org/react";
 import CellValue from "../../cell-value";
 import DynamicTable from "./Table";
-import { AvailableTest } from "@/interface/interface";
+import { AvailableTest } from "../../../interface/interface";
 
 const ViewAvailableTest = () => {
   const { id }: any = useParams();

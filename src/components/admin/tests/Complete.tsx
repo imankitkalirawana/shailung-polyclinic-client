@@ -15,6 +15,7 @@ import {
   CardBody,
   CardHeader,
   Checkbox,
+  Chip,
   DatePicker,
   Input,
   Select,
@@ -62,20 +63,19 @@ const Complete = () => {
             setTest(data);
             formik.setValues((previousData) => ({
               ...previousData,
+              _id: data._id,
+
               name: data.testDetail.userData.name,
               phone: data.testDetail.userData.phone,
               email: data.testDetail.userData.email,
               age: data.testDetail.userData.age,
               userid: data.testDetail.userData._id,
-              testname: data.testDetail.testData.name,
               testid: data._id,
-              doctors: data.doctors,
-              summary: data.testDetail.testData.summary,
-              description: data.testDetail.testData.description,
+              testname: data.testDetail.testData[0].name,
             }));
             axios
               .get(
-                `${API_BASE_URL}/api/available-test/${data.testDetail.testData._id}`,
+                `${API_BASE_URL}/api/available-test/${data.testDetail.testData[0]._id}`,
                 {
                   headers: {
                     Authorization: `${localStorage.getItem("token")}`,
@@ -104,18 +104,18 @@ const Complete = () => {
 
   const formik = useFormik({
     initialValues: {
+      _id: "",
       name: "",
-      fatherName: "",
       age: 0,
       gender: "",
       phone: "",
       email: "",
       address: "",
       testname: "",
+      testid: "",
       reportType: "text",
       reportDate: new Date().toISOString().split("T")[0],
       collectiondate: new Date().toISOString().split("T")[0],
-      testid: "",
       userid: "",
       labId: "",
       addedby: "",
@@ -123,6 +123,7 @@ const Complete = () => {
       status: "neutral",
       reportFile: [""],
       doctors: [] as string[],
+      refby: "",
     },
     onSubmit: async (values) => {
       try {
@@ -142,7 +143,7 @@ const Complete = () => {
           if (files) {
             const filenames = Array.from(files).map(
               (file) =>
-                `report-${values.testid}-${Date.now()}.${file.name
+                `report-${values._id}-${Date.now()}.${file.name
                   .split(".")
                   .pop()}`
             );
@@ -349,18 +350,6 @@ const Complete = () => {
               <div className="col-span-full md:col-span-2">
                 <Input
                   type="text"
-                  name="testname"
-                  id="testname"
-                  label="Test Name"
-                  isRequired
-                  onChange={formik.handleChange}
-                  value={formik.values.testname}
-                  isDisabled={test?.testDetail.testData.name !== ""}
-                />
-              </div>
-              <div className="col-span-full md:col-span-2">
-                <Input
-                  type="text"
                   name="labId"
                   id="labId"
                   label="Lab ID"
@@ -368,6 +357,16 @@ const Complete = () => {
                   isRequired
                   onChange={formik.handleChange}
                   value={formik.values.labId}
+                />
+              </div>
+              <div className="col-span-full md:col-span-2">
+                <Input
+                  type="text"
+                  name="refby"
+                  id="refby"
+                  label="Ref. By"
+                  onChange={formik.handleChange}
+                  value={formik.values.refby}
                 />
               </div>
 
@@ -427,7 +426,7 @@ const Complete = () => {
                   <SelectItem key="both">Both Text & File</SelectItem>
                 </Select>
               </div>
-              <div className="col-span-2">
+              <div className="col-span-2 col-start-1">
                 <label htmlFor="doctors" className="label">
                   <span className="label-text">Doctors</span>
                 </label>
@@ -454,6 +453,16 @@ const Complete = () => {
                       </span>
                     </label>
                   )}
+                </div>
+              </div>
+              <div className="col-span-full gap-2 flex flex-col md:col-span-2">
+                <label className="label">
+                  <span className="label-text">Test Names</span>
+                </label>{" "}
+                <div className="flex gap-1">
+                  {test?.testDetail.testData.map((test, index) => (
+                    <Chip key={index}>{test.name}</Chip>
+                  ))}
                 </div>
               </div>
 

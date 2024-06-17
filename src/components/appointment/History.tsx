@@ -29,6 +29,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Tooltip,
   useDisclosure,
 } from "@nextui-org/react";
 
@@ -81,9 +82,6 @@ const History = () => {
         test.testDetail.doctorData.name
           .toLowerCase()
           .includes(searchQuery.toLowerCase())) ||
-      test.testDetail.testData.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
       test.status.toLowerCase().includes(searchQuery.toLowerCase()) ||
       humanReadableDate(test.appointmentdate)
         .toLowerCase()
@@ -186,19 +184,17 @@ const History = () => {
                             {test.testDetail.userData.name}
                           </p>
                         </div>
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          // @ts-ignore
-                          // color={
-                          //   TestStatus.find(
-                          //     (status) => status.value === test.status
-                          //   )?.color
-                          // }
-                          className="text-end text-nowrap overflow-hidden text-ellipsis"
-                        >
-                          {test.testDetail.testData.name}
-                        </Chip>
+                        {test.testDetail.testData.length > 1 && (
+                          <Tooltip
+                            content={
+                              test.testDetail.testData.length - 1 + " more"
+                            }
+                          >
+                            <Chip size="sm">
+                              +{test.testDetail.testData.length - 1}
+                            </Chip>
+                          </Tooltip>
+                        )}
                       </div>
 
                       <div className="mt-4">
@@ -303,7 +299,7 @@ const History = () => {
               <ModalHeader>
                 <p>
                   Are you sure you want to cancel your appointment for{" "}
-                  {selected?.testDetail.testData.name}
+                  {selected?.testDetail.testData[0].name}
                 </p>
               </ModalHeader>
               <ModalBody></ModalBody>
@@ -404,7 +400,8 @@ const ScheduleModal = ({
           <>
             <ModalHeader>
               <p>
-                Reschedule your appointment for {test?.testDetail.testData.name}
+                Reschedule your appointment for{" "}
+                {test?.testDetail.testData[0].name}
               </p>
             </ModalHeader>
             <ModalBody>

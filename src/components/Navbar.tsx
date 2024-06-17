@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState, Fragment } from "react";
 import { API_BASE_URL } from "../utils/config";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../utils/auth";
 import { useFormik } from "formik";
 import { data } from "../utils/data";
@@ -78,13 +78,13 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="bg-base-100/30 backdrop-blur-lg fixed top-0 left-0 w-full z-50">
+      <header className="bg-base-300/40 backdrop-blur-lg shadow-xl fixed top-0 left-0 w-full z-50">
         <nav
           className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
           aria-label="Global"
         >
           <div className="flex lg:flex-1">
-            <Button as={"a"} variant="light" href="/" className="-m-1.5 p-1.5">
+            <Button as={Link} variant="light" to="/" className="-m-1.5 p-1.5">
               <span className="sr-only">
                 {websiteData.title || data.websiteData.title}
               </span>
@@ -118,12 +118,12 @@ const Navbar = () => {
             </button>
           </div>
           <Popover.Group className="hidden lg:flex lg:gap-x-12">
-            <a href="/dashboard" className="text-sm font-semibold leading-6">
+            <Link to="/dashboard" className="text-sm font-semibold leading-6">
               Dashboard
-            </a>
-            <a href="/profile" className="text-sm font-semibold leading-6">
+            </Link>
+            <Link to="/profile" className="text-sm font-semibold leading-6">
               Profile
-            </a>
+            </Link>
             <Popover className="relative">
               <Popover.Button className="flex items-center gap-x-1 text-sm font-semibold outline-none leading-6">
                 Appointments
@@ -156,13 +156,13 @@ const Navbar = () => {
                           />
                         </div>
                         <div className="flex-auto">
-                          <a
-                            href={item.href}
+                          <Link
+                            to={item.href}
                             className="block outline-none font-semibold"
                           >
                             {item.name}
                             <span className="absolute inset-0" />
-                          </a>
+                          </Link>
                         </div>
                       </div>
                     ))}
@@ -202,13 +202,13 @@ const Navbar = () => {
                           />
                         </div>
                         <div className="flex-auto">
-                          <a
-                            href={item.href}
+                          <Link
+                            to={item.href}
                             className="block outline-none font-semibold"
                           >
                             {item.name}
                             <span className="absolute inset-0" />
-                          </a>
+                          </Link>
                         </div>
                       </div>
                     ))}
@@ -249,13 +249,13 @@ const Navbar = () => {
                             />
                           </div>
                           <div className="flex-auto">
-                            <a
-                              href={item.href}
+                            <Link
+                              to={item.href}
                               className="block outline-none font-semibold"
                             >
                               {item.name}
                               <span className="absolute inset-0" />
-                            </a>
+                            </Link>
                           </div>
                         </div>
                       ))}
@@ -271,12 +271,12 @@ const Navbar = () => {
                 Logout
               </Button>
             ) : (
-              <a
-                href="/auth/login"
+              <Link
+                to="/auth/login"
                 className="text-sm font-semibold leading-6 btn btn-ghost btn-sm rounded-full"
               >
                 Log in <span aria-hidden="true">&rarr;</span>
-              </a>
+              </Link>
             )}
           </div>
         </nav>
@@ -289,7 +289,7 @@ const Navbar = () => {
           <div className="fixed inset-0 z-10" />
           <Dialog.Panel className="fixed inset-y-0 right-0 z-50 bg-base-300 w-full overflow-y-auto px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
-              <a href="/dashboard" className="-m-1.5 p-1.5">
+              <Link to="/dashboard" className="-m-1.5 p-1.5">
                 <span className="sr-only">Shailung Polyclinic</span>
                 <div className="flex items-center gap-2">
                   <img
@@ -308,7 +308,7 @@ const Navbar = () => {
                     {websiteData.title || data.websiteData.title}
                   </span>
                 </div>
-              </a>
+              </Link>
               <button
                 type="button"
                 className="btn btn-ghost btn-circle"
@@ -321,18 +321,18 @@ const Navbar = () => {
             <div className="mt-6 flow-root">
               <div className="-my-6 divide-y divide-base-2000/10">
                 <div className="space-y-2 py-6">
-                  <a
-                    href="/dashboard"
+                  <Link
+                    to="/dashboard"
                     className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 hover:bg-base-200"
                   >
                     Dashboard
-                  </a>
-                  <a
-                    href="/profile"
+                  </Link>
+                  <Link
+                    to="/profile"
                     className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 hover:bg-base-200"
                   >
                     Profile
-                  </a>
+                  </Link>
                   <Disclosure as="div" className="-mx-3">
                     {({ open }) => (
                       <>
@@ -350,8 +350,8 @@ const Navbar = () => {
                           {appointments.map((item) => (
                             <Disclosure.Button
                               key={item.name}
-                              as="a"
-                              href={item.href}
+                              as={Link}
+                              to={item.href}
                               className="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 hover:bg-base-200"
                             >
                               {item.name}
@@ -378,8 +378,8 @@ const Navbar = () => {
                           {tests.map((item) => (
                             <Disclosure.Button
                               key={item.name}
-                              as="a"
-                              href={item.href}
+                              as={Link}
+                              to={item.href}
                               className="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 hover:bg-base-200"
                             >
                               {item.name}
@@ -407,8 +407,8 @@ const Navbar = () => {
                             {users.map((item) => (
                               <Disclosure.Button
                                 key={item.name}
-                                as="a"
-                                href={item.href}
+                                as={Link}
+                                to={item.href}
                                 className="block rounded-lg py-2 pl-6 pr-3 text-sm font-semibold leading-7 hover:bg-base-200"
                               >
                                 {item.name}
@@ -423,12 +423,12 @@ const Navbar = () => {
 
                 <div className="py-6">
                   {!loggedIn ? (
-                    <a
-                      href="/auth/login"
+                    <Link
+                      to="/auth/login"
                       className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 hover:bg-base-200"
                     >
                       Log in
-                    </a>
+                    </Link>
                   ) : (
                     <span
                       className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 hover:bg-base-200"

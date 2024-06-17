@@ -121,7 +121,7 @@ const Tests = () => {
 
   useEffect(() => {
     if (queryStatus == null) {
-      window.location.href = "/dashboard/tests?status=all";
+      navigate("/dashboard/tests?status=all");
     }
     fetchAllTests();
   }, [queryStatus]);
@@ -302,7 +302,28 @@ const Tests = () => {
                           )}
                       </Dropdown>
                     </TableCell>
-                    <TableCell>{test.testDetail.testData.name}</TableCell>
+                    <TableCell className="space-x-1">
+                      {test.testDetail.testData.slice(0, 2).map((data) => {
+                        return (
+                          <>
+                            <Chip key={data._id} size="sm">
+                              {data.name}
+                            </Chip>
+                          </>
+                        );
+                      })}
+                      {test.testDetail.testData.length > 2 && (
+                        <Tooltip
+                          content={
+                            test.testDetail.testData.length - 2 + " more"
+                          }
+                        >
+                          <Chip size="sm">
+                            +{test.testDetail.testData.length - 2}
+                          </Chip>
+                        </Tooltip>
+                      )}
+                    </TableCell>
                     <TableCell>{test.testDetail.userData.name}</TableCell>
                     <TableCell>{test.testDetail.userData.phone}</TableCell>
                     <TableCell>{test.addedby}</TableCell>
@@ -625,7 +646,7 @@ const DeleteModal = ({ test, setTests, deleteTestModal }: DeleteModalProps) => {
               <ModalHeader>
                 <p>
                   Are you sure you want to delete{" "}
-                  {test?.testDetail.testData.name}
+                  {test?.testDetail.testData[0].name}
                 </p>
               </ModalHeader>
               <ModalBody></ModalBody>
@@ -735,7 +756,8 @@ const ScheduleModal = ({
           <>
             <ModalHeader>
               <p>
-                Reschedule your appointment for {test?.testDetail.testData.name}
+                Reschedule your appointment for{" "}
+                {test?.testDetail.testData[0].name}
               </p>
             </ModalHeader>
             <ModalBody>

@@ -15,6 +15,7 @@ import {
   CardBody,
   CardHeader,
   Checkbox,
+  Chip,
   DatePicker,
   Input,
   Select,
@@ -110,6 +111,7 @@ const CompleteHold = () => {
                       isDraft: data.isDraft,
                       reportid: data.reportid,
                       doctors: data.doctors,
+                      refby: data.refby,
                     }));
                   });
               });
@@ -153,6 +155,7 @@ const CompleteHold = () => {
       reportid: "",
       reportFile: [""],
       doctors: [] as string[],
+      refby: "",
     },
     onSubmit: async (values) => {
       try {
@@ -262,8 +265,6 @@ const CompleteHold = () => {
       console.error("Error submitting data:", error);
     }
   };
-
-  console.log(formik.values);
 
   const handleFormikSubmit = async (values: any, formikData: any) => {
     try {
@@ -389,18 +390,6 @@ const CompleteHold = () => {
             <div className="col-span-full md:col-span-2">
               <Input
                 type="text"
-                name="testname"
-                id="testname"
-                label="Test Name"
-                isRequired
-                onChange={formik.handleChange}
-                value={formik.values.testname}
-                isDisabled={test?.testDetail.testData.name !== ""}
-              />
-            </div>
-            <div className="col-span-full md:col-span-2">
-              <Input
-                type="text"
                 name="labId"
                 id="labId"
                 label="Lab ID"
@@ -408,6 +397,16 @@ const CompleteHold = () => {
                 isRequired
                 onChange={formik.handleChange}
                 value={formik.values.labId}
+              />
+            </div>
+            <div className="col-span-full md:col-span-2">
+              <Input
+                type="text"
+                name="refby"
+                id="refby"
+                label="Ref. By"
+                onChange={formik.handleChange}
+                value={formik.values.refby}
               />
             </div>
             <div className="col-span-full md:col-span-2">
@@ -444,7 +443,7 @@ const CompleteHold = () => {
                 onChange={formik.handleChange}
                 value={formik.values.status}
                 label="Report Status"
-                defaultSelectedKeys={["neutral"]}
+                defaultSelectedKeys={[formik.values.status]}
               >
                 <SelectItem key="neutral">Neutral</SelectItem>
                 <SelectItem key="positive">Positive</SelectItem>
@@ -466,7 +465,7 @@ const CompleteHold = () => {
                 <SelectItem key="both">Both Text & File</SelectItem>
               </Select>
             </div>
-            <div className="col-span-2">
+            <div className="col-span-2 col-start-1">
               <label htmlFor="doctors" className="label">
                 <span className="label-text">Doctors</span>
               </label>
@@ -493,6 +492,16 @@ const CompleteHold = () => {
                     </span>
                   </label>
                 )}
+              </div>
+            </div>
+            <div className="col-span-full gap-2 flex flex-col md:col-span-2">
+              <label className="label">
+                <span className="label-text">Test Names</span>
+              </label>{" "}
+              <div className="flex gap-1">
+                {test?.testDetail.testData.map((test, index) => (
+                  <Chip key={index}>{test.name}</Chip>
+                ))}
               </div>
             </div>
 

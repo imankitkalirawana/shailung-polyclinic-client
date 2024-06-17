@@ -25,6 +25,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  Tooltip,
 } from "@nextui-org/react";
 
 const humanReadableDate = (date: string) => {
@@ -386,11 +387,16 @@ const TestCard = ({ tests }: TestCardProps) => {
                     {test.status}
                   </Chip>
                 </TableCell>
-                <TableCell
-                  title={test.testDetail.testData.name}
-                  className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[200px]"
-                >
-                  {test.testDetail.testData.name}
+                <TableCell className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[200px]">
+                  {test.testDetail.testData.length > 2 && (
+                    <Tooltip
+                      content={test.testDetail.testData.length - 2 + " more"}
+                    >
+                      <Chip size="sm">
+                        +{test.testDetail.testData.length - 2}
+                      </Chip>
+                    </Tooltip>
+                  )}
                 </TableCell>
                 <TableCell>{test.testDetail.userData.name}</TableCell>
                 <TableCell>{test.testDetail.userData.phone}</TableCell>
