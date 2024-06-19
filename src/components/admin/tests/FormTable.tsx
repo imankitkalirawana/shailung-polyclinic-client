@@ -12,6 +12,7 @@ interface FormTableProps {
   onSecondarySubmit?: (values: any) => void;
   rowCount?: number;
   colCount?: number;
+  isHidden?: boolean;
 }
 
 const FormTable = ({
@@ -20,9 +21,10 @@ const FormTable = ({
   onSecondarySubmit,
   rowCount,
   colCount,
+  isHidden,
 }: FormTableProps) => {
-  const [rows, setRows] = useState<number>(rowCount || 3);
-  const [cols, setCols] = useState<number>(colCount || 3);
+  const [rows, setRows] = useState<number>(rowCount || 1);
+  const [cols, setCols] = useState<number>(colCount || 1);
   const [initialValues, setInitialValues] = useState<{ [key: string]: string }>(
     {}
   );
@@ -148,7 +150,7 @@ const FormTable = ({
     >
       {({ values, setValues }) => (
         <Form className="overflow-x-scroll">
-          <div className="flex justify-end mr-[72px]">
+          <div className={`flex justify-end mr-[72px] ${isHidden && "hidden"}`}>
             <Tooltip
               size="sm"
               placement="left"
@@ -175,7 +177,7 @@ const FormTable = ({
               </Button>
             </Tooltip>
           </div>
-          <table className="table">
+          <table className={`table ${isHidden && "hidden"}`}>
             <thead>
               <tr>
                 {Array.from({ length: cols }).map((_, colIndex) => (
@@ -289,7 +291,7 @@ const FormTable = ({
               ))}
             </tbody>
           </table>
-          <div className="flex justify-end mr-[72px]">
+          <div className={`flex justify-end mr-[72px] ${isHidden && "hidden"}`}>
             <Tooltip
               size="sm"
               placement="left"

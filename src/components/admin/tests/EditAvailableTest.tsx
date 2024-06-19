@@ -1,26 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useFormik } from "formik";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../../utils/config";
 import { isLoggedIn } from "../../../utils/auth";
-import { getAllDoctors } from "../../../functions/get";
-import { Doctor } from "../../../interface/interface";
-import {
-  Card,
-  Checkbox,
-  Input,
-  Select,
-  SelectItem,
-  Textarea,
-} from "@nextui-org/react";
+import { Card, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
 import FormTable from "./FormTable";
 
 const EditAvailableTest = () => {
   const { user } = isLoggedIn();
   const navigate = useNavigate();
-  const [doctors, setDoctors] = useState([]);
+  const location = useLocation();
+
   useEffect(() => {
     if (user?.role !== "admin" && user?.role !== "member") {
       navigate("/dashboard");
@@ -39,8 +31,6 @@ const EditAvailableTest = () => {
       );
       const data = response.data;
       formik.setValues(data);
-      const res2 = await getAllDoctors();
-      setDoctors(res2);
     };
 
     fetchUser();
@@ -59,13 +49,7 @@ const EditAvailableTest = () => {
       summary: "",
       serviceid: "",
     },
-    validate: (values) => {
-      const errors: any = {};
-      if (values.doctors.length === 0) {
-        errors.doctors = "Select atleast one doctor";
-      }
-      return errors;
-    },
+
     onSubmit: async (values) => {
       try {
         await axios.put(`${API_BASE_URL}/api/available-test/${id}`, values, {
@@ -85,6 +69,7 @@ const EditAvailableTest = () => {
   const handleTableSubmit = async (values: any) => {
     try {
       await handleFormikSubmit(values, formik.values);
+      // console.log("Table data:", values);
     } catch (error) {
       toast.error("Failed to submit data");
       console.error("Error submitting data:", error);
@@ -111,6 +96,15 @@ const EditAvailableTest = () => {
       console.error("Error submitting data:", error);
     }
   };
+
+  useEffect(() => {
+    if (location.hash === "#formtable") {
+      const element = document.getElementById("formtable");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [location]);
 
   return (
     <>
@@ -220,40 +214,11 @@ const EditAvailableTest = () => {
                 <SelectItem key="inactive">Not Available</SelectItem>
               </Select>
             </div>
-            <div className="col-span-2">
-              <label htmlFor="doctors" className="label">
-                <span className="label-text">Doctors</span>
-              </label>
-              <div className="max-h-48 p-2 overflow-y-scroll">
-                {doctors.map((doctor: Doctor, index) => (
-                  <div className="form-control" key={index}>
-                    <Checkbox
-                      name="doctors"
-                      className="mb-1"
-                      value={doctor._id}
-                      isSelected={formik.values.doctors.includes(
-                        doctor._id as string
-                      )}
-                      onChange={formik.handleChange}
-                    >
-                      {doctor.name}
-                    </Checkbox>
-                  </div>
-                ))}
-                {formik.errors.doctors && (
-                  <label htmlFor="doctors" className="label">
-                    <span className="label-text text-error">
-                      {formik.errors.doctors}
-                    </span>
-                  </label>
-                )}
-              </div>
-            </div>
           </div>
         </Card>
       </form>
 
-      <Card className="mt-8 p-4">
+      <Card className="mt-8 p-4" id="formtable">
         {/* {formik.values.serviceid && ( */}
         <FormTable
           tableid={formik.values.serviceid || ""}

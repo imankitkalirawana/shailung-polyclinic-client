@@ -5,13 +5,12 @@ import { toast } from "sonner";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { useFormik } from "formik";
-import { getAllAvailableTests, getAllDoctors } from "../../../functions/get";
+import { getAllAvailableTests } from "../../../functions/get";
 import { isLoggedIn } from "../../../utils/auth";
-import { Doctor, AvailableTest as Test } from "../../../interface/interface";
+import { AvailableTest as Test } from "../../../interface/interface";
 import * as Yup from "yup";
 import {
   Button,
-  Checkbox,
   Chip,
   Dropdown,
   DropdownItem,
@@ -232,24 +231,11 @@ interface AddTestProps {
 }
 
 const AddTest = ({ newServiceModal }: AddTestProps) => {
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const res = await getAllDoctors();
-        setDoctors(res);
-      } catch (error: any) {
-        console.error("Error fetching doctors:", error);
-      }
-    };
-    fetchDoctors();
-  }, []);
   const navigate = useNavigate();
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
     price: Yup.string().required("Price is required"),
-    doctors: Yup.array().min(1, "Select at least one doctor"),
   });
 
   const formik = useFormik({
@@ -265,28 +251,14 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      try {
-        await axios
-          .post(`${API_BASE_URL}/api/available-test/`, values, {
-            headers: {
-              Authorization: `${localStorage.getItem("token")}`,
-            },
-          })
-          .then(() => {
-            toast.success("Test added successfully");
-            newServiceModal.onClose();
-            navigate(0);
-          });
-      } catch (error: any) {
-        toast.error(error.response.data.error);
-        console.log(error);
-      }
+      console.log("values", values);
     },
   });
 
   const handleTableSubmit = async (values: any) => {
     try {
       await handleFormikSubmit(values, formik.values);
+      // console.log("values", values);
     } catch (error: any) {
       toast.error("Error submitting data");
       console.error("Error submitting data:", error);
@@ -306,7 +278,10 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
           },
         }
       );
-      toast.success("Data submitted successfully");
+      navigate(
+        `/dashboard/tests/available-tests/${response.data._id}/edit#formtable`
+      );
+      toast.success("Please fill the form table to complete the process");
       console.log("Data submitted successfully:", response.data);
     } catch (error: any) {
       toast.error("Error submitting data");
@@ -389,32 +364,8 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
               onChange={formik.handleChange}
               value={formik.values.summary}
             />
-            <label className="label" htmlFor="doctors">
-              <span className="label-text">Select Doctors:</span>
-            </label>
-            <div className="max-h-48 min-h-32 flex flex-col p-2 overflow-y-scroll">
-              {doctors.map((doctor: Doctor) => (
-                <Checkbox
-                  key={doctor._id}
-                  name="doctors"
-                  className="mb-1"
-                  value={doctor._id}
-                  isSelected={formik.values.doctors.includes(
-                    doctor._id as string
-                  )}
-                  onChange={formik.handleChange}
-                >
-                  {doctor.name}
-                </Checkbox>
-              ))}
-            </div>
-            {/* show error */}
-            {formik.touched.doctors && formik.errors.doctors && (
-              <div className="text-danger">{formik.errors.doctors}</div>
-            )}
-
             <div className="form-control col-span-full">
-              <FormTable onSubmit={handleTableSubmit} />
+              <FormTable onSubmit={handleTableSubmit} isHidden />
             </div>
           </ModalBody>
         </ModalContent>
