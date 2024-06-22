@@ -133,3 +133,12 @@ export const getAllReports = async () => {
     return data.reverse();
 }
 
+export const getAllMER = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/mer/`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    const data = response.data;
+    return data.reverse();
+}

@@ -387,7 +387,16 @@ const TestCard = ({ tests }: TestCardProps) => {
                     {test.status}
                   </Chip>
                 </TableCell>
-                <TableCell className="overflow-hidden whitespace-nowrap text-ellipsis max-w-[200px]">
+                <TableCell className="space-x-1">
+                  {test.testDetail.testData.slice(0, 2).map((data) => {
+                    return (
+                      <>
+                        <Chip key={data._id} size="sm">
+                          {data.name}
+                        </Chip>
+                      </>
+                    );
+                  })}
                   {test.testDetail.testData.length > 2 && (
                     <Tooltip
                       content={test.testDetail.testData.length - 2 + " more"}

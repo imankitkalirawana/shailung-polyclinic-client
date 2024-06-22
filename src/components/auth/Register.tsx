@@ -309,6 +309,7 @@ const Register = () => {
                       value={parseDate(formik.values.dob)}
                       name="dob"
                       isRequired
+                      showMonthAndYearPickers
                     />
                     <Select name="gender" isRequired label="Gender" id="gender">
                       <SelectItem key="male">Male</SelectItem>

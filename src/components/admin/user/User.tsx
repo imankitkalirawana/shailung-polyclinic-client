@@ -246,6 +246,7 @@ const User = () => {
             }}
             value={parseDate(formik.values.dob)}
             name="dob"
+            showMonthAndYearPickers
           />
           <Textarea
             label="Bio"

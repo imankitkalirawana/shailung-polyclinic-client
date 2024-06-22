@@ -38,7 +38,6 @@ const Profile = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [forgotProcessing, setForgotProcessing] = useState(false);
-
   const deleteAccountModal = useDisclosure();
 
   const formik = useFormik({
@@ -280,6 +279,7 @@ const Profile = () => {
               }}
               value={parseDate(formik.values.dob)}
               name="dob"
+              showMonthAndYearPickers
             />
             <Textarea
               label="Bio"

@@ -420,6 +420,7 @@ const CompleteHold = () => {
                 }}
                 value={parseDate(formik.values.reportDate)}
                 name="reportDate"
+                showMonthAndYearPickers
               />
             </div>
             <div className="col-span-full md:col-span-2">
@@ -433,6 +434,7 @@ const CompleteHold = () => {
                 }}
                 value={parseDate(formik.values.collectiondate)}
                 name="collectiondate"
+                showMonthAndYearPickers
               />
             </div>
             <div className="col-span-full md:col-span-2">

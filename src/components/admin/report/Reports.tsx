@@ -118,7 +118,10 @@ const Reports = () => {
               <TableColumn key={"date"}>Date</TableColumn>
               <TableColumn key={"actions"}>Actions</TableColumn>
             </TableHeader>
-            <TableBody items={reports.filter((report) => handleSearch(report))}>
+            <TableBody
+              emptyContent={"No Report Available"}
+              items={reports.filter((report) => handleSearch(report))}
+            >
               {(report: Report) => (
                 <TableRow key={report._id}>
                   <TableCell>

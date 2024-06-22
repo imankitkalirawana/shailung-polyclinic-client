@@ -379,6 +379,7 @@ const New = () => {
                     );
                   }}
                   isRequired
+                  showMonthAndYearPickers
                 />
               </div>
               <div className="form-control col-span-2">

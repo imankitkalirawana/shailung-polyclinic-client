@@ -775,6 +775,7 @@ const ScheduleModal = ({
                 }}
                 isInvalid={formik.errors.appointmentdate ? true : false}
                 errorMessage={formik.errors.appointmentdate}
+                showMonthAndYearPickers
               />
             </ModalBody>
             <ModalFooter className="flex-col-reverse sm:flex-row">

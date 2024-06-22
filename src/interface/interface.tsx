@@ -125,3 +125,127 @@ export interface Report {
   reportFile: string[];
   refby: string;
 }
+
+export interface GeneralExamination {
+  height: string;
+  weight: string;
+  pulseRate: string;
+  temperature: string;
+  bloodPressure: string;
+  jaundice: boolean;
+  paller: boolean;
+  cynosis: boolean;
+  clubbing: boolean;
+  oedema: boolean;
+  ascitis: boolean;
+  lymphNode: boolean;
+}
+
+export interface SystematicExamination {
+  cardiovascular: string;
+  pulmonary: string;
+  gastroenterology: string;
+  neurology: string;
+  musculoskeletal: string;
+  genitourinary: string;
+  oroDental: string;
+  deformities: string;
+  varicosVeins: string;
+  hernia: string;
+  hydrocele: string;
+  eye: {
+    rightEye: string;
+    leftEye: string;
+  };
+  ear: {
+    rightEar: string;
+    leftEar: string;
+  };
+  others: string;
+  radiologicalChestXRay: string;
+  ecg: string;
+  clinicalImpression: string;
+}
+
+export interface DifferentialCount {
+  value: string;
+  referenceRange: string;
+}
+
+export interface Hematology {
+  totalWBCCount: DifferentialCount;
+  differentialCount: {
+    neutrophils: DifferentialCount;
+    lymphocytes: DifferentialCount;
+    eosinophils: DifferentialCount;
+    monocytes: DifferentialCount;
+    basophils: DifferentialCount;
+  };
+  esr: DifferentialCount;
+  hemoglobin: DifferentialCount;
+  malariaParasite: string;
+  microfilaria: string;
+}
+
+export interface Biochemistry {
+  randomBloodSugar: DifferentialCount;
+  urea: DifferentialCount;
+  creatinine: DifferentialCount;
+  bilirubin: {
+    totalDirect: DifferentialCount;
+  };
+  sgpt: DifferentialCount;
+  sgop: DifferentialCount;
+}
+
+export interface Serology {
+  antiHIV: string;
+  hbsAg: string;
+  antiHCV: string;
+  vdrlRPR: string;
+  tpHA: string;
+  BloodGroupRh: string;
+}
+
+export interface Urine {
+  albuminSugar: string;
+  pusCells: string;
+  rbcs: string;
+  epithelialCells: string;
+}
+
+export interface OtherTests {
+  opiates: string;
+  cannabis: string;
+  mantouxTest: string;
+  urinePregnancyTest: string;
+}
+
+export interface LaboratoryExamination {
+  hematology: Hematology;
+  biochemistry: Biochemistry;
+  serology: Serology;
+  urine: Urine;
+  other: OtherTests;
+}
+
+export interface MER {
+  _id: string;
+  name: string;
+  age: number;
+  sex: string;
+  maritialStatus: string;
+  passportNumber: string;
+  passportExpiry: string;
+  placeOfBirth: string;
+  medicalExaminationDate: string;
+  appliedCountry: string;
+  nationality: string;
+  photo: string;
+  generalExamination: GeneralExamination;
+  systematicExamination: SystematicExamination;
+  laboratoryExamination: LaboratoryExamination;
+  createdAt: string;
+  updatedAt: string;
+  addedby: string;
+}

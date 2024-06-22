@@ -414,6 +414,7 @@ const ScheduleModal = ({
                 onChange={(date) => {
                   setDate(date.toString());
                 }}
+                showMonthAndYearPickers
               />
             </ModalBody>
             <ModalFooter className="flex-col-reverse sm:flex-row">

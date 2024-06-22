@@ -5,3 +5,16 @@
 ::-webkit-scrollbar {
   display: none;
 }
+
+.tbl td,
+.tbl th {
+  /* padding: 0.25rem; */
+  padding: 1px;
+  /* padding-left: 0.5rem; */
+  border: 1px solid #000;
+  text-transform: capitalize;
+}
+
+.tbl th {
+  white-space: nowrap;
+}

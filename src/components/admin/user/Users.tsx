@@ -605,6 +605,7 @@ const AddUser = ({ addUserModal }: AddUserProps) => {
               isRequired
               isInvalid={formik.errors.dob ? true : false}
               errorMessage={formik.errors.dob}
+              showMonthAndYearPickers
             />
 
             <Input
