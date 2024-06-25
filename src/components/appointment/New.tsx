@@ -47,7 +47,7 @@ interface Tests {
 }
 
 const New = () => {
-  const { loggedIn } = isLoggedIn();
+  const { loggedIn, user } = isLoggedIn();
   const navigate = useNavigate();
   const [tests, setTests] = useState<Tests[]>([]);
   const [lUser, setUser] = useState<User>({} as User);
@@ -172,7 +172,13 @@ const New = () => {
               action: {
                 label: "View",
                 onClick: () => {
-                  navigate("/appointment/history");
+                  navigate(
+                    `${
+                      user?.role === "user"
+                        ? "/appointment/history"
+                        : "/dashboard/tests?status=booked"
+                    }`
+                  );
                 },
               },
               duration: Infinity,
@@ -335,20 +341,21 @@ const New = () => {
                   isRequired
                 />
               </div>
-              <div className="col-span-2">
-                <Input
-                  type="text"
-                  id="phone"
-                  name="phone"
-                  label="Patient Phone"
-                  placeholder="Patient phone"
-                  variant="bordered"
-                  value={formik.values.phone}
-                  onChange={formik.handleChange}
-                  isDisabled
-                  description="Patient phone number will be same as registered by the user"
-                />
-              </div>
+              {isPhone !== "false" && (
+                <div className="col-span-2">
+                  <Input
+                    type="text"
+                    id="phone"
+                    name="phone"
+                    label="Patient Phone"
+                    placeholder="Patient phone"
+                    variant="bordered"
+                    value={formik.values.phone}
+                    onChange={formik.handleChange}
+                    description="Patient phone number will be same as registered by the user"
+                  />
+                </div>
+              )}
               <div className="col-span-2 md:col-span-1">
                 <Input
                   type="number"
@@ -361,6 +368,7 @@ const New = () => {
                   // @ts-ignore
                   value={formik.values.age}
                   onChange={formik.handleChange}
+                  min={0}
                 />
               </div>
             </>

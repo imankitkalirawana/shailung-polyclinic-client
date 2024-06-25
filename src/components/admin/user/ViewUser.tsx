@@ -138,7 +138,7 @@ const ViewUser = () => {
               </div>
             </div>
           </CardBody>
-          {(user?.role === "admin" || user?.role === "member") && (
+          {(user?.role === "admin" || user?.role === "doctor") && (
             <CardFooter>
               <Button
                 fullWidth

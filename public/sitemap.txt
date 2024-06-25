@@ -23,3 +23,7 @@ https://report.shailungpolyclinic.com/dashboard/doctors
 https://report.shailungpolyclinic.com/dashboard/doctors/:id
 https://report.shailungpolyclinic.com/dashboard/doctors/:id/edit
 https://report.shailungpolyclinic.com/dashboard/website
+https://report.shailungpolyclinic.com/dashboard/medical-examination-report
+https://report.shailungpolyclinic.com/dashboard/medical-examination-report/:id
+https://report.shailungpolyclinic.com/dashboard/medical-examination-report/:id/edit
+https://report.shailungpolyclinic.com/dashboard/medical-examination-report/new

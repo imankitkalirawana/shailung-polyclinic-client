@@ -13,6 +13,8 @@ interface FormTableProps {
   rowCount?: number;
   colCount?: number;
   isHidden?: boolean;
+  isLoading?: boolean;
+  isDrafting?: boolean;
 }
 
 const FormTable = ({
@@ -22,6 +24,8 @@ const FormTable = ({
   rowCount,
   colCount,
   isHidden,
+  isLoading,
+  isDrafting,
 }: FormTableProps) => {
   const [rows, setRows] = useState<number>(rowCount || 1);
   const [cols, setCols] = useState<number>(colCount || 1);
@@ -134,7 +138,6 @@ const FormTable = ({
     for (let row = 0; row < rows; row++) {
       newValues[`cell-${row}-${colIndex}`] = "";
     }
-
     setCols(cols + 1);
     setValues(newValues);
   };
@@ -326,11 +329,19 @@ const FormTable = ({
                 onPress={() => {
                   onSecondarySubmit(values);
                 }}
+                isLoading={isDrafting}
+                isDisabled={isDrafting}
               >
                 Save Draft
               </Button>
             )}
-            <Button variant="flat" color="primary" type="submit">
+            <Button
+              variant="flat"
+              color="primary"
+              type="submit"
+              isLoading={isLoading}
+              isDisabled={isLoading}
+            >
               Submit
             </Button>
           </div>

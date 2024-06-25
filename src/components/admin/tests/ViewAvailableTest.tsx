@@ -15,7 +15,7 @@ const ViewAvailableTest = () => {
   const { user } = isLoggedIn();
   const navigate = useNavigate();
   useEffect(() => {
-    if (user?.role !== "admin" && user?.role !== "member") {
+    if (user?.role !== "admin" && user?.role !== "doctor") {
       navigate("/dashboard");
     }
   }, [user]);

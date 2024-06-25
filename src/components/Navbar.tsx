@@ -216,7 +216,7 @@ const Navbar = () => {
                 </Popover.Panel>
               </Transition>
             </Popover>
-            {user?.role === "admin" || user?.role === "member" ? (
+            {user?.role === "admin" || user?.role === "doctor" ? (
               <>
                 <Popover className="relative">
                   <Popover.Button className="flex items-center gap-x-1 text-sm font-semibold outline-none leading-6">
@@ -397,7 +397,7 @@ const Navbar = () => {
                       </>
                     )}
                   </Disclosure>
-                  {(user?.role === "admin" || user?.role === "member") && (
+                  {(user?.role === "admin" || user?.role === "doctor") && (
                     <Disclosure as="div" className="-mx-3">
                       {({ open }) => (
                         <>
@@ -535,7 +535,7 @@ const users = [
   },
 ];
 
-if (user?.role === "admin" || user?.role === "member") {
+if (user?.role === "admin" || user?.role === "doctor") {
   appointments.unshift(
     {
       name: "New Appointment (Existing User)",

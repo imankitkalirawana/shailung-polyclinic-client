@@ -12,6 +12,8 @@ interface ReportTableProps {
   onSecondarySubmit?: (values: any) => void;
   rowCount?: number;
   colCount?: number;
+  isLoading?: boolean;
+  isDrafting?: boolean;
 }
 
 const ReportTable = ({
@@ -20,6 +22,8 @@ const ReportTable = ({
   onSecondarySubmit,
   rowCount,
   colCount,
+  isLoading,
+  isDrafting,
 }: ReportTableProps) => {
   const [rows, setRows] = useState<number>(rowCount || 3);
   const [cols, setCols] = useState<number>(colCount || 3);
@@ -323,11 +327,19 @@ const ReportTable = ({
                 onPress={() => {
                   onSecondarySubmit(values);
                 }}
+                isLoading={isDrafting}
+                isDisabled={isDrafting}
               >
                 Save Draft
               </Button>
             )}
-            <Button variant="flat" color="primary" type="submit">
+            <Button
+              variant="flat"
+              color="primary"
+              type="submit"
+              isLoading={isLoading}
+              isDisabled={isLoading}
+            >
               Submit
             </Button>
           </div>

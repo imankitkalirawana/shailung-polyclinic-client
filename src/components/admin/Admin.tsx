@@ -6,7 +6,7 @@ const Admin = () => {
   // const { loggedIn, user } = isLoggedIn();
   // if (!loggedIn) {
   //   window.location.href = "/auth/login";
-  // } else if (loggedIn && user?.role !== "admin" && user?.role !== "member") {
+  // } else if (loggedIn && user?.role !== "admin" && user?.role !== "doctor") {
   //   return (
   //     <div className="my-24" onLoad={() => {}}>
   //       <UserDashboard />

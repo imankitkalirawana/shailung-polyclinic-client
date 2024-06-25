@@ -89,7 +89,7 @@ export const getDoctorWithId = async (id: string) => {
 }
 
 export const getAllTests = async (status: any) => {
-    const response = await axios.get(`${API_BASE_URL}/api/test/status/${status}`, {
+    const response = await axios.get(`${API_BASE_URL}/api/test/status/${status || "all"}`, {
         headers: {
             Authorization: `${localStorage.getItem("token")}`,
         },

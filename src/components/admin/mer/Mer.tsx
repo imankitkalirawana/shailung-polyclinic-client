@@ -66,6 +66,12 @@ const Mer = () => {
                 height: "29.7cm",
               }}
             >
+              <img
+                className="absolute top-[50%] left-[50%] translate-x-[-50%] opacity-10 mix-blend-multiply translate-y-[-50%] w-[90%]"
+                src="/mer.webp"
+                loading="eager"
+              />
+
               <div className="border border-black w-full h-full">
                 <header>
                   <div className="flex flex-col justify-center items-center">

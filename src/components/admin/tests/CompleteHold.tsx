@@ -33,8 +33,8 @@ const CompleteHold = () => {
   const [test, setTest] = useState<Test | null>(null);
   const [files, setFiles] = useState<FileList | null>(null);
   // const [isUplaoded, setIsUploaded] = useState<boolean>(false);
-  // const [processing, setProcessing] = useState<boolean>(false);
-  // const [isDrafting, setIsDrafting] = useState<boolean>(false);
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [isDrafting, setIsDrafting] = useState<boolean>(false);
   // const [tableid, setTableid] = useState<string>("");
   const [doctors, setDoctors] = useState([]);
 
@@ -244,8 +244,8 @@ const CompleteHold = () => {
   };
 
   const handleDraftSubmit = async (values: any, formikData: any) => {
+    setIsDrafting(true);
     try {
-      // setIsDrafting(true);
       await axios.put(
         `${API_BASE_URL}/api/report/redraft/${formikData._id}`,
         {
@@ -259,14 +259,16 @@ const CompleteHold = () => {
         }
       );
       toast.success("Report saved as draft");
-      // navigate("/dashboard/tests");
-      // setIsDrafting(false);
+      navigate("/dashboard/tests?status=hold");
     } catch (error) {
+      toast.error("Failed to submit data");
       console.error("Error submitting data:", error);
     }
+    setIsDrafting(false);
   };
 
   const handleFormikSubmit = async (values: any, formikData: any) => {
+    setProcessing(true);
     try {
       await axios.put(
         `${API_BASE_URL}/api/report/draft/${formikData._id}`,
@@ -281,10 +283,12 @@ const CompleteHold = () => {
         }
       );
       toast.success("Data submitted successfully");
+      navigate("/dashboard/tests?status=completed");
     } catch (error) {
       toast.error("Failed to submit data");
       console.error("Error submitting data:", error);
     }
+    setProcessing(false);
   };
 
   return (
@@ -577,6 +581,8 @@ const CompleteHold = () => {
                   tableid={formik.values.reportid}
                   onSubmit={handleTableSubmit}
                   onSecondarySubmit={handleDraftTableSubmit}
+                  isLoading={processing}
+                  isDrafting={isDrafting}
                 />
               </CardBody>
             </>

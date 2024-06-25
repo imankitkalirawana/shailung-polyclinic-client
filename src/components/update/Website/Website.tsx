@@ -1,7 +1,6 @@
 import { isLoggedIn } from "../../../utils/auth";
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import ViewSign from "./ViewSign";
 import { useFormik } from "formik";
 import { API_BASE_URL } from "../../../utils/config";
 import axios from "axios";
@@ -169,9 +168,7 @@ const Website = () => {
             </Button>
           </CardFooter>
         </Card>
-        <div className="my-8">
-          <ViewSign />
-        </div>
+        {/* <div className="my-8"><ViewSign /></div> */}
       </div>
     </>
   );

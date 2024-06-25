@@ -14,7 +14,7 @@ const EditAvailableTest = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (user?.role !== "admin" && user?.role !== "member") {
+    if (user?.role !== "admin" && user?.role !== "doctor") {
       navigate("/dashboard");
     }
   }, [user]);

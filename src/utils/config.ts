@@ -2,7 +2,7 @@
 // export const API_BASE_URL = "https://backend.shailungpolyclinic.com";
 const CurrentDate = new Date();
 const ExpiryDate = new Date("2024-07-11");
-const IsExpired = CurrentDate > ExpiryDate;
+const IsExpired = CurrentDate < ExpiryDate;
 console.log(IsExpired)
 export const API_BASE_URL = IsExpired ? "http://localhost:3000" : "https://backend.shailungpolyclinic.com";
 export const Roles = [
@@ -13,9 +13,15 @@ export const Roles = [
         color: "danger"
     },
     {
-        value: "member",
-        label: "Member",
-        description: "Member can manage user profile and appointments",
+        value: "receptionist",
+        label: "Receptionist",
+        description: "Receptionists can book appointments",
+        color: "secondary"
+    },
+    {
+        value: "doctor",
+        label: "Doctor",
+        description: "Doctor can manage user profile and appointments",
         color: "warning"
     }, {
         value: "user",

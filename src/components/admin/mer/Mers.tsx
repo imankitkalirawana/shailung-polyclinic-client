@@ -46,7 +46,7 @@ const Mers = () => {
   const deleteReportModal = useDisclosure();
 
   useEffect(() => {
-    if (!loggedIn || (user?.role !== "admin" && user?.role !== "member")) {
+    if (!loggedIn || (user?.role !== "admin" && user?.role !== "doctor")) {
       window.location.href = `/auth/login?redirect=${currentUrl}`;
     }
   }, [currentUrl]);

@@ -78,7 +78,7 @@ const Tests = () => {
   const exportModal = useDisclosure();
 
   useEffect(() => {
-    if (user?.role !== "admin" && user?.role !== "member") {
+    if (user?.role !== "admin" && user?.role !== "doctor") {
       navigate("/dashboard");
     }
   }, [user]);
@@ -125,6 +125,7 @@ const Tests = () => {
     }
     fetchAllTests();
   }, [queryStatus]);
+
   const fetchAllTests = async () => {
     const data = await getAllTests(queryStatus);
     setTests(data);
@@ -691,6 +692,8 @@ const ScheduleModal = ({
   setTests,
   scheduleTestModal,
 }: ScheduleModalProps) => {
+  const [searchParams] = useSearchParams();
+  const queryStatus = searchParams.get("status");
   const formik = useFormik({
     initialValues: {
       appointmentdate: test.appointmentdate.split("T")[0],
@@ -728,13 +731,8 @@ const ScheduleModal = ({
         toast.error("Failed to Schedule Appointment");
         console.log(err);
       } finally {
-        const response = await axios.get(`${API_BASE_URL}/api/test/my`, {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        });
-        const data = response.data;
-        setTests(data.reverse());
+        const data = await getAllTests(queryStatus);
+        setTests(data);
       }
     },
   });

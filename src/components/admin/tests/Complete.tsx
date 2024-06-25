@@ -32,8 +32,8 @@ const Complete = () => {
 
   const [test, setTest] = useState<Test | null>(null);
   const [files, setFiles] = useState<FileList | null>(null);
-  // const [processing, setProcessing] = useState<boolean>(false);
-  // const [isDrafting, setIsDrafting] = useState<boolean>(false);
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [isDrafting, setIsDrafting] = useState<boolean>(false);
   const [tableid, setTableid] = useState<string>("");
   const [doctors, setDoctors] = useState([]);
 
@@ -171,8 +171,6 @@ const Complete = () => {
     },
   });
 
-  console.log("formik", formik.values);
-
   const uploadReport = async (values: any) => {
     try {
       const res = await axios.post(`${API_BASE_URL}/api/report`, values, {
@@ -206,8 +204,8 @@ const Complete = () => {
   };
 
   const handleDraftSubmit = async (values: any, formikData: any) => {
+    setIsDrafting(true);
     try {
-      // setIsDrafting(true);
       await axios.post(
         `${API_BASE_URL}/api/report/draft`,
         {
@@ -221,15 +219,26 @@ const Complete = () => {
         }
       );
       toast.success("Report saved as draft");
-      // navigate("/dashboard/tests");
-      // setIsDrafting(false);
+      navigate("/dashboard/tests?status=hold");
     } catch (error) {
       console.error("Error submitting data:", error);
     }
+    setIsDrafting(false);
   };
 
   const handleFormikSubmit = async (values: any, formikData: any) => {
+    setProcessing(true);
     try {
+      if (files) {
+        const filenames = Array.from(files).map(
+          (file) =>
+            `report-${formikData._id}-${Date.now()}.${file.name
+              .split(".")
+              .pop()}`
+        );
+        formikData.reportFile = filenames;
+        await UploadMultipleFiles(files, filenames);
+      }
       await axios.post(
         `${API_BASE_URL}/api/report/`,
         {
@@ -243,10 +252,12 @@ const Complete = () => {
         }
       );
       toast.success("Data submitted successfully");
+      navigate("/dashboard/tests?status=completed");
     } catch (error) {
       toast.error("Failed to submit data");
       console.error("Error submitting data:", error);
     }
+    setProcessing(false);
   };
   return (
     <>
@@ -269,7 +280,7 @@ const Complete = () => {
                   isRequired
                   onChange={formik.handleChange}
                   value={formik.values.name}
-                  isDisabled={test?.testDetail.userData.name !== ""}
+                  // isDisabled={test?.testDetail.userData.name !== ""}
                 />
               </div>
               <div className="col-span-full md:col-span-3">
@@ -281,7 +292,7 @@ const Complete = () => {
                   isRequired
                   onChange={formik.handleChange}
                   value={formik.values.phone}
-                  isDisabled={test?.testDetail.userData.phone !== ""}
+                  // isDisabled={test?.testDetail.userData.phone !== ""}
                 />
               </div>
               <div className="col-span-full md:col-span-2">
@@ -293,7 +304,7 @@ const Complete = () => {
                   isRequired
                   onChange={formik.handleChange}
                   value={formik.values.email}
-                  isDisabled={test?.testDetail.userData.email !== ""}
+                  // isDisabled={test?.testDetail.userData.email !== ""}
                 />
               </div>
               <div className="col-span-full md:col-span-2">
@@ -540,37 +551,12 @@ const Complete = () => {
                     tableid={tableid}
                     onSubmit={handleTableSubmit}
                     onSecondarySubmit={handleDraftTableSubmit}
+                    isLoading={processing}
+                    isDrafting={isDrafting}
                   />
                 </CardBody>
               </>
             )}
-            {/* <CardFooter className="col-span-full flex gap-4 justify-end">
-              <Button
-                type="button"
-                onClick={() => {
-                  formik.setValues((prevValues) => ({
-                    ...prevValues,
-                    isDraft: true,
-                  }));
-                  formik.handleSubmit();
-                }}
-                variant="bordered"
-                isLoading={isDrafting}
-                isDisabled={isDrafting}
-              >
-                Save Draft
-              </Button>
-
-              <Button
-                type="submit"
-                variant="flat"
-                color="primary"
-                isDisabled={processing}
-                isLoading={processing}
-              >
-                Upload Report
-              </Button>
-            </CardFooter> */}
           </Card>
         </div>
       </div>
