@@ -49,7 +49,7 @@ const Mer = () => {
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-col items-start px-4 pb-0 pt-4">
+        <CardHeader className="flex flex-col items-center px-4 pb-0 pt-4">
           <p className="text-large">Download Report</p>
         </CardHeader>
         <CardBody>
@@ -59,7 +59,7 @@ const Mer = () => {
             fileName={report?.name + "-" + report?.createdAt + "-Report.pdf"}
           >
             <div
-              className="relative font-serif mx-auto p-2 h-full mb-8 object-cover flex flex-col justify-between"
+              className="relative font-serif mx-auto h-full mb-8 object-cover flex flex-col justify-between"
               data-theme="light"
               style={{
                 width: "21cm",
@@ -72,7 +72,7 @@ const Mer = () => {
                 loading="eager"
               />
 
-              <div className="border border-black w-full h-full">
+              <div className="w-full h-full">
                 <header>
                   <div className="flex flex-col justify-center items-center">
                     <h1 className="font-semibold text-lg">
@@ -101,13 +101,19 @@ const Mer = () => {
                       <tbody>
                         <tr>
                           <td>Name:</td>
-                          <td className="!uppercase" colSpan={4}>
+                          <td className="!uppercase font-bold" colSpan={4}>
                             {report?.name}
                           </td>
                           <td>Age:</td>
                           <td className="!uppercase">{report?.age}</td>
                           <td>Sex:</td>
-                          <td className="!uppercase">{report?.sex}</td>
+                          <td className="!uppercase">
+                            {report?.sex === "male"
+                              ? "M"
+                              : report?.sex === "female"
+                              ? "F"
+                              : "O"}
+                          </td>
                           <td>Marital Status:</td>
                           <td className="!uppercase">
                             {report?.maritialStatus}
@@ -115,7 +121,7 @@ const Mer = () => {
                         </tr>
                         <tr>
                           <td>Passport No.</td>
-                          <td colSpan={2} className="!uppercase">
+                          <td colSpan={2} className="!uppercase font-bold">
                             {report?.passportNumber}
                           </td>
                           <td colSpan={2}>Passport Expired On:</td>
@@ -133,7 +139,7 @@ const Mer = () => {
                             {report?.medicalExaminationDate}
                           </td>
                           <td colSpan={3}>Applied Country:</td>
-                          <td className="!uppercase">
+                          <td className="!uppercase font-bold">
                             {report?.appliedCountry}
                           </td>
                           <td>Nationality:</td>
@@ -148,74 +154,58 @@ const Mer = () => {
                       height={100}
                     />
                   </div>
-
-                  <table className="border-collapse relative w-full mt-2 tbl border border-black">
-                    <tbody>
-                      <tr>
-                        <td>Height:</td>
-                        <td>{report?.generalExamination.height}CM</td>
-                        <td>Weight:</td>
-                        <td>{report?.generalExamination.weight}kg</td>
-                        <td>Pulse:</td>
-                        <td>{report?.generalExamination.pulseRate}/min</td>
-                        <td>Height:</td>
-                        <td>{report?.generalExamination.temperature}°F</td>
-                      </tr>
-                      <tr>
-                        <td>BP:</td>
-                        <td>
-                          {report?.generalExamination.bloodPressure} mm/hg
-                        </td>
-                        <td>Jaundice:</td>
-                        <td>
-                          {report?.generalExamination.jaundice
-                            ? "Present"
-                            : "Absent"}
-                        </td>
-                        <td>Paller:</td>
-                        <td>
-                          {report?.generalExamination.paller
-                            ? "Present"
-                            : "Absent"}
-                        </td>
-                        <td>Cynosis:</td>
-                        <td>
-                          {report?.generalExamination.cynosis
-                            ? "Present"
-                            : "Absent"}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Clubbing:</td>
-                        <td>
-                          {report?.generalExamination.clubbing
-                            ? "Present"
-                            : "Absent"}{" "}
-                        </td>
-                        <td>Oedema:</td>
-                        <td>
-                          {report?.generalExamination.oedema
-                            ? "Present"
-                            : "Absent"}
-                        </td>
-                        <td>Ascitis:</td>
-                        <td>
-                          {report?.generalExamination.ascitis
-                            ? "Present"
-                            : "Absent"}
-                        </td>
-                        <td>Lymph Node:</td>
-                        <td>
-                          {report?.generalExamination.lymphNode
-                            ? "Present"
-                            : "Absent"}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div className="flex gap-2">
+                  <div className="relative mt-2">
+                    <span className="px-3 font-roboto top-2 whitespace-nowrap left-[0%] bg-black text-white">
+                      GENERAL EXAMINATION
+                    </span>
+                    <ul className="text-[10px] leading-tight list-decimal pl-3">
+                      <li>
+                        Past history of serious illness, Major surgery, and
+                        significant psychological problem including (Epilepsy
+                        and Depression): None
+                      </li>
+                      <li>Past history of allergy: None</li>
+                    </ul>
+                    <table className="border-collapse relative w-full tbl border border-black">
+                      <tbody>
+                        <tr>
+                          <td>Height:</td>
+                          <td>{report?.generalExamination.height}CM</td>
+                          <td>Weight:</td>
+                          <td>{report?.generalExamination.weight}kg</td>
+                          <td>Pulse:</td>
+                          <td>{report?.generalExamination.pulseRate}/min</td>
+                          <td>Height:</td>
+                          <td>{report?.generalExamination.temperature}°F</td>
+                        </tr>
+                        <tr>
+                          <td>BP:</td>
+                          <td>
+                            {report?.generalExamination.bloodPressure} mm/hg
+                          </td>
+                          <td>Jaundice:</td>
+                          <td>Absent</td>
+                          <td>Paller:</td>
+                          <td>Absent</td>
+                          <td>Cynosis:</td>
+                          <td>Absent</td>
+                        </tr>
+                        <tr>
+                          <td>Clubbing:</td>
+                          <td>Absent</td>
+                          <td>Oedema:</td>
+                          <td>Absent</td>
+                          <td>Ascitis:</td>
+                          <td>Absent</td>
+                          <td>Lymph Node:</td>
+                          <td>Absent</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="flex gap-8">
                     <div className="relative pt-4 w-[50%]">
-                      <span className="absolute px-3 font-roboto top-2 whitespace-nowrap left-[50%] translate-x-[-50%] bg-black text-white">
+                      <span className="absolute px-3 font-roboto top-2 whitespace-nowrap left-[0%] bg-black text-white">
                         SYSTEMIC EXAMINATION
                       </span>
                       <table className="border-collapse h-fit relative w-full mt-2 tbl border border-black">
@@ -230,134 +220,85 @@ const Mer = () => {
                         <tbody>
                           <tr>
                             <td colSpan={4}>Cardiovascular</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.cardiovascular ||
-                                "N/A"}
-                            </td>
+                            <td colSpan={4}>NAD</td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Pulmonary</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.pulmonary || "N/A"}
-                            </td>
+                            <td colSpan={4}>NAD </td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Gastroenterology</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.gastroenterology ||
-                                "N/A"}
-                            </td>
+                            <td colSpan={4}>NAD</td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Neurology</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.neurology || "N/A"}
-                            </td>
+                            <td colSpan={4}>NAD </td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Musculoskeletal</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.musculoskeletal ||
-                                "N/A"}
-                            </td>
+                            <td colSpan={4}>NAD</td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Genitourinary</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.genitourinary ||
-                                "N/A"}
-                            </td>
+                            <td colSpan={4}>NAD</td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Oro - Dental</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.oroDental || "N/A"}
-                            </td>
+                            <td colSpan={4}>Normal</td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Extremities / Deformities</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.deformities ||
-                                "N/A"}
-                            </td>
+                            <td colSpan={4}>NAD</td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Varicose Veins</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.varicosVeins ||
-                                "N/A"}
-                            </td>
+                            <td colSpan={4}>NAD</td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Hernia</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.hernia || "N/A"}
-                            </td>
+                            <td colSpan={4}>Absent </td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Hydrocele</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.hydrocele || "N/A"}
-                            </td>
+                            <td colSpan={4}>Absent </td>
                           </tr>
                           <tr>
                             <td colSpan={2} rowSpan={2}>
                               Eye (Vision)
                             </td>
                             <td colSpan={2}>R.Eye</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.eye.rightEye ||
-                                "N/A"}
-                            </td>
+                            <td colSpan={4}>6/6</td>
                           </tr>
                           <tr>
                             <td colSpan={2}>L.Eye</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.eye.leftEye ||
-                                "N/A"}
-                            </td>
+                            <td colSpan={4}>6/6</td>
                           </tr>
                           <tr>
                             <td colSpan={2} rowSpan={2}>
                               Ear
                             </td>
                             <td colSpan={2}>R.Ear</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.ear.rightEar ||
-                                "N/A"}
-                            </td>
+                            <td colSpan={4}>Normal</td>
                           </tr>
                           <tr>
                             <td colSpan={2}>L.Ear</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.ear.leftEar ||
-                                "N/A"}
-                            </td>
+                            <td colSpan={4}>Normal</td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Others:</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.others || "N/A"}
-                            </td>
+                            <td colSpan={4}>N/A </td>
                           </tr>
                           <tr>
                             <td colSpan={4}>Radiological (Chest X-Ray):</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination
-                                .radiologicalChestXRay || "N/A"}
-                            </td>
+                            <td colSpan={4}>Normal</td>
                           </tr>
                           <tr>
                             <td colSpan={4}>ECG:</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.ecg || "N/A"}
-                            </td>
+                            <td colSpan={4}>N/A </td>
                           </tr>
                           <tr>
                             <td colSpan={4}>CLINICAL IMPRESSION:</td>
-                            <td colSpan={4}>
-                              {report?.systematicExamination.clinicalImpression}
-                            </td>
+                            <td colSpan={4}>Normal </td>
                           </tr>
                         </tbody>
                       </table>
@@ -369,9 +310,10 @@ const Mer = () => {
                         <br />
                         <br />
                         <span className="text-justify w-full">
-                          THIS IS TO CERTIFY THAT <b>{report?.name}</b>{" "}
-                          CLINICALLY AND MENTALLY FIT AND THERE IS NO EVIDENCE
-                          OF COMMUNICABLE DISEASE IN HIM.
+                          THIS IS TO CERTIFY THAT{" "}
+                          <b className="uppercase">{report?.name}</b> CLINICALLY
+                          AND MENTALLY FIT AND THERE IS NO EVIDENCE OF
+                          COMMUNICABLE DISEASE IN HIM.
                         </span>
                         <br />
                         <br />
@@ -389,10 +331,28 @@ const Mer = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="relative pt-4 w-[50%]">
+                    <div className="relative flex pt-4 w-[50%]">
                       <span className="absolute px-3 font-roboto top-2 whitespace-nowrap left-[50%] translate-x-[-50%] bg-black text-white">
                         LABORATORY EXAMINATION
                       </span>
+                      <div className="absolute w-full min-w-[744px] border border-collapse border-black flex justify-evenly text-center top-[51.5%] translate-y-[-50%] -rotate-90 -left-2 translate-x-[-50%]">
+                        <span className="border border-black flex-[5]">
+                          Other
+                        </span>
+                        {/* 35 */}
+                        <span className="border border-black flex-[4]">
+                          Urine
+                        </span>
+                        <span className="border border-black flex-[6]">
+                          Serology
+                        </span>
+                        <span className="border border-black flex-[7]">
+                          BIOCHEMISTRY
+                        </span>
+                        <span className="border border-black flex-[13]">
+                          HEMATOLOGY
+                        </span>
+                      </div>
                       <table className="border-collapse relative w-full mt-2 tbl border border-black">
                         <thead>
                           {/* <td rowSpan={2}></td> */}
@@ -534,22 +494,12 @@ const Mer = () => {
                           </tr>
                           <tr>
                             <td colSpan={2}>Malaria Parasite</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .malariaParasite
-                              }
-                            </td>
+                            <td colSpan={2}>Not Found</td>
                             <td colSpan={2}></td>
                           </tr>
                           <tr>
                             <td colSpan={2}>Micro Filaria</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .microfilaria
-                              }
-                            </td>
+                            <td colSpan={2}>Not Found</td>
                             <td colSpan={2}></td>
                           </tr>
                           {/* BIOCHEMISTRY */}
@@ -559,7 +509,7 @@ const Mer = () => {
                           >
                             BIOCHEMISTRY
                           </td> */}
-                          <tr>
+                          <tr className="border-t-2 border-black">
                             <td colSpan={2}>Random Blood Sugar</td>
                             <td colSpan={2}>
                               {
@@ -656,46 +606,30 @@ const Mer = () => {
                           >
                             SEROLOGY
                           </td> */}
-                          <tr>
+                          <tr className="border-t-2 border-black">
                             <td colSpan={3}>Anti-HIV (1&2)</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.serology.antiHIV ||
-                                "NIL"}
-                            </td>
+                            <td colSpan={3}>Non Reactive</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>HBs-Ag</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.serology.hbsAg ||
-                                "NIL"}
-                            </td>
+                            <td colSpan={3}>Negative</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>Anti-HCV</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.serology.antiHCV ||
-                                "NIL"}
-                            </td>
+                            <td colSpan={3}>Negative</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>VDRL/RPR</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.serology.vdrlRPR ||
-                                "NIL"}
-                            </td>
+                            <td colSpan={3}>Non Reactive</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>TPHA</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.serology.tpHA ||
-                                "NIL"}
-                            </td>
+                            <td colSpan={3}>Non Reactive</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>ABO-Blood Group & Rh-type</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.serology
-                                .BloodGroupRh || "NIL"}
+                            <td colSpan={3} className="uppercase">
+                              Nil
                             </td>
                           </tr>
                           {/* URINE */}
@@ -705,33 +639,21 @@ const Mer = () => {
                           >
                             URINE
                           </td> */}
-                          <tr>
+                          <tr className="border-t-2 border-black">
                             <td colSpan={3}>Albumin/Sugar</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.urine
-                                .albuminSugar || "NIL"}
-                            </td>
+                            <td colSpan={3}>Nil</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>Pus Cells fapf</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.urine.pusCells ||
-                                "NIL"}
-                            </td>
+                            <td colSpan={3}>Nil</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>RBCs /hpf</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.urine.rbcs ||
-                                "NIL"}
-                            </td>
+                            <td colSpan={3}>Nil</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>Epithelial cells /hpf</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.urine
-                                .epithelialCells || "NIL"}
-                            </td>
+                            <td colSpan={3}>Nil</td>
                           </tr>
                           {/* other */}
                           {/* <td
@@ -740,34 +662,27 @@ const Mer = () => {
                           >
                             OTHER
                           </td> */}
-                          <tr>
+                          <tr className="border-t-2 border-black">
                             <td colSpan={3}>Opiates</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.other.opiates ||
-                                "NIL"}
-                            </td>
+                            <td colSpan={3}>Negative</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>Cannabies</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.other.cannabis ||
-                                "NIL"}
-                            </td>
+                            <td colSpan={3}>Negative</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>Mantoux Test</td>
-                            <td colSpan={3}>
-                              {report?.laboratoryExamination.other
-                                .mantouxTest || "NIL"}
-                            </td>
+                            <td colSpan={3}>N/A</td>
                           </tr>
                           <tr>
                             <td colSpan={3}>
                               Urine Pregnancy Test (for female)
                             </td>
                             <td colSpan={3}>
-                              {report?.laboratoryExamination.other
-                                .urinePregnancyTest || "NIL"}
+                              {report?.sex === "female"
+                                ? report?.laboratoryExamination.other
+                                    .urinePregnancyTest || "N/A"
+                                : "N/A"}
                             </td>
                           </tr>
                           <tr>

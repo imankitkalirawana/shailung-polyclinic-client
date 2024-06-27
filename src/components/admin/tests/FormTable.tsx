@@ -239,7 +239,7 @@ const FormTable = ({
                     <td className="p-1" key={colIndex}>
                       <Field
                         as="textarea"
-                        className="textarea textarea-bordered h-full w-full"
+                        className="textarea textarea-bordered h-[50px] w-full"
                         name={`cell-${rowIndex}-${colIndex}`}
                       />
                     </td>

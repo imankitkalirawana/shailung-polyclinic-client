@@ -201,7 +201,7 @@ const Download = () => {
                                 {report?.testname}
                               </h3>
                               <p className="c text-center text-sm">
-                                {report?.description}
+                                {report?.description[0]}
                               </p>
                             </div>
                           </div>
@@ -303,13 +303,13 @@ const Download = () => {
                         ).length -
                           1 && (
                         <div className="space-y-2">
-                          {report?.summary && (
+                          {report?.summary[0] && (
                             <div>
                               <h3 className="text-xs font-semibold">
                                 Test Information:
                               </h3>
                               <p className="text-xs whitespace-pre-wrap">
-                                {report?.summary}
+                                {report?.summary[0]}
                               </p>
                             </div>
                           )}

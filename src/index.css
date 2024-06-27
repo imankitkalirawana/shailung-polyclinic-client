@@ -9,7 +9,7 @@
 .tbl td,
 .tbl th {
   /* padding: 0.25rem; */
-  padding: 1px;
+  padding: 2px !important;
   /* padding-left: 0.5rem; */
   border: 1px solid #000;
   text-transform: capitalize;

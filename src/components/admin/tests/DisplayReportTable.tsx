@@ -49,11 +49,12 @@ const DynamicTable = ({ tableid }: DynamicTableProps) => {
       headers.push(
         <th
           key={cellKey}
+          className="p-0"
           dangerouslySetInnerHTML={{ __html: data[cellKey] || "" }}
         />
       );
     }
-    return <tr>{headers}</tr>;
+    return <tr className="border-b border-slate-300">{headers}</tr>;
   };
 
   const renderTableBody = () => {
@@ -66,18 +67,23 @@ const DynamicTable = ({ tableid }: DynamicTableProps) => {
         rowData.push(
           <td
             key={cellKey}
+            className="whitespace-pre-line p-0"
             dangerouslySetInnerHTML={{ __html: data[cellKey] || "" }}
           />
         );
       }
-      bodyRows.push(<tr key={row}>{rowData}</tr>);
+      bodyRows.push(
+        <tr className="border-y border-slate-300" key={row}>
+          {rowData}
+        </tr>
+      );
     }
     return bodyRows;
   };
 
   return (
     <div>
-      <table className="table">
+      <table className="table text-xs border-collapse">
         <thead>{renderTableHead()}</thead>
         <tbody>{renderTableBody()}</tbody>
       </table>

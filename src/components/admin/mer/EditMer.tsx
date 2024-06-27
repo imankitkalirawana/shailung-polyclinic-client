@@ -119,38 +119,6 @@ const EditMer = () => {
         pulseRate: "",
         temperature: "",
         bloodPressure: "",
-        jaundice: false,
-        paller: false,
-        cynosis: false,
-        clubbing: false,
-        oedema: false,
-        ascitis: false,
-        lymphNode: false,
-      },
-      systematicExamination: {
-        cardiovascular: "",
-        pulmonary: "",
-        gastroenterology: "",
-        neurology: "",
-        musculoskeletal: "",
-        genitourinary: "",
-        oroDental: "",
-        deformities: "",
-        varicosVeins: "",
-        hernia: "",
-        hydrocele: "",
-        eye: {
-          rightEye: "",
-          leftEye: "",
-        },
-        ear: {
-          rightEar: "",
-          leftEar: "",
-        },
-        others: "",
-        radiologicalChestXRay: "",
-        ecg: "",
-        clinicalImpression: "",
       },
       laboratoryExamination: {
         hematology: {
@@ -173,8 +141,6 @@ const EditMer = () => {
             value: "",
             referenceRange: "M: 12-18 gm%, F: 12-16",
           },
-          malariaParasite: "",
-          microfilaria: "",
         },
         biochemistry: {
           randomBloodSugar: {
@@ -205,23 +171,9 @@ const EditMer = () => {
           },
         },
         serology: {
-          antiHIV: "",
-          hbsAg: "",
-          antiHCV: "",
-          vdrlRPR: "",
-          tpHA: "",
           BloodGroupRh: "",
         },
-        urine: {
-          albuminSugar: "",
-          pusCells: "",
-          rbcs: "",
-          epithelialCells: "",
-        },
         other: {
-          opiates: "",
-          cannabis: "",
-          mantouxTest: "",
           urinePregnancyTest: "",
         },
       },
@@ -353,6 +305,7 @@ const EditMer = () => {
                   formik.touched.sex && formik.errors.sex ? true : false
                 }
                 errorMessage={formik.touched.sex && formik.errors.sex}
+                selectedKeys={[formik.values.sex]}
               >
                 <SelectItem key="male">Male</SelectItem>
                 <SelectItem key="female">Female</SelectItem>
@@ -546,224 +499,6 @@ const EditMer = () => {
                   formik.errors.generalExamination?.bloodPressure
                 }
               />
-              <CheckboxGroup label="General Illness" className="col-span-full">
-                <Checkbox
-                  value="jaundice"
-                  isSelected={formik.values.generalExamination.jaundice}
-                  onChange={(e) =>
-                    formik.setFieldValue(
-                      "generalExamination.jaundice",
-                      e.target.checked
-                    )
-                  }
-                >
-                  Jaundice
-                </Checkbox>
-                <Checkbox
-                  value="paller"
-                  isSelected={formik.values.generalExamination.paller}
-                  onChange={(e) =>
-                    formik.setFieldValue(
-                      "generalExamination.paller",
-                      e.target.checked
-                    )
-                  }
-                >
-                  Paller
-                </Checkbox>
-                <Checkbox
-                  value="cynosis"
-                  isSelected={formik.values.generalExamination.cynosis}
-                  onChange={(e) =>
-                    formik.setFieldValue(
-                      "generalExamination.cynosis",
-                      e.target.checked
-                    )
-                  }
-                >
-                  Cynosis
-                </Checkbox>
-                <Checkbox
-                  value="clubbing"
-                  isSelected={formik.values.generalExamination.clubbing}
-                  onChange={(e) =>
-                    formik.setFieldValue(
-                      "generalExamination.clubbing",
-                      e.target.checked
-                    )
-                  }
-                >
-                  Clubbing
-                </Checkbox>
-                <Checkbox
-                  value="oedema"
-                  isSelected={formik.values.generalExamination.oedema}
-                  onChange={(e) =>
-                    formik.setFieldValue(
-                      "generalExamination.oedema",
-                      e.target.checked
-                    )
-                  }
-                >
-                  Oedema
-                </Checkbox>
-                <Checkbox
-                  value="ascitis"
-                  isSelected={formik.values.generalExamination.ascitis}
-                  onChange={(e) =>
-                    formik.setFieldValue(
-                      "generalExamination.ascitis",
-                      e.target.checked
-                    )
-                  }
-                >
-                  Ascitis
-                </Checkbox>
-                <Checkbox
-                  value="lymphNode"
-                  isSelected={formik.values.generalExamination.lymphNode}
-                  onChange={(e) =>
-                    formik.setFieldValue(
-                      "generalExamination.lymphNode",
-                      e.target.checked
-                    )
-                  }
-                >
-                  Lymph Node
-                </Checkbox>
-              </CheckboxGroup>
-            </CardBody>
-          </Card>
-          <Card className="mt-8">
-            <CardHeader className="flex flex-col items-start px-4 pb-0 pt-4">
-              <p className="text-large">Systematic Examination</p>
-            </CardHeader>
-            <CardBody className="grid grid-cols-1 gap-6 mt-4 md:grid-cols-6">
-              <Input
-                label="Cardiovascular"
-                placeholder="Enter cardiovascular"
-                {...formik.getFieldProps(
-                  "systematicExamination.cardiovascular"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Pulmonary"
-                placeholder="Enter pulmonary"
-                {...formik.getFieldProps("systematicExamination.pulmonary")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Gastroenterology"
-                placeholder="Enter gastroenterology"
-                {...formik.getFieldProps(
-                  "systematicExamination.gastroenterology"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Neurology"
-                placeholder="Enter neurology"
-                {...formik.getFieldProps("systematicExamination.neurology")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Musculoskeletal"
-                placeholder="Enter musculoskeletal"
-                {...formik.getFieldProps(
-                  "systematicExamination.musculoskeletal"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Genitourinary"
-                placeholder="Enter genitourinary"
-                {...formik.getFieldProps("systematicExamination.genitourinary")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Oro Dental"
-                placeholder="Enter oro dental"
-                {...formik.getFieldProps("systematicExamination.oroDental")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Deformities"
-                placeholder="Enter deformities"
-                {...formik.getFieldProps("systematicExamination.deformities")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Varicos Veins"
-                placeholder="Enter varicos veins"
-                {...formik.getFieldProps("systematicExamination.varicosVeins")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Hernia"
-                placeholder="Enter hernia"
-                {...formik.getFieldProps("systematicExamination.hernia")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Hydrocele"
-                placeholder="Enter hydrocele"
-                {...formik.getFieldProps("systematicExamination.hydrocele")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-
-              <Input
-                label="Left Eye"
-                placeholder="Enter left eye"
-                {...formik.getFieldProps("systematicExamination.eye.leftEye")}
-                className="col-span-6 sm:col-span-3 col-start-1"
-              />
-              <Input
-                label="Right Eye"
-                placeholder="Enter right eye"
-                {...formik.getFieldProps("systematicExamination.eye.rightEye")}
-                className="col-span-6 sm:col-span-3"
-              />
-              <Input
-                label="Left Ear"
-                placeholder="Enter left ear"
-                {...formik.getFieldProps("systematicExamination.ear.leftEar")}
-                className="col-span-6 sm:col-span-3 col-start-1"
-              />
-              <Input
-                label="Right Ear"
-                placeholder="Enter right ear"
-                {...formik.getFieldProps("systematicExamination.ear.rightEar")}
-                className="col-span-6 sm:col-span-3"
-              />
-              <Input
-                label="Others"
-                placeholder="Enter others"
-                {...formik.getFieldProps("systematicExamination.others")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Radiological Chest X-Ray"
-                placeholder="Enter radiological chest x-ray"
-                {...formik.getFieldProps(
-                  "systematicExamination.radiologicalChestXRay"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="ECG"
-                placeholder="Enter ECG"
-                {...formik.getFieldProps("systematicExamination.ecg")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Clinical Impression"
-                placeholder="Enter clinical impression"
-                {...formik.getFieldProps(
-                  "systematicExamination.clinicalImpression"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
             </CardBody>
           </Card>
           <Card className="mt-8">
@@ -773,7 +508,6 @@ const EditMer = () => {
             <CardBody className="grid grid-cols-1 gap-6 mt-4 md:grid-cols-6">
               <Divider className="my-4 col-span-full" />
               <p className="text-base col-span-full">Hematology</p>
-
               <Input
                 label="Total WBC Count"
                 placeholder="Enter total WBC count"
@@ -846,22 +580,6 @@ const EditMer = () => {
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
                 description={`Reference Range: ${formik.values.laboratoryExamination.hematology.hemoglobin.referenceRange}`}
               />
-              <Input
-                label="Malaria Parasite"
-                placeholder="Enter malaria parasite"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.hematology.malariaParasite"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Micro Filaria"
-                placeholder="Enter microfilaria"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.hematology.microfilaria"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
               <Divider className="my-4 col-span-full" />
               <p className="text-base col-span-full">Biochemistry</p>
               <Input
@@ -921,44 +639,6 @@ const EditMer = () => {
               <Divider className="my-4 col-span-full" />
               <p className="text-base col-span-full">Serology</p>
               <Input
-                label="Anti HIV"
-                placeholder="Enter Anti HIV"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.serology.antiHIV"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="HBS Ag"
-                placeholder="Enter HBS Ag"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.serology.hbsAg"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Anti HCV"
-                placeholder="Enter Anti HCV"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.serology.antiHCV"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="VDRL RPR"
-                placeholder="Enter VDRL RPR"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.serology.vdrlRPR"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="TPHA"
-                placeholder="Enter TPHA"
-                {...formik.getFieldProps("laboratoryExamination.serology.tpHA")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
                 label="Blood Group Rh"
                 placeholder="Enter Blood Group Rh"
                 {...formik.getFieldProps(
@@ -966,70 +646,20 @@ const EditMer = () => {
                 )}
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
               />
-              <Divider className="my-4 col-span-full" />
-              <p className="text-base col-span-full">Urine</p>
-              <Input
-                label="Albumin Sugar"
-                placeholder="Enter Albumin Sugar"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.urine.albuminSugar"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Pus Cells"
-                placeholder="Enter Pus Cells"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.urine.pusCells"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="RBCs"
-                placeholder="Enter RBCs"
-                {...formik.getFieldProps("laboratoryExamination.urine.rbcs")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Epithelial Cells"
-                placeholder="Enter Epithelial Cells"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.urine.epithelialCells"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Divider className="my-4 col-span-full" />
-              <p className="text-base col-span-full">Other Tests</p>
-              <Input
-                label="Opiates"
-                placeholder="Enter Opiates"
-                {...formik.getFieldProps("laboratoryExamination.other.opiates")}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Cannabis"
-                placeholder="Enter Cannabis"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.other.cannabis"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Mantoux Test"
-                placeholder="Enter Mantoux Test"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.other.mantouxTest"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Urine Pregnancy Test"
-                placeholder="Enter Urine Pregnancy Test"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.other.urinePregnancyTest"
-                )}
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
+              {formik.values.sex === "female" && (
+                <>
+                  <Divider className="my-4 col-span-full" />
+                  <p className="text-base col-span-full">Other Tests</p>
+                  <Input
+                    label="Urine Pregnancy Test"
+                    placeholder="Enter Urine Pregnancy Test"
+                    {...formik.getFieldProps(
+                      "laboratoryExamination.other.urinePregnancyTest"
+                    )}
+                    className="col-span-6 sm:col-span-3 lg:col-span-2"
+                  />
+                </>
+              )}
             </CardBody>
             <CardFooter className="justify-end">
               <Button

@@ -7,7 +7,7 @@ import { useFormik } from "formik";
 import { UploadMultipleFiles } from "../../../utils/FileHandling";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { Doctor, Test } from "../../../interface/interface";
+import { AvailableTest, Doctor, Test } from "../../../interface/interface";
 import { parseDate } from "@internationalized/date";
 
 import {
@@ -72,6 +72,9 @@ const Complete = () => {
               userid: data.testDetail.userData._id,
               testid: data._id,
               testname: data.testDetail.testData[0].name,
+              testids: data.testDetail.testData.map(
+                (test: AvailableTest) => test._id
+              ),
             }));
             axios
               .get(
@@ -113,6 +116,7 @@ const Complete = () => {
       address: "",
       testname: "",
       testid: "",
+      testids: [],
       reportType: "text",
       reportDate: new Date().toISOString().split("T")[0],
       collectiondate: new Date().toISOString().split("T")[0],
@@ -170,6 +174,8 @@ const Complete = () => {
       }
     },
   });
+
+  console.log(formik.values);
 
   const uploadReport = async (values: any) => {
     try {

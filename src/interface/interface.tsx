@@ -89,14 +89,14 @@ export interface Report {
   _id: string;
   name: string;
   doctor: string;
-  description: string;
+  description: string[];
   age: number;
   gender: string;
   dob: string;
   phone: string;
   email: string;
   address: string;
-  testname: string;
+  testname: string[];
   reportType: string;
   reportDate: string;
   collectiondate: string;
@@ -105,7 +105,7 @@ export interface Report {
   addedby: string;
   testid: string;
   reportid: string;
-  summary: string;
+  summary: string[];
   labId: string;
   doctors: [
     {
