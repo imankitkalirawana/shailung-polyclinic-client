@@ -5,7 +5,7 @@ const initialFormState = {
     formData: [],
 };
 
-const formReducer = (state = initialFormState, action) => {
+const formReducer = (state = initialFormState, action: any) => {
     switch (action.type) {
         case 'ADD_FORM_DATA':
             return {

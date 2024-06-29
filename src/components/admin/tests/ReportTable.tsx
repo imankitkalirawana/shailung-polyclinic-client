@@ -250,6 +250,7 @@ const FormTable = ({
                     name={`cell-${rowIndex}-${colIndex}`}
                     value={formik.values[`cell-${rowIndex}-${colIndex}`] || ""}
                     onChange={(e) => {
+                      // @ts-ignore
                       handleInputChange(e);
                     }}
                   />

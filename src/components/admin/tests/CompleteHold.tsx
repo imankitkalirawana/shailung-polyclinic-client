@@ -26,7 +26,6 @@ import {
 } from "@nextui-org/react";
 import ReportTable from "./ReportTable";
 import { getAllDoctors } from "../../../functions/get";
-import FormTable from "./FormTable";
 
 const CompleteHold = () => {
   const { loggedIn } = isLoggedIn();

@@ -1,5 +1,5 @@
 // actions.js
-export const submitFormData = (formData) => {
+export const submitFormData = (formData: any) => {
   return {
     type: 'SUBMIT_FORM_DATA',
     payload: formData,
@@ -11,7 +11,7 @@ const initialState = {
   formData: {},
 };
 
-const formReducer = (state = initialState, action) => {
+const formReducer = (state = initialState, action: any) => {
   switch (action.type) {
     case 'SUBMIT_FORM_DATA':
       return {
