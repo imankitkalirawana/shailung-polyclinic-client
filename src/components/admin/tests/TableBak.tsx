@@ -1,23 +1,77 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { Formik, Form, Field } from "formik";
-import { Button } from "@nextui-org/react";
+import { Button, Tooltip } from "@nextui-org/react";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
+import { IconPlus, IconX } from "@tabler/icons-react";
 
-const DynamicTable: React.FC = () => {
-  const [rows, setRows] = useState<number>(3);
-  const [cols, setCols] = useState<number>(3);
+interface FormTableProps {
+  tableid?: string;
+  onSubmit?: (values: any) => void;
+  onSecondarySubmit?: (values: any) => void;
+  rowCount?: number;
+  colCount?: number;
+  isHidden?: boolean;
+  isLoading?: boolean;
+  isDrafting?: boolean;
+}
 
-  const generateInitialValues = (rows: number, cols: number) => {
-    const initialValues: { [key: string]: string } = {};
-    for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < cols; col++) {
-        initialValues[`cell-${row}-${col}`] = "";
+const FormTable = ({
+  tableid,
+  onSubmit,
+  onSecondarySubmit,
+  rowCount,
+  colCount,
+  isHidden,
+  isLoading,
+  isDrafting,
+}: FormTableProps) => {
+  const [rows, setRows] = useState<number>(rowCount || 1);
+  const [cols, setCols] = useState<number>(colCount || 1);
+  const [initialValues, setInitialValues] = useState<{ [key: string]: string }>(
+    {}
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `${API_BASE_URL}/api/service/${tableid}`
+        );
+        const data = response.data.data;
+
+        // Determine the number of rows and columns based on the data
+        const rowCount =
+          Math.max(
+            ...Object.keys(data).map((key) => parseInt(key.split("-")[1]))
+          ) + 1;
+        const colCount =
+          Math.max(
+            ...Object.keys(data).map((key) => parseInt(key.split("-")[2]))
+          ) + 1;
+        if (rowCount === -Infinity) {
+          setRows(2);
+        } else {
+          setRows(rowCount);
+        }
+        if (colCount === -Infinity) {
+          setCols(2);
+        } else {
+          setCols(colCount);
+        }
+        setInitialValues(data);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to fetch data");
+      }
+    };
+    {
+      if (tableid) {
+        fetchData();
       }
     }
-    return initialValues;
-  };
+  }, [tableid]);
 
   const handleDeleteRow = (rowIndex: number, values: any, setValues: any) => {
     const newValues = { ...values };
@@ -25,7 +79,6 @@ const DynamicTable: React.FC = () => {
       delete newValues[`cell-${rowIndex}-${col}`];
     }
 
-    // Adjust values for the remaining rows
     for (let row = rowIndex + 1; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
         newValues[`cell-${row - 1}-${col}`] = newValues[`cell-${row}-${col}`];
@@ -58,94 +111,244 @@ const DynamicTable: React.FC = () => {
     setValues(newValues);
   };
 
-  const handleSubmit = async (values: any) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/service`, {
-        data: values,
-      });
-      toast.success("Data submitted successfully");
-      console.log("Data submitted successfully:", response.data);
-    } catch (error) {
-      console.error("Error submitting data:", error);
+  const handleAddRow = (rowIndex: number, values: any, setValues: any) => {
+    const newValues = { ...values };
+    for (let row = rows; row > rowIndex; row--) {
+      for (let col = 0; col < cols; col++) {
+        newValues[`cell-${row}-${col}`] = newValues[`cell-${row - 1}-${col}`];
+      }
     }
+
+    for (let col = 0; col < cols; col++) {
+      newValues[`cell-${rowIndex}-${col}`] = "";
+    }
+
+    setRows(rows + 1);
+    setValues(newValues);
+  };
+
+  const handleAddColumn = (colIndex: number, values: any, setValues: any) => {
+    const newValues = { ...values };
+    for (let col = cols; col > colIndex; col--) {
+      for (let row = 0; row < rows; row++) {
+        newValues[`cell-${row}-${col}`] = newValues[`cell-${row}-${col - 1}`];
+      }
+    }
+
+    for (let row = 0; row < rows; row++) {
+      newValues[`cell-${row}-${colIndex}`] = "";
+    }
+    setCols(cols + 1);
+    setValues(newValues);
   };
 
   return (
     <Formik
-      initialValues={generateInitialValues(rows, cols)}
+      enableReinitialize
+      initialValues={initialValues}
       onSubmit={(values) => {
-        handleSubmit(values);
+        onSubmit && onSubmit(values);
         console.log("Form data", values);
       }}
     >
       {({ values, setValues }) => (
-        <Form>
-          <table>
+        <Form className="overflow-x-scroll">
+          <div className={`flex justify-end mr-[72px] ${isHidden && "hidden"}`}>
+            <Tooltip
+              size="sm"
+              placement="left"
+              content="Add Column (Right)"
+              color="primary"
+              showArrow
+            >
+              <Button
+                size="sm"
+                type="button"
+                onClick={() => {
+                  setCols(cols + 1);
+                  setInitialValues({
+                    ...initialValues,
+                    [`cell-${rows}-${cols}`]: "",
+                  });
+                }}
+                isIconOnly
+                radius="full"
+                color="primary"
+                variant="flat"
+              >
+                <IconPlus size={16} />
+              </Button>
+            </Tooltip>
+          </div>
+          <table className={`table ${isHidden && "hidden"}`}>
             <thead>
               <tr>
                 {Array.from({ length: cols }).map((_, colIndex) => (
-                  <th key={colIndex}>
-                    Column {colIndex + 1}
-                    <Button
-                      onClick={() =>
-                        handleDeleteColumn(colIndex, values, setValues)
-                      }
-                    >
-                      Delete
-                    </Button>
+                  <th className="text-center" key={colIndex}>
+                    <div className="flex flex-row-reverse justify-between">
+                      {cols > 1 && (
+                        <Tooltip
+                          className="justify-self-center"
+                          content="Delete Column"
+                          color="danger"
+                          size="sm"
+                          showArrow
+                        >
+                          <Button
+                            onClick={() =>
+                              handleDeleteColumn(colIndex, values, setValues)
+                            }
+                            isIconOnly
+                            radius="full"
+                            color="danger"
+                            variant="light"
+                            size="sm"
+                          >
+                            <IconX size={16} />
+                          </Button>
+                        </Tooltip>
+                      )}
+                      <Tooltip
+                        content="Add Column (Left)"
+                        size="sm"
+                        color="primary"
+                        showArrow
+                      >
+                        <Button
+                          onClick={() =>
+                            handleAddColumn(colIndex, values, setValues)
+                          }
+                          isIconOnly
+                          radius="full"
+                          color="primary"
+                          variant="light"
+                          size="sm"
+                        >
+                          <IconPlus size={16} />
+                        </Button>
+                      </Tooltip>
+                    </div>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {Array.from({ length: rows }).map((_, rowIndex) => (
-                <tr key={rowIndex}>
+                <tr key={rowIndex} className="g group">
                   {Array.from({ length: cols }).map((_, colIndex) => (
-                    <td key={colIndex}>
+                    <td className="p-1" key={colIndex}>
                       <Field
-                        className="input input-bordered"
+                        as="textarea"
+                        className="textarea textarea-bordered h-[50px] w-full"
                         name={`cell-${rowIndex}-${colIndex}`}
                       />
                     </td>
                   ))}
-                  <td>
-                    <Button
-                      onClick={() =>
-                        handleDeleteRow(rowIndex, values, setValues)
-                      }
-                    >
-                      Delete Row {rowIndex + 1}
-                    </Button>
+                  <td className="w-[40px] transition-all opacity-0 group-hover:opacity-100">
+                    <div className="flex gap-1 flex-col-reverse items-center">
+                      {rows > 2 && (
+                        <Tooltip
+                          content="Delete Row"
+                          placement="left"
+                          color="danger"
+                          size="sm"
+                          showArrow
+                        >
+                          <Button
+                            onClick={() =>
+                              handleDeleteRow(rowIndex, values, setValues)
+                            }
+                            isIconOnly
+                            radius="full"
+                            color="danger"
+                            variant="light"
+                            size="sm"
+                          >
+                            <IconX size={16} />
+                          </Button>
+                        </Tooltip>
+                      )}
+                      <Tooltip
+                        content="Add Row (Above)"
+                        placement="left"
+                        color="primary"
+                        size="sm"
+                        showArrow
+                      >
+                        <Button
+                          onClick={() =>
+                            handleAddRow(rowIndex, values, setValues)
+                          }
+                          isIconOnly
+                          radius="full"
+                          color="primary"
+                          variant="light"
+                          size="sm"
+                        >
+                          <IconPlus size={16} />
+                        </Button>
+                      </Tooltip>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <div>
-            <Button
-              type="button"
-              onClick={() => {
-                setCols(cols + 1);
-              }}
+          <div className={`flex justify-end mr-[72px] ${isHidden && "hidden"}`}>
+            <Tooltip
+              size="sm"
+              placement="left"
+              content="Add Row (Below)"
+              color="primary"
+              showArrow
             >
-              Add Column
-            </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  setRows(rows + 1);
+                  setInitialValues({
+                    ...initialValues,
+                    [`cell-${rows}-${cols}`]: "",
+                  });
+                }}
+                isIconOnly
+                radius="full"
+                color="primary"
+                variant="flat"
+                size="sm"
+              >
+                <IconPlus size={16} />
+              </Button>
+            </Tooltip>
+          </div>
+          <div className="flex justify-end gap-4 mt-4">
+            {onSecondarySubmit && (
+              <Button
+                variant="bordered"
+                type="button"
+                onPress={() => {
+                  onSecondarySubmit(values);
+                }}
+                isLoading={isDrafting}
+                isDisabled={isDrafting}
+              >
+                Save Draft
+              </Button>
+            )}
             <Button
-              type="button"
-              onClick={() => {
-                setRows(rows + 1);
-              }}
+              variant="flat"
+              color="primary"
+              type="submit"
+              isLoading={isLoading}
+              isDisabled={isLoading}
             >
-              Add Row
+              Submit
             </Button>
           </div>
-          <Button color="primary" type="submit">
-            Submit
-          </Button>
         </Form>
       )}
     </Formik>
   );
 };
 
-export default DynamicTable;
+export default FormTable;

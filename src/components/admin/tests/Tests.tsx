@@ -217,10 +217,10 @@ const Tests = () => {
               All
             </Chip>
             {TestStatus.sort((a, b) => (a.value > b.value ? 1 : -1)).map(
-              (status, index) => (
+              (status) => (
                 <Chip
                   as={Link}
-                  key={index}
+                  key={status.value}
                   color={queryStatus === status.value ? "primary" : "default"}
                   variant={queryStatus === status.value ? "flat" : "bordered"}
                   to={`/dashboard/tests?status=${status.value}`}
@@ -259,7 +259,7 @@ const Tests = () => {
                   return handleSearch(test);
                 })
                 .map((test, index) => (
-                  <TableRow key={index}>
+                  <TableRow key={test._id}>
                     <TableCell>
                       <Dropdown>
                         <DropdownTrigger>
@@ -289,9 +289,9 @@ const Tests = () => {
                                 (status) =>
                                   status.value !== "overdue" &&
                                   status.value !== "hold"
-                              ).map((status, index) => (
+                              ).map((status) => (
                                 <DropdownItem
-                                  key={index}
+                                  key={status.value}
                                   onClick={() => {
                                     handleStatusChange(test, status.value);
                                   }}
@@ -545,8 +545,8 @@ const ExportModal = ({ tests, exportModal }: ExportModalProps) => {
                   b.testDetail.userData.name
                 )
               )
-              .map((test, index) => (
-                <div className="form-control" key={index}>
+              .map((test) => (
+                <div className="form-control" key={test._id}>
                   <label className="label cursor-pointer">
                     <span className="label-text">
                       {test.testDetail.userData.name}

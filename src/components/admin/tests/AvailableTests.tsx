@@ -251,42 +251,44 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log("values", values);
+      try {
+        await axios.post(
+          `${API_BASE_URL}/api/available-test`,
+          {
+            values,
+            formData,
+          },
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        toast.success("Service added successfully");
+
+        navigate(0);
+        newServiceModal.onClose();
+      } catch (error: any) {
+        toast.error(error.response.statusText);
+      }
     },
   });
 
-  const handleTableSubmit = async (values: any) => {
-    try {
-      await handleFormikSubmit(values, formik.values);
-      // console.log("values", values);
-    } catch (error: any) {
-      toast.error("Error submitting data");
-      console.error("Error submitting data:", error);
-    }
-  };
-  const handleFormikSubmit = async (values: any, formikData: any) => {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/available-test`,
-        {
-          data: values,
-          values: formikData,
-        },
-        {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      navigate(
-        `/dashboard/tests/available-tests/${response.data._id}/edit#formtable`
-      );
-      toast.success("Please fill the form table to complete the process");
-      console.log("Data submitted successfully:", response.data);
-    } catch (error: any) {
-      toast.error("Error submitting data");
-      console.error("Error submitting data:", error);
-    }
+  const [formData, setFormData] = useState<{ [key: string]: any }[]>([]);
+
+  const handleDataChange = (values: { [key: string]: any }, formid: string) => {
+    setFormData((prevData) => {
+      const updatedData = [...prevData];
+      const dataIndex = updatedData.findIndex((data) => data.formid === formid);
+
+      if (dataIndex !== -1) {
+        updatedData[dataIndex] = { ...values, formid };
+      } else {
+        updatedData.push({ ...values, formid });
+      }
+
+      return updatedData;
+    });
   };
 
   return (
@@ -364,10 +366,24 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
               onChange={formik.handleChange}
               value={formik.values.summary}
             />
-            <div className="form-control col-span-full">
-              <FormTable onSubmit={handleTableSubmit} isHidden />
+            <div className="col-span-full">
+              <FormTable onDataChange={handleDataChange} />
             </div>
           </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" onPress={newServiceModal.onOpenChange}>
+              Cancel
+            </Button>
+            <Button
+              color="primary"
+              variant="flat"
+              isLoading={formik.isSubmitting}
+              isDisabled={formik.isSubmitting}
+              onPress={() => formik.handleSubmit()}
+            >
+              Add Service
+            </Button>
+          </ModalFooter>
         </ModalContent>
       </Modal>
     </>

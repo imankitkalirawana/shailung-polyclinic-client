@@ -42,6 +42,7 @@ import Mers from "./components/admin/mer/Mers";
 import NewMer from "./components/admin/mer/NewMer";
 import Mer from "./components/admin/mer/Mer";
 import EditMer from "./components/admin/mer/EditMer";
+import RoughApp from "./components/admin/tests/AppRough";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -75,6 +76,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Homepage />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/rough" element={<RoughApp />} />
                   <Route
                     path="/view-available-services"
                     element={<AvailableServices />}

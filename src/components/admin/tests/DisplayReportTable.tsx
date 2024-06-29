@@ -18,7 +18,8 @@ const DynamicTable = ({ tableid }: DynamicTableProps) => {
         const response = await axios.get(
           `${API_BASE_URL}/api/report/report-row/${tableid}`
         );
-        const data = response.data.data;
+        let data = response.data.data;
+        delete data["formid"];
 
         // Determine the number of rows and columns based on the data
         const rowCount =

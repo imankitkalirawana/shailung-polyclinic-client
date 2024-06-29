@@ -1,11 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { API_BASE_URL } from "../../../utils/config";
 import { isLoggedIn } from "../../../utils/auth";
-import { Card, Input, Select, SelectItem, Textarea } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  Input,
+  Select,
+  SelectItem,
+  Textarea,
+} from "@nextui-org/react";
 import FormTable from "./FormTable";
 
 const EditAvailableTest = () => {
@@ -52,50 +59,23 @@ const EditAvailableTest = () => {
 
     onSubmit: async (values) => {
       try {
-        await axios.put(`${API_BASE_URL}/api/available-test/${id}`, values, {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        });
+        await axios.put(
+          `${API_BASE_URL}/api/available-test/${id}`,
+          { values, formData },
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          }
+        );
         toast.success("Updated Successfully");
-        navigate("/dashboard/tests/available-tests");
+        // navigate("/dashboard/tests/available-tests");
       } catch (error: any) {
         console.log(error.message);
         toast.error(error.message);
       }
     },
   });
-
-  const handleTableSubmit = async (values: any) => {
-    try {
-      await handleFormikSubmit(values, formik.values);
-      // console.log("Table data:", values);
-    } catch (error) {
-      toast.error("Failed to submit data");
-      console.error("Error submitting data:", error);
-    }
-  };
-
-  const handleFormikSubmit = async (values: any, formikData: any) => {
-    try {
-      await axios.put(
-        `${API_BASE_URL}/api/available-test/${formikData._id}`,
-        {
-          data: values,
-          values: formikData,
-        },
-        {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      toast.success("Data submitted successfully");
-    } catch (error) {
-      toast.error("Failed to submit data");
-      console.error("Error submitting data:", error);
-    }
-  };
 
   useEffect(() => {
     if (location.hash === "#formtable") {
@@ -105,6 +85,23 @@ const EditAvailableTest = () => {
       }
     }
   }, [location]);
+
+  const [formData, setFormData] = useState<{ [key: string]: any }[]>([]);
+
+  const handleDataChange = (values: { [key: string]: any }, formid: string) => {
+    setFormData((prevData) => {
+      const updatedData = [...prevData];
+      const dataIndex = updatedData.findIndex((data) => data.formid === formid);
+
+      if (dataIndex !== -1) {
+        updatedData[dataIndex] = { ...values, formid };
+      } else {
+        updatedData.push({ ...values, formid });
+      }
+
+      return updatedData;
+    });
+  };
 
   return (
     <>
@@ -122,7 +119,7 @@ const EditAvailableTest = () => {
                 Update your Test information.
               </p>
             </div>
-            {/* <Button
+            <Button
               type="submit"
               isLoading={formik.isSubmitting}
               isDisabled={formik.isSubmitting}
@@ -130,7 +127,7 @@ const EditAvailableTest = () => {
               color="primary"
             >
               Update
-            </Button> */}
+            </Button>
           </div>
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div className="col-span-6 sm:col-span-2">
@@ -222,7 +219,7 @@ const EditAvailableTest = () => {
         {/* {formik.values.serviceid && ( */}
         <FormTable
           tableid={formik.values.serviceid || ""}
-          onSubmit={handleTableSubmit}
+          onDataChange={handleDataChange}
         />
         {/* )} */}
       </Card>

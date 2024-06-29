@@ -11,12 +11,15 @@ import { AvailableTest, Doctor, Test } from "../../../interface/interface";
 import { parseDate } from "@internationalized/date";
 
 import {
+  Button,
   Card,
   CardBody,
+  CardFooter,
   CardHeader,
   Checkbox,
   Chip,
   DatePicker,
+  Divider,
   Input,
   Select,
   SelectItem,
@@ -32,9 +35,7 @@ const Complete = () => {
 
   const [test, setTest] = useState<Test | null>(null);
   const [files, setFiles] = useState<FileList | null>(null);
-  const [processing, setProcessing] = useState<boolean>(false);
   const [isDrafting, setIsDrafting] = useState<boolean>(false);
-  const [tableid, setTableid] = useState<string>("");
   const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
@@ -51,52 +52,57 @@ const Complete = () => {
       addedby: userData.user.email,
     }));
 
-    const fetchTests = async () => {
+    const fetchData = async () => {
       try {
-        await axios
-          .get(`${API_BASE_URL}/api/test/test/${id}`, {
+        const { data } = await axios.get(
+          `${API_BASE_URL}/api/test/test/${id}`,
+          {
             headers: {
               Authorization: `${localStorage.getItem("token")}`,
             },
-          })
-          .then(({ data }) => {
-            setTest(data);
-            formik.setValues((previousData) => ({
-              ...previousData,
-              _id: data._id,
+          }
+        );
+        setTest(data);
 
-              name: data.testDetail.userData.name,
-              phone: data.testDetail.userData.phone,
-              email: data.testDetail.userData.email,
-              age: data.testDetail.userData.age,
-              userid: data.testDetail.userData._id,
-              testid: data._id,
-              testname: data.testDetail.testData[0].name,
-              testids: data.testDetail.testData.map(
-                (test: AvailableTest) => test._id
-              ),
-            }));
+        const tableidsPromises = data.testDetail.testData.map(
+          (test: AvailableTest) =>
             axios
-              .get(
-                `${API_BASE_URL}/api/available-test/${data.testDetail.testData[0]._id}`,
-                {
-                  headers: {
-                    Authorization: `${localStorage.getItem("token")}`,
-                  },
-                }
-              )
-              .then(({ data }) => {
-                setTableid(data.serviceid);
-              });
-          });
-        const res2 = await getAllDoctors();
-        setDoctors(res2);
+              .get(`${API_BASE_URL}/api/available-test/${test._id}`, {
+                headers: {
+                  Authorization: `${localStorage.getItem("token")}`,
+                },
+              })
+              .then((res) => res.data.serviceid)
+        );
+
+        const tableids = await Promise.all(tableidsPromises);
+        // @ts-ignore
+        formik.setValues((previousData) => ({
+          ...previousData,
+          _id: data._id,
+          name: data.testDetail.userData.name,
+          phone: data.testDetail.userData.phone,
+          email: data.testDetail.userData.email,
+          age: data.testDetail.userData.age,
+          userid: data.testDetail.userData._id,
+          testid: data._id,
+          testnames: data.testDetail.testData.map(
+            (test: AvailableTest) => test.name
+          ),
+          testids: data.testDetail.testData.map(
+            (test: AvailableTest) => test._id
+          ),
+          tableids,
+        }));
+
+        const doctors = await getAllDoctors();
+        setDoctors(doctors);
       } catch (error) {
         toast.error("Failed to fetch tests");
         console.error(error);
       }
     };
-    fetchTests();
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -114,9 +120,10 @@ const Complete = () => {
       phone: "",
       email: "",
       address: "",
-      testname: "",
       testid: "",
       testids: [],
+      tableids: [],
+      testnames: [],
       reportType: "text",
       reportDate: new Date().toISOString().split("T")[0],
       collectiondate: new Date().toISOString().split("T")[0],
@@ -130,60 +137,63 @@ const Complete = () => {
       refby: "",
     },
     onSubmit: async (values) => {
+      if (values.isDraft) {
+        setIsDrafting(true);
+      }
       try {
-        if (values.isDraft) {
-          // setIsDrafting(true);
-          await axios.post(`${API_BASE_URL}/api/report/draft`, values, {
-            headers: {
-              Authorization: `${localStorage.getItem("token")}`,
-            },
+        if (files) {
+          const filenames = Array.from(files).map(
+            (file) =>
+              `report-${values._id}-${Date.now()}.${file.name.split(".").pop()}`
+          );
+          values.reportFile = filenames;
+          await UploadMultipleFiles(files, filenames).then(async (res) => {
+            if (res) {
+              await uploadReport(values, formData).then((res) => {
+                if (res) {
+                  toast.success("Report uploaded successfully");
+                  navigate(
+                    `/dashboard/tests?status=${
+                      values.isDraft ? "hold" : "completed"
+                    }`
+                  );
+                }
+              });
+            }
           });
-          toast.success("Report saved as draft");
-          navigate("/dashboard/tests?status=completed");
-          // setIsDrafting(false);
         } else {
-          // setProcessing(true);
-
-          if (files) {
-            const filenames = Array.from(files).map(
-              (file) =>
-                `report-${values._id}-${Date.now()}.${file.name
-                  .split(".")
-                  .pop()}`
-            );
-            values.reportFile = filenames;
-            await UploadMultipleFiles(files, filenames).then(async (res) => {
-              if (res) {
-                await uploadReport(values);
-              }
-            });
-          } else {
-            await uploadReport(values).then((res) => {
-              if (res) {
-              }
-            });
-          }
-          // setProcessing(false);
+          await uploadReport(values, formData).then((res) => {
+            if (res) {
+              toast.success("Report uploaded successfully");
+              navigate(
+                `/dashboard/tests?status=${
+                  values.isDraft ? "hold" : "completed"
+                }`
+              );
+            }
+          });
         }
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        toast.success("Report uploaded successfully");
-        navigate("/dashboard/tests?status=completed");
       } catch (error) {
-        toast.error("Failed to upload report");
         console.error(error);
+        toast.error("Failed to upload report");
+      }
+      if (values.isDraft) {
+        setIsDrafting(false);
       }
     },
   });
 
-  console.log(formik.values);
-
-  const uploadReport = async (values: any) => {
+  const uploadReport = async (values: any, formData: any) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/api/report`, values, {
-        headers: {
-          Authorization: `${localStorage.getItem("token")}`,
-        },
-      });
+      const res = await axios.post(
+        `${API_BASE_URL}/api/report`,
+        { values, formData },
+        {
+          headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+          },
+        }
+      );
       return res.data;
     } catch (error) {
       console.error(error);
@@ -191,79 +201,21 @@ const Complete = () => {
     }
   };
 
-  const handleTableSubmit = async (values: any) => {
-    try {
-      await handleFormikSubmit(values, formik.values);
-    } catch (error) {
-      toast.error("Failed to submit data");
-      console.error("Error submitting data:", error);
-    }
-  };
+  const [formData, setFormData] = useState<{ [key: string]: any }[]>([]);
 
-  const handleDraftTableSubmit = async (values: any) => {
-    try {
-      await handleDraftSubmit(values, formik.values);
-    } catch (error) {
-      toast.error("Failed to submit data");
-      console.error("Error submitting data:", error);
-    }
-  };
+  const handleDataChange = (values: { [key: string]: any }, formid: string) => {
+    setFormData((prevData) => {
+      const updatedData = [...prevData];
+      const dataIndex = updatedData.findIndex((data) => data.formid === formid);
 
-  const handleDraftSubmit = async (values: any, formikData: any) => {
-    setIsDrafting(true);
-    try {
-      await axios.post(
-        `${API_BASE_URL}/api/report/draft`,
-        {
-          data: values,
-          values: formikData,
-        },
-        {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      toast.success("Report saved as draft");
-      navigate("/dashboard/tests?status=hold");
-    } catch (error) {
-      console.error("Error submitting data:", error);
-    }
-    setIsDrafting(false);
-  };
-
-  const handleFormikSubmit = async (values: any, formikData: any) => {
-    setProcessing(true);
-    try {
-      if (files) {
-        const filenames = Array.from(files).map(
-          (file) =>
-            `report-${formikData._id}-${Date.now()}.${file.name
-              .split(".")
-              .pop()}`
-        );
-        formikData.reportFile = filenames;
-        await UploadMultipleFiles(files, filenames);
+      if (dataIndex !== -1) {
+        updatedData[dataIndex] = { ...values, formid };
+      } else {
+        updatedData.push({ ...values, formid });
       }
-      await axios.post(
-        `${API_BASE_URL}/api/report/`,
-        {
-          data: values,
-          values: formikData,
-        },
-        {
-          headers: {
-            Authorization: `${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      toast.success("Data submitted successfully");
-      navigate("/dashboard/tests?status=completed");
-    } catch (error) {
-      toast.error("Failed to submit data");
-      console.error("Error submitting data:", error);
-    }
-    setProcessing(false);
+
+      return updatedData;
+    });
   };
   return (
     <>
@@ -477,10 +429,10 @@ const Complete = () => {
               <div className="col-span-full gap-2 flex flex-col md:col-span-2">
                 <label className="label">
                   <span className="label-text">Test Names</span>
-                </label>{" "}
+                </label>
                 <div className="flex gap-1">
-                  {test?.testDetail.testData.map((test, index) => (
-                    <Chip key={index}>{test.name}</Chip>
+                  {formik.values.testnames.map((test, index) => (
+                    <Chip key={index}>{test}</Chip>
                   ))}
                 </div>
               </div>
@@ -553,14 +505,49 @@ const Complete = () => {
                   <p className="text-large">Investigation Data</p>
                 </CardHeader>
                 <CardBody className="flex flex-col md:col-span-full">
-                  <FormTable
-                    tableid={tableid}
-                    onSubmit={handleTableSubmit}
-                    onSecondarySubmit={handleDraftTableSubmit}
-                    isLoading={processing}
-                    isDrafting={isDrafting}
-                  />
+                  {formik.values.tableids.map((tableid, index) => (
+                    <div
+                      className="border border-default border-collapse rounded-lg p-4 mb-4"
+                      key={tableid}
+                    >
+                      <div className="flex justify-center">
+                        <Chip color="primary" variant="flat">
+                          {formik.values.testnames[index]}
+                        </Chip>
+                      </div>
+                      <FormTable
+                        key={tableid}
+                        tableid={tableid}
+                        onDataChange={handleDataChange}
+                        isHidden={false}
+                      />
+                    </div>
+                  ))}
                 </CardBody>
+                <CardFooter className="justify-center gap-4">
+                  <Button
+                    variant="bordered"
+                    onClick={() => {
+                      formik.setFieldValue("isDraft", true);
+                      formik.handleSubmit();
+                    }}
+                    isLoading={isDrafting}
+                    isDisabled={isDrafting}
+                  >
+                    Save as Draft
+                  </Button>
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      formik.setFieldValue("isDraft", false);
+                      formik.handleSubmit();
+                    }}
+                    isLoading={formik.isSubmitting && !isDrafting}
+                    isDisabled={formik.isSubmitting && !isDrafting}
+                  >
+                    Upload Report
+                  </Button>
+                </CardFooter>
               </>
             )}
           </Card>
