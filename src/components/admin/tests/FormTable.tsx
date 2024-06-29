@@ -243,7 +243,7 @@ const FormTable = ({
           {Array.from({ length: rows }).map((_, rowIndex) => (
             <tr key={rowIndex} className="group border-y-0">
               {Array.from({ length: cols }).map((_, colIndex) => (
-                <td className="p-1" key={colIndex}>
+                <td className="p-1 h-[40px]" key={colIndex}>
                   <textarea
                     className="textarea textarea-bordered h-[50px] w-full"
                     name={`cell-${rowIndex}-${colIndex}`}

@@ -388,7 +388,7 @@ const TestCard = ({ tests }: TestCardProps) => {
                   </Chip>
                 </TableCell>
                 <TableCell className="space-x-1">
-                  {test.testDetail.testData.slice(0, 2).map((data) => {
+                  {test.testDetail.testData.slice(0, 1).map((data) => {
                     return (
                       <>
                         <Chip key={data._id} size="sm">
@@ -397,12 +397,23 @@ const TestCard = ({ tests }: TestCardProps) => {
                       </>
                     );
                   })}
-                  {test.testDetail.testData.length > 2 && (
+                  {test.testDetail.testData.length > 1 && (
                     <Tooltip
-                      content={test.testDetail.testData.length - 2 + " more"}
+                      radius="full"
+                      content={
+                        <div className="flex gap-1">
+                          {test.testDetail.testData
+                            .slice(1)
+                            .map((data, index) => (
+                              <Chip key={index} size="sm">
+                                {data.name}
+                              </Chip>
+                            ))}
+                        </div>
+                      }
                     >
                       <Chip size="sm">
-                        +{test.testDetail.testData.length - 2}
+                        +{test.testDetail.testData.length - 1}
                       </Chip>
                     </Tooltip>
                   )}

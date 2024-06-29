@@ -36,6 +36,7 @@ import {
   IconArrowUpRight,
   IconPencil,
   IconTrash,
+  IconSearch,
 } from "@tabler/icons-react";
 import FormTable from "./FormTable";
 
@@ -46,6 +47,7 @@ const AvailableTests = () => {
   const [selected, setSelected] = useState<Test | null>(null);
   const deleteTestModal = useDisclosure();
   const newServiceModal = useDisclosure();
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const fetchTests = async () => {
     try {
@@ -75,6 +77,18 @@ const AvailableTests = () => {
     }
   };
 
+  const handleSearch = (test: Test) => {
+    if (
+      (test.name &&
+        test.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (test.uniqueid &&
+        test.uniqueid.toLowerCase().includes(searchQuery.toLowerCase()))
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <>
       <section>
@@ -91,6 +105,17 @@ const AvailableTests = () => {
               </Button>
             )}
           </div>
+          <div className="relative w-full max-w-md mb-4">
+            <Input
+              type="text"
+              placeholder="Search by Name, Unique ID"
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+              }}
+              endContent={<IconSearch size={16} />}
+            />
+          </div>
+
           <Table
             topContent={
               <span className="text-default-400 text-small">
@@ -114,7 +139,10 @@ const AvailableTests = () => {
                 Actions
               </TableColumn>
             </TableHeader>
-            <TableBody emptyContent={"No Available services"} items={tests}>
+            <TableBody
+              emptyContent={"No Available services"}
+              items={tests.filter((test) => handleSearch(test))}
+            >
               {(test) => (
                 <TableRow key={test._id}>
                   <TableCell>

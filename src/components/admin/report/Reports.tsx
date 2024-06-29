@@ -26,6 +26,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  Tooltip,
   useDisclosure,
 } from "@nextui-org/react";
 import {
@@ -34,6 +35,7 @@ import {
   IconSearch,
   IconTrash,
 } from "@tabler/icons-react";
+import test from "node:test";
 
 const Reports = () => {
   const { loggedIn, user } = isLoggedIn();
@@ -65,8 +67,8 @@ const Reports = () => {
         report.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (report.phone &&
         report.phone.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (report.testname &&
-        report.testname.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (report.testname[0] &&
+        report.testname[0].toLowerCase().includes(searchQuery.toLowerCase())) ||
       (report.status &&
         report.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (report.addedby &&
@@ -138,7 +140,36 @@ const Reports = () => {
                       {report.status}
                     </Chip>
                   </TableCell>
-                  <TableCell>{report.testname}</TableCell>
+                  <TableCell className="space-x-1">
+                    {report.testname.slice(0, 1).map((data) => {
+                      return (
+                        <>
+                          <Chip key={data} size="sm">
+                            {data}
+                          </Chip>
+                        </>
+                      );
+                    })}
+                    {report.testname.length > 1 && (
+                      <Tooltip
+                        radius="full"
+                        content={
+                          <div className="flex gap-1">
+                            {report.testname
+                              // slice the first element
+                              .slice(1)
+                              .map((data, index) => (
+                                <Chip key={index} size="sm">
+                                  {data}
+                                </Chip>
+                              ))}
+                          </div>
+                        }
+                      >
+                        <Chip size="sm">+{report.testname.length - 1}</Chip>
+                      </Tooltip>
+                    )}
+                  </TableCell>
                   <TableCell>{report.name}</TableCell>
                   <TableCell>{report.phone}</TableCell>
                   <TableCell>{report.addedby}</TableCell>

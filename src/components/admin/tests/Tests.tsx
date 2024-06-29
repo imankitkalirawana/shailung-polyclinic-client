@@ -258,7 +258,7 @@ const Tests = () => {
                 .filter((test) => {
                   return handleSearch(test);
                 })
-                .map((test, index) => (
+                .map((test) => (
                   <TableRow key={test._id}>
                     <TableCell>
                       <Dropdown>
@@ -304,7 +304,7 @@ const Tests = () => {
                       </Dropdown>
                     </TableCell>
                     <TableCell className="space-x-1">
-                      {test.testDetail.testData.slice(0, 2).map((data) => {
+                      {test.testDetail.testData.slice(0, 1).map((data) => {
                         return (
                           <>
                             <Chip key={data._id} size="sm">
@@ -313,14 +313,24 @@ const Tests = () => {
                           </>
                         );
                       })}
-                      {test.testDetail.testData.length > 2 && (
+                      {test.testDetail.testData.length > 1 && (
                         <Tooltip
+                          radius="full"
                           content={
-                            test.testDetail.testData.length - 2 + " more"
+                            <div className="flex gap-1">
+                              {test.testDetail.testData
+                                // slice the first element
+                                .slice(1)
+                                .map((data, index) => (
+                                  <Chip key={index} size="sm">
+                                    {data.name}
+                                  </Chip>
+                                ))}
+                            </div>
                           }
                         >
                           <Chip size="sm">
-                            +{test.testDetail.testData.length - 2}
+                            +{test.testDetail.testData.length - 1}
                           </Chip>
                         </Tooltip>
                       )}
