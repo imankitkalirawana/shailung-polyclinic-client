@@ -18,3 +18,16 @@
 .tbl th {
   white-space: nowrap;
 }
+
+.ql-toolbar {
+  display: none !important;
+}
+
+.ql-container {
+  border-top-width: 1px !important;
+  border-radius: 10px;
+}
+
+.ql-toolbar.ql-snow + .ql-container.ql-snow {
+  border-top: 1px solid #ccc !important;
+}

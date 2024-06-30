@@ -1,16 +1,13 @@
-import React from "react";
-
+import React, { useState } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const Rough = () => {
+  const [value, setValue] = useState("hello");
   return (
-    <div>
-      <div id="editor">
-        <h2>Demo Content</h2>
-        <p>
-          Preset build with <code>snow</code> theme, and some common formats.
-        </p>
-      </div>
-    </div>
+    <ReactQuill>
+      <div className="input input-bordered"></div>
+    </ReactQuill>
   );
 };
 

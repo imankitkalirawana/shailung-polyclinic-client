@@ -5,6 +5,7 @@ import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
 import { IconPlus, IconX } from "@tabler/icons-react";
+import ReactQuill from "react-quill";
 
 interface FormTableProps {
   tableid?: string;
@@ -245,7 +246,7 @@ const FormTable = ({
             <tr key={rowIndex} className="group border-y-0">
               {Array.from({ length: cols }).map((_, colIndex) => (
                 <td className="p-1" key={colIndex}>
-                  <textarea
+                  {/* <textarea
                     className="textarea textarea-bordered h-[50px] w-full"
                     name={`cell-${rowIndex}-${colIndex}`}
                     value={formik.values[`cell-${rowIndex}-${colIndex}`] || ""}
@@ -253,6 +254,21 @@ const FormTable = ({
                       // @ts-ignore
                       handleInputChange(e);
                     }}
+                  /> */}
+                  <ReactQuill
+                    theme="snow"
+                    value={formik.values[`cell-${rowIndex}-${colIndex}`] || ""}
+                    onChange={
+                      // @ts-ignore
+                      (value) => {
+                        formik.setFieldValue(
+                          `cell-${rowIndex}-${colIndex}`,
+                          value
+                        );
+                        onDataChange(formik.values, tableid || "");
+                      }
+                    }
+                    formats={["bold", "italic", "underline", "strike"]}
                   />
                 </td>
               ))}
