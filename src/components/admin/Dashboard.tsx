@@ -104,89 +104,93 @@ const Dashboard = () => {
                   <IconArrowRight size={16} />
                 </Button>
               </Card>
+
+              <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
+                <Card
+                  isHoverable
+                  isPressable
+                  shadow="lg"
+                  as={Link}
+                  to="/dashboard/tests?status=all"
+                  className="flex-row items-center p-4 gap-2"
+                >
+                  <Avatar
+                    className="bg-primary text-base-100"
+                    showFallback
+                    fallback={<CellIcon className="w-5 h-5" />}
+                  />
+                  <div>
+                    <p className="mb-2 text-sm font-medium">Total Tests</p>
+                    <p className="text-lg font-semibold">{tests.length || 0}</p>
+                  </div>
+                </Card>
+                <Card
+                  isHoverable
+                  isPressable
+                  shadow="lg"
+                  as={Link}
+                  className="flex-row items-center p-4 gap-2"
+                  to={"/dashboard/tests?status=completed"}
+                >
+                  <Avatar
+                    showFallback
+                    className="bg-primary text-base-100"
+                    fallback={<MicroscopeIcon className="w-5 h-5" />}
+                  />
+                  <div>
+                    <p className="mb-2 text-sm font-medium">Test done</p>
+                    <p className="text-lg font-semibold">
+                      {countData.testsDone || 0}
+                    </p>
+                  </div>
+                </Card>
+
+                <Card
+                  isHoverable
+                  isPressable
+                  shadow="lg"
+                  as={Link}
+                  className="flex-row items-center p-4 gap-2"
+                  to="/dashboard/reports"
+                >
+                  <Avatar
+                    showFallback
+                    className="bg-primary text-base-100"
+                    fallback={<ReportIcon className="w-5 h-5" />}
+                  />
+                  <div>
+                    <p className="mb-2 text-sm font-medium">Reports</p>
+                    <p className="text-lg font-semibold">
+                      {countData.reports || 0}
+                    </p>
+                  </div>
+                </Card>
+                <Card
+                  isHoverable
+                  isPressable
+                  shadow="lg"
+                  as={Link}
+                  className="flex-row items-center p-4 gap-2"
+                  to={"/dashboard/tests/available-tests"}
+                >
+                  <Avatar
+                    showFallback
+                    className="bg-primary text-base-100"
+                    fallback={<IconTestPipe className="w-5 h-5" />}
+                  />
+                  <div>
+                    <p className="mb-2 text-sm font-medium">
+                      Available Services
+                    </p>
+                    <p className="text-lg font-semibold">
+                      {countData?.availableTestCount || 0}
+                    </p>
+                  </div>
+                </Card>
+              </div>
             </>
           )}
-          <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
-            <Card
-              isHoverable
-              isPressable
-              shadow="lg"
-              as={Link}
-              to="/dashboard/tests?status=all"
-              className="flex-row items-center p-4 gap-2"
-            >
-              <Avatar
-                className="bg-primary text-base-100"
-                showFallback
-                fallback={<CellIcon className="w-5 h-5" />}
-              />
-              <div>
-                <p className="mb-2 text-sm font-medium">Total Tests</p>
-                <p className="text-lg font-semibold">{tests.length || 0}</p>
-              </div>
-            </Card>
-            <Card
-              isHoverable
-              isPressable
-              shadow="lg"
-              as={Link}
-              className="flex-row items-center p-4 gap-2"
-              to={"/dashboard/tests?status=completed"}
-            >
-              <Avatar
-                showFallback
-                className="bg-primary text-base-100"
-                fallback={<MicroscopeIcon className="w-5 h-5" />}
-              />
-              <div>
-                <p className="mb-2 text-sm font-medium">Test done</p>
-                <p className="text-lg font-semibold">
-                  {countData.testsDone || 0}
-                </p>
-              </div>
-            </Card>
 
-            <Card
-              isHoverable
-              isPressable
-              shadow="lg"
-              as={Link}
-              className="flex-row items-center p-4 gap-2"
-              to="/dashboard/reports"
-            >
-              <Avatar
-                showFallback
-                className="bg-primary text-base-100"
-                fallback={<ReportIcon className="w-5 h-5" />}
-              />
-              <div>
-                <p className="mb-2 text-sm font-medium">Reports</p>
-                <p className="text-lg font-semibold">
-                  {countData.reports || 0}
-                </p>
-              </div>
-            </Card>
-            <Card
-              isHoverable
-              isPressable
-              shadow="lg"
-              as={Link}
-              className="flex-row items-center p-4 gap-2"
-              to={"/dashboard/tests/available-tests"}
-            >
-              <Avatar
-                showFallback
-                className="bg-primary text-base-100"
-                fallback={<IconTestPipe className="w-5 h-5" />}
-              />
-              <div>
-                <p className="mb-2 text-sm font-medium">Available Services</p>
-                <p className="text-lg font-semibold">
-                  {countData?.availableTestCount || 0}
-                </p>
-              </div>
-            </Card>
-          </div>
           {user?.role === "admin" && (
             <>
               <div className="flex justify-between items-center">
@@ -204,9 +208,15 @@ const Dashboard = () => {
             </>
           )}
           <TestCard tests={tests} />
-          <ReportCard reports={reports} />
-          <AvailableTestCard tests={availabletests} />
-          <UserCard users={users} />
+          {(user?.role === "admin" || user?.role === "doctor") && (
+            <ReportCard reports={reports} />
+          )}
+          {user?.role === "admin" && (
+            <>
+              <AvailableTestCard tests={availabletests} />
+              <UserCard users={users} />
+            </>
+          )}
         </div>
       </main>
     </>
@@ -390,11 +400,9 @@ const TestCard = ({ tests }: TestCardProps) => {
                 <TableCell className="space-x-1">
                   {test.testDetail.testData.slice(0, 1).map((data) => {
                     return (
-                      <>
-                        <Chip key={data._id} size="sm">
-                          {data.name}
-                        </Chip>
-                      </>
+                      <Chip key={data._id} size="sm">
+                        {data.name}
+                      </Chip>
                     );
                   })}
                   {test.testDetail.testData.length > 1 && (

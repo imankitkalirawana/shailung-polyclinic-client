@@ -124,7 +124,8 @@ const AvailableTests = () => {
             }
             aria-label="Users"
             onRowAction={(key) => {
-              navigate(`/dashboard/tests/available-tests/${key}`);
+              user?.role === "admin" &&
+                navigate(`/dashboard/tests/available-tests/${key}`);
             }}
             selectionMode="single"
           >

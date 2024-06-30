@@ -1,45 +1,15 @@
 import React from "react";
-import { useFormik } from "formik";
+import Quill from "quill";
 
-interface RoughProps {
-  formid?: string;
-  onDataChange: (values: { [key: string]: any }, formid: string) => void; // Callback function to pass data to parent
-}
-
-const Rough: React.FC<RoughProps> = ({ formid, onDataChange }) => {
-  const formik = useFormik({
-    initialValues: {
-      name: "",
-      email: "",
-    },
-    onSubmit: () => {}, // Remove onSubmit as we don't need individual submits
-  });
-
-  // Handle form data changes and pass to parent
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    formik.setFieldValue(name, value);
-    onDataChange(formik.values, formid || "");
-  };
-
+const Rough = () => {
   return (
-    <div className="mt-4">
-      <input
-        type="text"
-        name="name"
-        id={`name-${formid}`}
-        className="input input-bordered"
-        onChange={handleInputChange}
-        value={formik.values.name}
-      />
-      <input
-        type="text"
-        name="email"
-        id={`email-${formid}`}
-        className="input input-bordered"
-        onChange={handleInputChange}
-        value={formik.values.email}
-      />
+    <div>
+      <div id="editor">
+        <h2>Demo Content</h2>
+        <p>
+          Preset build with <code>snow</code> theme, and some common formats.
+        </p>
+      </div>
     </div>
   );
 };

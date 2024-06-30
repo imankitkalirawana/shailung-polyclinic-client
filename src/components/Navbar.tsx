@@ -502,9 +502,9 @@ const appointments = [
     name: "Appointment History",
     description: "View your previously booked appointments",
     href: `${
-      user?.role === "admin"
-        ? "/dashboard/tests?status=booked"
-        : "/appointment/history"
+      user?.role === "user"
+        ? "/appointment/history"
+        : "/dashboard/tests?status=booked"
     }`,
     icon: IconCalendarClock,
   },
@@ -535,7 +535,7 @@ const users = [
   },
 ];
 
-if (user?.role === "admin" || user?.role === "doctor") {
+if (user?.role === "admin") {
   appointments.unshift(
     {
       name: "New Appointment (Existing User)",
@@ -570,12 +570,28 @@ if (user?.role === "admin" || user?.role === "doctor") {
     href: "/dashboard/users?action=new",
     icon: IconNewSection,
   });
-} else {
+} else if (user?.role === "recp") {
+  appointments.unshift(
+    {
+      name: "New Appointment (Existing User)",
+      description: "Book an appointment for an existing user",
+      href: `/dashboard/appointments/new?user=existing`,
+      icon: IconUserEdit,
+    },
+    {
+      name: "New Appointment (New User)",
+      description: "Book an appointment for a new user",
+      href: `/dashboard/appointments/new?user=new`,
+      icon: IconUserScan,
+    }
+  );
+}
+if (user?.role === "user") {
   appointments.unshift({
-    name: "New Appointment",
-    description: "Book a new appointment with the doctor",
-    href: `/appointment/new`,
-    icon: IconUserEdit,
+    name: "View Appointments",
+    description: "View all the appointments booked by the patients",
+    href: "/dashboard/appointments",
+    icon: IconCalendarClock,
   });
 }
 

@@ -11,6 +11,7 @@ import { calculateAge } from "../../functions/agecalculator";
 import { User } from "../../interface/interface";
 import { parseDate } from "@internationalized/date";
 import { getLocalTimeZone, today } from "@internationalized/date";
+import * as Yup from "yup";
 
 import {
   IconHistory,
@@ -137,6 +138,17 @@ const New = () => {
     }
   }, []);
 
+  const validationSchema = Yup.object().shape({
+    age: Yup.number().required("Age is required").min(1, "Age should be 1+"),
+    name: Yup.string().required("Name is required"),
+    appointmentdate: Yup.string().required("Appointment date is required"),
+    testids: Yup.array()
+      .of(Yup.string())
+      .min(1)
+      .max(5)
+      .required("Select at least one test"),
+  });
+
   const formik = useFormik({
     initialValues: {
       testids: [],
@@ -146,6 +158,7 @@ const New = () => {
       email: "",
       age: 0,
     },
+    validationSchema: validationSchema,
     onSubmit: async (values) => {
       try {
         await axios
@@ -241,30 +254,32 @@ const New = () => {
       <div className="w-full p-4 mt-24 max-w-6xl mx-auto shadow-xs">
         <div className="flex justify-between items-center">
           <h1 className="text-lg font-semibold">Book an Test Appointment</h1>
-          <div className="flex gap-2 flex-row-reverse">
-            <Button
-              as={Link}
-              to={"/appointment/history"}
-              variant="bordered"
-              className="hidden sm:flex"
-            >
-              <HistoryIcon className="h-5 w-5" />
-              Appointment History
-            </Button>
-            <Tooltip content="Appointment History" color="primary">
+          {user?.role === "user" && (
+            <div className="flex gap-2 flex-row-reverse">
               <Button
                 as={Link}
-                isIconOnly
-                radius="full"
-                variant="flat"
-                color="primary"
-                to="/appointment/history"
-                className="sm:hidden flex items-center justify-center"
+                to={"/appointment/history"}
+                variant="bordered"
+                className="hidden sm:flex"
+                startContent={<HistoryIcon className="h-5 w-5" />}
               >
-                <IconHistory className="h-5 w-5" />
+                Appointment History
               </Button>
-            </Tooltip>
-          </div>
+              <Tooltip content="Appointment History" color="primary">
+                <Button
+                  as={Link}
+                  isIconOnly
+                  radius="full"
+                  variant="flat"
+                  color="primary"
+                  to="/appointment/history"
+                  className="sm:hidden flex items-center justify-center"
+                >
+                  <IconHistory className="h-5 w-5" />
+                </Button>
+              </Tooltip>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col justify-between items-center mt-12 gap-8">
@@ -339,6 +354,10 @@ const New = () => {
                   value={formik.values.name}
                   onChange={formik.handleChange}
                   isRequired
+                  isInvalid={
+                    formik.touched.name && formik.errors.name ? true : false
+                  }
+                  errorMessage={formik.touched.name && formik.errors.name}
                 />
               </div>
               {isPhone !== "false" && (
@@ -369,6 +388,10 @@ const New = () => {
                   value={formik.values.age}
                   onChange={formik.handleChange}
                   min={0}
+                  isInvalid={
+                    formik.touched.age && formik.errors.age ? true : false
+                  }
+                  errorMessage={formik.touched.age && formik.errors.age}
                 />
               </div>
             </>
@@ -388,6 +411,16 @@ const New = () => {
                   }}
                   isRequired
                   showMonthAndYearPickers
+                  isInvalid={
+                    formik.touched.appointmentdate &&
+                    formik.errors.appointmentdate
+                      ? true
+                      : false
+                  }
+                  errorMessage={
+                    formik.touched.appointmentdate &&
+                    formik.errors.appointmentdate
+                  }
                 />
               </div>
               <div className="form-control col-span-2">
@@ -443,6 +476,13 @@ const New = () => {
                           </div>
                         ))}
                     </div>
+                    {formik.touched.testids && formik.errors.testids && (
+                      <label className="label">
+                        <span className="label-text text-error">
+                          {formik.errors.testids}
+                        </span>
+                      </label>
+                    )}
                   </>
                 )}
               </div>
@@ -490,12 +530,6 @@ const New = () => {
                   variant="flat"
                   color="primary"
                   onClick={confirmModal.onOpenChange}
-                  isDisabled={
-                    formik.values.testids.length < 1 ||
-                    formik.values.appointmentdate === "" ||
-                    formik.values.age === 0 ||
-                    formik.values.name === ""
-                  }
                 >
                   Book Appointment
                 </Button>
@@ -508,7 +542,7 @@ const New = () => {
       <Modal
         isOpen={confirmModal.isOpen}
         onOpenChange={confirmModal.onOpenChange}
-        backdrop="blur"
+        backdrop="opaque"
       >
         <ModalContent>
           {(onClose) => (

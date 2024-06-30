@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { IconUserEdit, IconUserPlus } from "@tabler/icons-react";
 import { getBothUsers, getUserWithId } from "../../../functions/get";
-import { calculateAge } from "../../../functions/agecalculator";
 import { User } from "../../../interface/interface";
 import axios from "axios";
 import { useFormik } from "formik";
@@ -28,13 +27,22 @@ import {
 } from "@nextui-org/react";
 import { humanReadableDate } from "../user/Users";
 import * as Yup from "yup";
+import { isLoggedIn } from "../../../utils/auth";
 
 const NewAppointment = () => {
+  const { user } = isLoggedIn();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const userType = searchParams.get("user");
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (user?.role !== "admin" && user?.role !== "recp") {
+      navigate("/dashboard");
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!userType) {
@@ -204,31 +212,35 @@ const NewAppointment = () => {
                           className="h-20 w-20 translate-y-12"
                           src={`${API_BASE_URL}/api/upload/single/${selectedUser.photo}`}
                         />
-                        <Button
-                          as={Link}
-                          className="absolute right-3 top-3 bg-white/20 text-white dark:bg-black/20"
-                          radius="full"
-                          size="sm"
-                          variant="light"
-                          to={`/dashboard/users/${selectedUser._id}/edit`}
-                        >
-                          Edit Profile
-                        </Button>
+                        {user?.role === "admin" && (
+                          <Button
+                            as={Link}
+                            className="absolute right-3 top-3 bg-white/20 text-white dark:bg-black/20"
+                            radius="full"
+                            size="sm"
+                            variant="light"
+                            to={`/dashboard/users/${selectedUser._id}/edit`}
+                          >
+                            Edit Profile
+                          </Button>
+                        )}
                       </CardHeader>
                       <CardBody>
                         <div className="pb-4 pt-6">
-                          <p className="text-large font-medium">
+                          <p className="text-large capitalize font-medium">
                             {selectedUser.name}
                           </p>
                           <p className="max-w-[90%] text-small text-default-400">
-                            {selectedUser.email + " | " + selectedUser.phone}
+                            {selectedUser.email
+                              ? selectedUser.email + " | "
+                              : "" + (selectedUser.phone || "")}
                           </p>
                           <div className="flex gap-2 pb-1 pt-2">
-                            <Chip variant="flat">
-                              {selectedUser.dob &&
-                                calculateAge(selectedUser.dob)}{" "}
-                              years
-                            </Chip>
+                            {selectedUser.dob && (
+                              <Chip variant="flat">
+                                calculateAge(selectedUser.dob) years
+                              </Chip>
+                            )}
                             <Chip variant="flat" className="capitalize">
                               {selectedUser.role}
                             </Chip>

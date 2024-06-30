@@ -78,7 +78,11 @@ const Tests = () => {
   const exportModal = useDisclosure();
 
   useEffect(() => {
-    if (user?.role !== "admin" && user?.role !== "doctor") {
+    if (
+      user?.role !== "admin" &&
+      user?.role !== "doctor" &&
+      user?.role !== "recp"
+    ) {
       navigate("/dashboard");
     }
   }, [user]);
@@ -183,28 +187,33 @@ const Tests = () => {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold">Tests</h1>
             <div className="flex gap-2 flex-row-reverse">
-              <Button
-                variant="flat"
-                color="primary"
-                as={Link}
-                to="/dashboard/tests/appointment"
-              >
-                New Test
-              </Button>
+              {user?.role === "admin" ||
+                (user?.role === "recp" && (
+                  <Button
+                    variant="flat"
+                    color="primary"
+                    as={Link}
+                    to="/dashboard/tests/appointment"
+                  >
+                    New Test
+                  </Button>
+                ))}
 
-              <Tooltip content="Export to Excel">
-                <Button
-                  radius="full"
-                  variant="bordered"
-                  data-tip="Export to Excel"
-                  onClick={() => {
-                    exportModal.onOpenChange();
-                  }}
-                  isIconOnly
-                >
-                  <ExportTableIcon className="w-4 h-4" />
-                </Button>
-              </Tooltip>
+              {user?.role === "admin" && (
+                <Tooltip content="Export to Excel">
+                  <Button
+                    radius="full"
+                    variant="bordered"
+                    data-tip="Export to Excel"
+                    onClick={() => {
+                      exportModal.onOpenChange();
+                    }}
+                    isIconOnly
+                  >
+                    <ExportTableIcon className="w-4 h-4" />
+                  </Button>
+                </Tooltip>
+              )}
             </div>
           </div>
           <div className="flex gap-4 my-8 overflow-x-scroll">
@@ -261,7 +270,15 @@ const Tests = () => {
                 .map((test) => (
                   <TableRow key={test._id}>
                     <TableCell>
-                      <Dropdown>
+                      <Dropdown
+                        isDisabled={
+                          (user?.role !== "admin" && user?.role !== "doctor") ||
+                          test.status === "completed" ||
+                          test.status === "cancelled" ||
+                          test.status === "hold" ||
+                          (user.role === "doctor" && test.status === "overdue")
+                        }
+                      >
                         <DropdownTrigger>
                           <Chip
                             variant="dot"
@@ -345,8 +362,10 @@ const Tests = () => {
                         : "Not Scheduled"}
                     </TableCell>
                     <TableCell className="flex items-center">
-                      {(test.status !== "cancelled" ||
-                        user?.role === "admin") && (
+                      {((test.status !== "cancelled" &&
+                        test.status !== "hold") ||
+                        user?.role === "admin" ||
+                        user?.role === "doctor") && (
                         <Dropdown>
                           <DropdownTrigger>
                             <Button
@@ -362,8 +381,10 @@ const Tests = () => {
                           <DropdownMenu
                             aria-label="Test Actions"
                             disabledKeys={
-                              test.status === "completed" ||
-                              test.status === "cancelled"
+                              user?.role === "doctor"
+                                ? ["schedule"]
+                                : test.status === "completed" ||
+                                  test.status === "cancelled"
                                 ? ["schedule", "edit"]
                                 : test.status === "hold"
                                 ? ["schedule"]

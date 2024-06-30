@@ -28,7 +28,7 @@ import ReportTable from "./ReportTable";
 import { getAllDoctors } from "../../../functions/get";
 
 const CompleteHold = () => {
-  const { loggedIn } = isLoggedIn();
+  const { loggedIn, user } = isLoggedIn();
   const { id }: any = useParams();
   const navigate = useNavigate();
 
@@ -36,6 +36,13 @@ const CompleteHold = () => {
   const [files, setFiles] = useState<FileList | null>(null);
   const [isDrafting, setIsDrafting] = useState<boolean>(false);
   const [doctors, setDoctors] = useState([]);
+
+  useEffect(() => {
+    if (user?.role !== "admin" && user?.role !== "doctor") {
+      toast.error("Unauthorized access");
+      navigate("/dashboard/tests");
+    }
+  }, [user]);
 
   useEffect(() => {
     if (test?.isDone) {

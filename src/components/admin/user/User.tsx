@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
-import { API_BASE_URL } from "../../../utils/config";
+import { API_BASE_URL, Roles } from "../../../utils/config";
 import axios from "axios";
 import { toast } from "sonner";
 import { isLoggedIn } from "../../../utils/auth";
@@ -25,6 +25,8 @@ import {
   ModalFooter,
   ModalHeader,
   useDisclosure,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { IconPencil } from "@tabler/icons-react";
 import { parseDate } from "@internationalized/date";
@@ -68,7 +70,7 @@ const User = () => {
       email: "",
       photo: "",
       bio: "",
-      role: "",
+      role: "user",
       gender: "",
       dob: "2000-01-01",
       phone: "",
@@ -248,6 +250,15 @@ const User = () => {
             name="dob"
             showMonthAndYearPickers
           />
+          <Select
+            label="Role"
+            {...formik.getFieldProps("role")}
+            selectedKeys={[formik.values.role]}
+          >
+            {Roles.map((role) => (
+              <SelectItem key={role.value}>{role.label}</SelectItem>
+            ))}
+          </Select>
           <Textarea
             label="Bio"
             placeholder="Write a few sentences bio yourself."
