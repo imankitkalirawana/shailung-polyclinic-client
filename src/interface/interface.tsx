@@ -104,6 +104,7 @@ export interface Report {
   status: string;
   addedby: string;
   testid: string;
+  testids: string[];
   reportid: string;
   summary: string[];
   labId: string;

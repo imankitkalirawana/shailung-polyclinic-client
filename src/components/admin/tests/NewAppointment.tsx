@@ -28,6 +28,7 @@ import {
 import { humanReadableDate } from "../user/Users";
 import * as Yup from "yup";
 import { isLoggedIn } from "../../../utils/auth";
+import { calculateAge } from "../../../functions/agecalculator";
 
 const NewAppointment = () => {
   const { user } = isLoggedIn();
@@ -238,7 +239,7 @@ const NewAppointment = () => {
                           <div className="flex gap-2 pb-1 pt-2">
                             {selectedUser.dob && (
                               <Chip variant="flat">
-                                calculateAge(selectedUser.dob) years
+                                {calculateAge(selectedUser.dob)} years
                               </Chip>
                             )}
                             <Chip variant="flat" className="capitalize">

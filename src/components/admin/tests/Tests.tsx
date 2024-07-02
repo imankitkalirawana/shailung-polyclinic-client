@@ -187,17 +187,16 @@ const Tests = () => {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold">Tests</h1>
             <div className="flex gap-2 flex-row-reverse">
-              {user?.role === "admin" ||
-                (user?.role === "recp" && (
-                  <Button
-                    variant="flat"
-                    color="primary"
-                    as={Link}
-                    to="/dashboard/tests/appointment"
-                  >
-                    New Test
-                  </Button>
-                ))}
+              {(user?.role === "admin" || user?.role === "recp") && (
+                <Button
+                  variant="flat"
+                  color="primary"
+                  as={Link}
+                  to="/dashboard/tests/appointment"
+                >
+                  New Test
+                </Button>
+              )}
 
               {user?.role === "admin" && (
                 <Tooltip content="Export to Excel">
@@ -332,9 +331,9 @@ const Tests = () => {
                       })}
                       {test.testDetail.testData.length > 1 && (
                         <Tooltip
-                          radius="full"
+                          className="max-w-96"
                           content={
-                            <div className="flex gap-1">
+                            <div className="flex gap-1 flex-wrap justify-center">
                               {test.testDetail.testData
                                 // slice the first element
                                 .slice(1)

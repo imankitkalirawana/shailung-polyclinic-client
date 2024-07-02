@@ -171,11 +171,11 @@ const Complete = () => {
           await uploadReport(values, formData).then((res) => {
             if (res) {
               toast.success("Report uploaded successfully");
-              navigate(
-                `/dashboard/tests?status=${
-                  values.isDraft ? "hold" : "completed"
-                }`
-              );
+              // navigate(
+              //   `/dashboard/tests?status=${
+              //     values.isDraft ? "hold" : "completed"
+              //   }`
+              // );
             }
           });
         }
@@ -209,6 +209,7 @@ const Complete = () => {
 
   const [formData, setFormData] = useState<{ [key: string]: any }[]>([]);
 
+  console.log(formData);
   const handleDataChange = (values: { [key: string]: any }, formid: string) => {
     setFormData((prevData) => {
       const updatedData = [...prevData];
@@ -223,6 +224,7 @@ const Complete = () => {
       return updatedData;
     });
   };
+
   return (
     <>
       <div className="mx-auto">

@@ -76,11 +76,11 @@ const FormTable = ({
     onSubmit: () => {},
   });
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    formik.setFieldValue(name, value);
-    onDataChange && onDataChange(formik.values, tableid || "");
-  };
+  // const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = event.target;
+  //   formik.setFieldValue(name, value);
+  //   onDataChange && onDataChange(formik.values, tableid || "");
+  // };
 
   const handleDeleteRow = (rowIndex: number, values: any, setValues: any) => {
     const newValues = { ...values };
@@ -274,7 +274,7 @@ const FormTable = ({
               ))}
               <td className="w-[40px] transition-all opacity-0 group-hover:opacity-100">
                 <div className="flex gap-1 flex-col-reverse items-center">
-                  {rows > 2 && (
+                  {rows > 1 && (
                     <Tooltip
                       content="Delete Row"
                       placement="left"
