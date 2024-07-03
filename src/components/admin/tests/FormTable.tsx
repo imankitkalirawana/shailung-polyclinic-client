@@ -8,7 +8,7 @@ import { IconPlus, IconX } from "@tabler/icons-react";
 import ReactQuill from "react-quill";
 
 interface FormTableProps {
-  tableid: string;
+  tableid?: string;
   onDataChange: (values: { [key: string]: any }, formid: string) => void;
   rowCount?: number;
   colCount?: number;
@@ -56,7 +56,7 @@ const FormTable = ({
           setCols(colCount);
         }
         setInitialValues(data);
-        onDataChange(data, tableid);
+        onDataChange(data, tableid || "");
       } catch (error) {
         console.error(error);
         toast.error("Failed to fetch data");
@@ -71,15 +71,11 @@ const FormTable = ({
 
   const formik = useFormik({
     enableReinitialize: true,
-    initialValues: initialValues,
+    initialValues: {
+      ...initialValues,
+    },
     onSubmit: () => {},
   });
-
-  // const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = event.target;
-  //   formik.setFieldValue(name, value);
-  //   onDataChange && onDataChange(formik.values, tableid || "");
-  // };
 
   const handleDeleteRow = (rowIndex: number, values: any, setValues: any) => {
     const newValues = { ...values };

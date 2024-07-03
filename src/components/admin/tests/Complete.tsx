@@ -209,7 +209,6 @@ const Complete = () => {
 
   const [formData, setFormData] = useState<{ [key: string]: any }[]>([]);
 
-  console.log(formData);
   const handleDataChange = (values: { [key: string]: any }, formid: string) => {
     setFormData((prevData) => {
       const updatedData = [...prevData];
