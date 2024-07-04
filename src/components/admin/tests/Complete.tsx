@@ -70,18 +70,6 @@ const Complete = () => {
         );
         setTest(data);
 
-        const tableidsPromises = data.testDetail.testData.map(
-          (test: AvailableTest) =>
-            axios
-              .get(`${API_BASE_URL}/api/available-test/${test._id}`, {
-                headers: {
-                  Authorization: `${localStorage.getItem("token")}`,
-                },
-              })
-              .then((res) => res.data.serviceid)
-        );
-
-        const tableids = await Promise.all(tableidsPromises);
         // @ts-ignore
         formik.setValues((previousData) => ({
           ...previousData,
@@ -98,7 +86,6 @@ const Complete = () => {
           testids: data.testDetail.testData.map(
             (test: AvailableTest) => test._id
           ),
-          tableids,
         }));
 
         const doctors = await getAllDoctors();
@@ -128,7 +115,6 @@ const Complete = () => {
       address: "",
       testid: "",
       testids: [],
-      tableids: [],
       testnames: [],
       reportType: "text",
       reportDate: new Date().toISOString().split("T")[0],
@@ -512,7 +498,7 @@ const Complete = () => {
                   <p className="text-large">Investigation Data</p>
                 </CardHeader>
                 <CardBody className="flex flex-col md:col-span-full">
-                  {formik.values.tableids.map((tableid, index) => (
+                  {formik.values.testids.map((tableid, index) => (
                     <div
                       className="border border-default border-collapse rounded-lg p-4 mb-4"
                       key={tableid}

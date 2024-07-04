@@ -54,7 +54,6 @@ const EditAvailableTest = () => {
       status: "active",
       doctors: [] as string[],
       summary: "",
-      serviceid: "",
     },
 
     onSubmit: async (values) => {
@@ -103,6 +102,7 @@ const EditAvailableTest = () => {
     });
   };
 
+  console.log(formData);
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
@@ -216,9 +216,8 @@ const EditAvailableTest = () => {
       </form>
 
       <Card className="mt-8 p-4" id="formtable">
-        {/* {formik.values.serviceid && ( */}
         <FormTable
-          tableid={formik.values.serviceid || ""}
+          tableid={formik.values._id}
           onDataChange={handleDataChange}
         />
         {/* )} */}

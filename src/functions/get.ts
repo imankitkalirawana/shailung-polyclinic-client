@@ -108,6 +108,16 @@ export const countAll = async () => {
     return data;
 }
 
+export const getAllAvailableTestsWithIds = async (ids: any) => {
+    const response = await axios.post(`${API_BASE_URL}/api/available-test/by-ids`, { ids }, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    const data = response.data;
+    return data;
+}
+
 export const getAllAvailableTests = async () => {
     const response = await axios.get(`${API_BASE_URL}/api/available-test/all`, {
         headers: {

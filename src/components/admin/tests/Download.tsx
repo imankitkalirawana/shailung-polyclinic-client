@@ -4,16 +4,18 @@ import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
 import { Link, useParams } from "react-router-dom";
 import { SmartHomeIcon } from "../../icons/Icons";
-import { Doctor, Report } from "../../../interface/interface";
+import { AvailableTest, Doctor, Report } from "../../../interface/interface";
 import DynamicTable from "./DisplayReportTable";
-import { getDoctorsWithIds } from "../../../functions/get";
+import {
+  getAllAvailableTestsWithIds,
+  getDoctorsWithIds,
+} from "../../../functions/get";
 import { Button, Kbd } from "@nextui-org/react";
 
 const Download = () => {
   const { reportId }: any = useParams();
   const [report, setReport] = useState<Report | null>(null);
   const [reportRows, setReportRows] = useState<any[]>([]);
-
   const [loading, setLoading] = useState(true);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const reportArea = useRef<HTMLDivElement>(null);
@@ -108,9 +110,9 @@ const Download = () => {
               />
               <div
                 data-theme="light"
-                className="flex flex-col justify-between pb-24 top-0 left-0 w-full h-full pt-48"
+                className="flex flex-col justify-between top-0 left-0 w-full h-full pt-48"
               >
-                <main className="px-8 mt-4 min-h-[900px]">
+                <main className="px-8 mt-4 min-h-[740px]">
                   <div className="space-y-4 font-roboto flex flex-col gap-4">
                     <div className="flex text-xs justify-between">
                       <div className="flex gap-4">
@@ -140,38 +142,42 @@ const Download = () => {
                           </span>
                           <span>{report?.reportDate || "-"}</span>
                           <span>{report?.collectiondate || "-"}</span>
-                          <span>{report?._id}</span>
+                          <span>{report?._id.slice(0, 6)}</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                  {reportRows.map((row, index) => (
+                  {reportRows.map((row) => (
                     <div className="my-4" key={row._id}>
                       <div className="space-y-2">
                         <div className="space-y-1">
                           <h3 className="text-sm text-center font-semibold leading-none">
-                            {report?.testname[index]}
+                            {row.testname}
                           </h3>
-                          <p className="text-center text-xs"></p>
+                          <p className="text-center text-xs">
+                            {row.testdescription}
+                          </p>
                         </div>
                       </div>
                       <DynamicTable tableid={row._id} />
                       <div className="mt-3">
-                        {/* {report?.summary[index] && ( */}
-                        <div>
-                          <h3 className="text-xs font-semibold">
-                            Test Information:
-                          </h3>
-                          <p className="text-xs whitespace-pre-wrap">{}</p>
-                        </div>
-                        {/* )} */}
+                        {row.testsummary && (
+                          <div>
+                            <h3 className="text-xs font-semibold">
+                              Test Information:
+                            </h3>
+                            <p className="text-xs whitespace-pre-wrap">
+                              {row.testsummary}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
                   <div className="space-y-2"></div>
                 </main>
                 <div className="relative">
-                  <footer>
+                  <footer className="absolute z-10 w-full -top-24">
                     <div className="flex w-full justify-evenly gap-4 text-center">
                       {doctors?.slice(0, 4).map((doc) => (
                         <div key={doc._id}>
@@ -195,7 +201,7 @@ const Download = () => {
                   <div className="relative">
                     <img
                       src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${report?._id}/download`}
-                      className="print:w-[80px] h-[100px] w-[100px] print:h-[80px] absolute bottom-[70px] right-[25px] print:bottom-[45px] print:right-[15px]"
+                      className="print:w-[80px] h-[100px] w-[100px] print:h-[80px] absolute bottom-[70px] right-[25px] print:bottom-[55px] print:right-[20px]"
                       alt=""
                     />
                     <img src="/report-footer.jpg" loading="eager" />

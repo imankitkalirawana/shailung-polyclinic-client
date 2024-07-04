@@ -68,20 +68,6 @@ const CompleteHold = () => {
           })
           .then(async ({ data }) => {
             setTest(data);
-            // formik.setValues((previousData) => ({
-            //   ...previousData,
-            //   name: data.testDetail.userData.name,
-            //   phone: data.testDetail.userData.phone,
-            //   email: data.testDetail.userData.email,
-            //   age: data.testDetail.userData.age,
-            //   userid: data.testDetail.userData._id,
-            //   testname: data.testDetail.testData.name,
-            //   testid: data._id,
-            //   doctors: data.doctors,
-            //   summary: data.testDetail.testData.summary,
-            //   description: data.testDetail.testData.description,
-            // }));
-
             axios
               .get(
                 `${API_BASE_URL}/api/available-test/${data.testDetail.testData._id}`,

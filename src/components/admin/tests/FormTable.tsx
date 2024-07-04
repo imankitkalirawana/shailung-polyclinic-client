@@ -32,7 +32,7 @@ const FormTable = ({
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/api/service/${tableid}`
+          `${API_BASE_URL}/api/available-test/data/${tableid}`
         );
         const data = response.data.data;
 
@@ -146,7 +146,11 @@ const FormTable = ({
     setValues(newValues);
   };
 
-  // initially send the form data to parent component
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    formik.setFieldValue(name, value);
+    onDataChange && onDataChange(formik.values, tableid || "");
+  };
 
   return (
     <form onSubmit={formik.handleSubmit} className="overflow-x-scroll">
@@ -238,15 +242,6 @@ const FormTable = ({
             <tr key={rowIndex} className="group border-y-0">
               {Array.from({ length: cols }).map((_, colIndex) => (
                 <td className="p-1" key={colIndex}>
-                  {/* <textarea
-                    className="textarea textarea-bordered h-[50px] w-full"
-                    name={`cell-${rowIndex}-${colIndex}`}
-                    value={formik.values[`cell-${rowIndex}-${colIndex}`] || ""}
-                    onChange={(e) => {
-                      // @ts-ignore
-                      handleInputChange(e);
-                    }}
-                  /> */}
                   <ReactQuill
                     theme="snow"
                     value={formik.values[`cell-${rowIndex}-${colIndex}`] || ""}

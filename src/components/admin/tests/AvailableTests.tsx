@@ -277,6 +277,7 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
       summary: "",
       doctors: [] as string[],
       serviceid: "",
+      data: [] as { [key: string]: any }[],
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -285,7 +286,6 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
           `${API_BASE_URL}/api/available-test`,
           {
             values,
-            formData,
           },
           {
             headers: {
@@ -295,7 +295,7 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
         );
         toast.success("Service added successfully");
 
-        navigate(0);
+        // navigate(0);
         newServiceModal.onClose();
       } catch (error: any) {
         toast.error(error.response.statusText);
@@ -303,20 +303,17 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
     },
   });
 
-  const [formData, setFormData] = useState<{ [key: string]: any }[]>([]);
+  // const [formData, setFormData] = useState<{ [key: string]: any }[]>([]);
 
   const handleDataChange = (values: { [key: string]: any }, formid: string) => {
-    setFormData((prevData) => {
-      const updatedData = [...prevData];
-      const dataIndex = updatedData.findIndex((data) => data.formid === formid);
-
-      if (dataIndex !== -1) {
-        updatedData[dataIndex] = { ...values, formid };
-      } else {
-        updatedData.push({ ...values, formid });
-      }
-
-      return updatedData;
+    formik.setValues((prev) => {
+      return {
+        ...prev,
+        data: [
+          ...prev.data.filter((data) => data.formid !== formid),
+          { ...values, formid },
+        ],
+      };
     });
   };
 
