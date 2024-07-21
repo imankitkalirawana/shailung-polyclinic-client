@@ -272,15 +272,14 @@ const Navbar = () => {
                 </Popover>
               </>
             ) : null}
-            {user?.role === "admin" ||
-              (user?.role === "recp" && (
-                <Link
-                  to="/dashboard/medical-examination"
-                  className="text-sm font-semibold leading-6"
-                >
-                  Medical Examination
-                </Link>
-              ))}
+            {(user?.role === "admin" || user?.role === "recp") && (
+              <Link
+                to="/dashboard/medical-examination"
+                className="text-sm font-semibold leading-6"
+              >
+                Medical Examination
+              </Link>
+            )}
           </Popover.Group>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             {loggedIn ? (

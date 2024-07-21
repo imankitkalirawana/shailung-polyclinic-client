@@ -2,7 +2,6 @@ import { useFormik } from "formik";
 import { isLoggedIn } from "../../../utils/auth";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { parseDate } from "@internationalized/date";
 
 import {
   Avatar,
@@ -12,7 +11,6 @@ import {
   CardBody,
   CardFooter,
   CardHeader,
-  DatePicker,
   Divider,
   Input,
   Select,

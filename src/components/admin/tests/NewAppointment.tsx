@@ -464,27 +464,6 @@ const AddUser = () => {
             <>
               <Input
                 type="text"
-                name="email"
-                label="Email"
-                placeholder="Enter patient email"
-                id="email"
-                value={formik.values.email}
-                onChange={async (e) => {
-                  formik.handleChange(e);
-                  const email = e.target.value;
-                  if (email === "") return;
-                  if (await checkMail(email)) {
-                    formik.setErrors({
-                      email: "Email is already registered",
-                    });
-                  }
-                }}
-                isRequired
-                isInvalid={formik.errors.email ? true : false}
-                errorMessage={formik.errors.email}
-              />
-              <Input
-                type="text"
                 label="Phone Number"
                 placeholder="Enter patient phone number"
                 name="phone"
@@ -504,6 +483,26 @@ const AddUser = () => {
                 isInvalid={formik.errors.phone ? true : false}
                 errorMessage={formik.errors.phone}
               />
+              <Input
+                type="text"
+                name="email"
+                label="Email"
+                placeholder="Enter patient email"
+                id="email"
+                value={formik.values.email}
+                onChange={async (e) => {
+                  formik.handleChange(e);
+                  const email = e.target.value;
+                  if (email === "") return;
+                  if (await checkMail(email)) {
+                    formik.setErrors({
+                      email: "Email is already registered",
+                    });
+                  }
+                }}
+                isInvalid={formik.errors.email ? true : false}
+                errorMessage={formik.errors.email}
+              />
             </>
           )}
         </CardBody>
@@ -514,8 +513,7 @@ const AddUser = () => {
             isDisabled={
               isAdding ||
               !formik.values.name ||
-              (isPhone === "true" &&
-                (!formik.values.email || !formik.values.phone))
+              (isPhone === "true" && !formik.values.phone)
             }
             isLoading={isAdding}
             fullWidth

@@ -215,29 +215,31 @@ const Tests = () => {
               )}
             </div>
           </div>
-          <div className="flex gap-4 my-8 overflow-x-scroll">
-            <Chip
-              as={Link}
-              color={queryStatus === "all" ? "primary" : "default"}
-              variant={queryStatus === "all" ? "flat" : "bordered"}
-              to={`/dashboard/tests?status=all`}
-            >
-              All
-            </Chip>
-            {TestStatus.sort((a, b) => (a.value > b.value ? 1 : -1)).map(
-              (status) => (
-                <Chip
-                  as={Link}
-                  key={status.value}
-                  color={queryStatus === status.value ? "primary" : "default"}
-                  variant={queryStatus === status.value ? "flat" : "bordered"}
-                  to={`/dashboard/tests?status=${status.value}`}
-                >
-                  {status.label}
-                </Chip>
-              )
-            )}
-          </div>
+          {user?.role !== "recp" && (
+            <div className="flex gap-4 my-8 overflow-x-scroll">
+              <Chip
+                as={Link}
+                color={queryStatus === "all" ? "primary" : "default"}
+                variant={queryStatus === "all" ? "flat" : "bordered"}
+                to={`/dashboard/tests?status=all`}
+              >
+                All
+              </Chip>
+              {TestStatus.sort((a, b) => (a.value > b.value ? 1 : -1)).map(
+                (status) => (
+                  <Chip
+                    as={Link}
+                    key={status.value}
+                    color={queryStatus === status.value ? "primary" : "default"}
+                    variant={queryStatus === status.value ? "flat" : "bordered"}
+                    to={`/dashboard/tests?status=${status.value}`}
+                  >
+                    {status.label}
+                  </Chip>
+                )
+              )}
+            </div>
+          )}
           <div className="relative w-full max-w-md mb-4">
             <Input
               type="text"

@@ -30,7 +30,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
   };
 
   return (
-    <Card className="p-4 mb-4 print:p-0 print:mb-0 print:border-0 print:shadow-none">
+    <Card className="p-4 mb-4 min-h-[1240px] print:p-0 print:mb-0 print:border-0 print:shadow-none">
       <div
         className="relative mx-auto mb-8 justify-between"
         data-theme="light"
@@ -137,7 +137,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
             <div className="relative">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${report?._id}/download`}
-                className="print:w-[80px] h-[100px] w-[100px] print:h-[80px] absolute bottom-[70px] right-[25px] print:bottom-[55px] print:right-[20px]"
+                className="print:w-[80px] h-[100px] w-[100px] print:h-[80px] absolute bottom-[70px] right-[25px] print:bottom-[75px] print:right-[35px]"
                 alt=""
               />
               <img src="/report-footer.jpg" loading="eager" />
@@ -194,7 +194,7 @@ const Download = () => {
   }, [reportId]);
 
   return (
-    <div className="max-w-6xl mx-auto my-24 print:my-0 print:max-w-full">
+    <div className="max-w-6xl mx-auto my-24 print:my-0 print:w-[1000px]">
       <div className="text-sm breadcrumbs print:hidden">
         <ul>
           <li>
