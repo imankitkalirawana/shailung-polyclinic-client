@@ -94,7 +94,7 @@ const CompleteHold = () => {
                       testid: data.testid,
                       testids: data.testids,
                       tableids: data.reportids,
-                      testnames: data.testname,
+                      testname: data.testname,
                       reportType: data.reportType,
                       reportDate: data.reportDate,
                       collectiondate: data.collectiondate,
@@ -138,7 +138,7 @@ const CompleteHold = () => {
       testid: "",
       testids: [],
       tableids: [],
-      testnames: [],
+      testname: [],
       reportType: "text",
       reportDate: new Date().toISOString().split("T")[0],
       collectiondate: new Date().toISOString().split("T")[0],
@@ -446,7 +446,7 @@ const CompleteHold = () => {
                   <span className="label-text">Test Names</span>
                 </label>
                 <div className="flex gap-1">
-                  {formik.values.testnames.map((test, index) => (
+                  {formik.values.testname.map((test, index) => (
                     <Chip key={index}>{test}</Chip>
                   ))}
                 </div>
@@ -527,7 +527,7 @@ const CompleteHold = () => {
                     >
                       <div className="flex justify-center">
                         <Chip color="primary" variant="flat">
-                          {formik.values.testnames[index]}
+                          {formik.values.testname[index]}
                         </Chip>
                       </div>
                       <ReportTable

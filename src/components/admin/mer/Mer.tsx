@@ -46,6 +46,16 @@ const Mer = () => {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  };
   return (
     <>
       <Card>
@@ -59,7 +69,7 @@ const Mer = () => {
             fileName={report?.name + "-" + report?.createdAt + "-Report.pdf"}
           >
             <div
-              className="relative font-serif mx-auto h-full mb-8 object-cover flex flex-col justify-between"
+              className="relative font-serif p-2 mx-auto h-full mb-8 object-cover flex flex-col justify-between"
               data-theme="light"
               style={{
                 width: "21cm",
@@ -71,15 +81,20 @@ const Mer = () => {
                 src="/mer.webp"
                 loading="eager"
               />
-
-              <div className="w-full h-full">
+              <div className="w-full h-full p-2 border-1 border-black flex flex-col">
                 <header>
-                  <div className="flex flex-col justify-center items-center">
-                    <h1 className="font-semibold text-lg">
+                  <div className="flex flex-col justify-center mx-auto items-center">
+                    <div className="flex justify-between w-full max-w-[630px]">
+                      <p className="text-xs">S.N-</p>
+                      <p className="text-xs justify-self-end">
+                        Gov. Reg. No.66087/066/067
+                      </p>
+                    </div>
+                    <h1 className="font-semibold text-lg uppercase">
                       Shailung Polyclinic &Diagnostic Center Pvt. Ltd.
                     </h1>
                     <i className="text-xs">
-                      Itahari -/ Sunsari, Phone no:025-585541
+                      Itahari - Sunsari, Phone no:025-585541
                     </i>
                     <span className="text-xs">
                       E-mail:shailungpde@gmail.com / ghimirebab@gmail.com
@@ -95,7 +110,7 @@ const Mer = () => {
                     </span>
                   </div>
                 </header>
-                <div className="px-4 text-xs">
+                <div className="px-4 text-[9px]">
                   <div className="flex items-end gap-4">
                     <table className="border-collapse h-fit relative mt-2 w-full tbl border border-black">
                       <tbody>
@@ -104,7 +119,7 @@ const Mer = () => {
                           <td className="!uppercase font-bold" colSpan={4}>
                             {report?.name}
                           </td>
-                          <td>Age:</td>
+                          <td className="!text-wrap">Age (year):</td>
                           <td className="!uppercase">{report?.age}</td>
                           <td>Sex:</td>
                           <td className="!uppercase">
@@ -114,19 +129,19 @@ const Mer = () => {
                               ? "F"
                               : "O"}
                           </td>
-                          <td>Marital Status:</td>
+                          <td className="!text-wrap">Marital Status:</td>
                           <td className="!uppercase">
                             {report?.maritialStatus}
                           </td>
                         </tr>
                         <tr>
-                          <td>Passport No.</td>
-                          <td colSpan={2} className="!uppercase font-bold">
+                          <td colSpan={2}>Passport No.</td>
+                          <td colSpan={1} className="!uppercase font-bold">
                             {report?.passportNumber}
                           </td>
                           <td colSpan={2}>Passport Expired On:</td>
                           <td colSpan={2} className="!uppercase">
-                            {report?.passportExpiry}
+                            {formatDate(report?.passportExpiry || "")}
                           </td>
                           <td colSpan={2}>Place of Birth</td>
                           <td colSpan={2} className="!uppercase">
@@ -136,7 +151,7 @@ const Mer = () => {
                         <tr>
                           <td colSpan={3}>Medical Examination Date:</td>
                           <td colSpan={2} className="!uppercase">
-                            {report?.medicalExaminationDate}
+                            {formatDate(report?.medicalExaminationDate || "")}
                           </td>
                           <td colSpan={3}>Applied Country:</td>
                           <td className="!uppercase font-bold">
@@ -158,7 +173,7 @@ const Mer = () => {
                     <span className="px-3 font-roboto top-2 whitespace-nowrap left-[0%] bg-black text-white">
                       GENERAL EXAMINATION
                     </span>
-                    <ul className="text-[10px] leading-tight list-decimal pl-3">
+                    <ul className="text-[8px] leading-tight list-decimal pl-3">
                       <li>
                         Past history of serious illness, Major surgery, and
                         significant psychological problem including (Epilepsy
@@ -166,7 +181,7 @@ const Mer = () => {
                       </li>
                       <li>Past history of allergy: None</li>
                     </ul>
-                    <table className="border-collapse relative w-full tbl border border-black">
+                    <table className="border-collapse relative w-full tbl border-black">
                       <tbody>
                         <tr>
                           <td>Height:</td>
@@ -203,112 +218,116 @@ const Mer = () => {
                       </tbody>
                     </table>
                   </div>
-                  <div className="flex gap-8">
-                    <div className="relative pt-4 w-[50%]">
-                      <span className="absolute px-3 font-roboto top-2 whitespace-nowrap left-[0%] bg-black text-white">
-                        SYSTEMIC EXAMINATION
-                      </span>
-                      <table className="border-collapse h-fit relative w-full mt-2 tbl border border-black">
-                        <thead>
-                          <tr>
-                            <th colSpan={4} className="min-w-[250px]">
-                              Type of Medical Examination
-                            </th>
-                            <th colSpan={4}>Findings</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td colSpan={4}>Cardiovascular</td>
-                            <td colSpan={4}>NAD</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Pulmonary</td>
-                            <td colSpan={4}>NAD </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Gastroenterology</td>
-                            <td colSpan={4}>NAD</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Neurology</td>
-                            <td colSpan={4}>NAD </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Musculoskeletal</td>
-                            <td colSpan={4}>NAD</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Genitourinary</td>
-                            <td colSpan={4}>NAD</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Oro - Dental</td>
-                            <td colSpan={4}>Normal</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Extremities / Deformities</td>
-                            <td colSpan={4}>NAD</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Varicose Veins</td>
-                            <td colSpan={4}>NAD</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Hernia</td>
-                            <td colSpan={4}>Absent </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Hydrocele</td>
-                            <td colSpan={4}>Absent </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2} rowSpan={2}>
-                              Eye (Vision)
-                            </td>
-                            <td colSpan={2}>R.Eye</td>
-                            <td colSpan={4}>6/6</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>L.Eye</td>
-                            <td colSpan={4}>6/6</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2} rowSpan={2}>
-                              Ear
-                            </td>
-                            <td colSpan={2}>R.Ear</td>
-                            <td colSpan={4}>Normal</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>L.Ear</td>
-                            <td colSpan={4}>Normal</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Others:</td>
-                            <td colSpan={4}>N/A </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>Radiological (Chest X-Ray):</td>
-                            <td colSpan={4}>Normal</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>ECG:</td>
-                            <td colSpan={4}>N/A </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={4}>CLINICAL IMPRESSION:</td>
-                            <td colSpan={4}>Normal </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <div className="flex flex-col">
-                        <span>MIN</span>
-                        <br />
-                        <br />
-                        <span>DEAR SIR,</span>
-                        <br />
-                        <br />
+                  <div className="flex gap-8 border mt-6 border-black border-collapse">
+                    <div className="relative w-[50%]">
+                      <div className="border border-black px-2">
+                        <span className="absolute px-3 font-roboto -top-[15px] whitespace-nowrap left-[0%] bg-black text-white">
+                          SYSTEMIC EXAMINATION
+                        </span>
+                        <table className="border-collapse h-fit relative w-full mt-2 tbl border border-black">
+                          <thead>
+                            <tr>
+                              <th colSpan={4} className="min-w-[250px]">
+                                Type of Medical Examination
+                              </th>
+                              <th colSpan={4}>Findings</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td colSpan={4}>Cardiovascular</td>
+                              <td colSpan={4}>NAD</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Pulmonary</td>
+                              <td colSpan={4}>NAD </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Gastroenterology</td>
+                              <td colSpan={4}>NAD</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Neurology</td>
+                              <td colSpan={4}>NAD </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Musculoskeletal</td>
+                              <td colSpan={4}>NAD</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Genitourinary</td>
+                              <td colSpan={4}>NAD</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Oro - Dental</td>
+                              <td colSpan={4}>Normal</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Extremities / Deformities</td>
+                              <td colSpan={4}>NAD</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Varicose Veins</td>
+                              <td colSpan={4}>NAD</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Hernia</td>
+                              <td colSpan={4}>Absent </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Hydrocele</td>
+                              <td colSpan={4}>Absent </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2} rowSpan={2}>
+                                Eye (Vision)
+                              </td>
+                              <td colSpan={2}>R.Eye</td>
+                              <td colSpan={4}>6/6</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>L.Eye</td>
+                              <td colSpan={4}>6/6</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2} rowSpan={2}>
+                                Ear
+                              </td>
+                              <td colSpan={2}>R.Ear</td>
+                              <td colSpan={4}>Normal</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>L.Ear</td>
+                              <td colSpan={4}>Normal</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Others:</td>
+                              <td colSpan={4}>N/A </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>Radiological (Chest X-Ray):</td>
+                              <td colSpan={4}>Normal</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>ECG:</td>
+                              <td colSpan={4}>N/A </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={4}>CLINICAL IMPRESSION:</td>
+                              <td colSpan={4}>Normal </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="flex flex-col border px-2 border-black">
+                        <div>
+                          <span>MIN</span>
+                          <br />
+                          <br />
+                          <span>DEAR SIR,</span>
+                          <br />
+                          <br />
+                        </div>
                         <span className="text-justify w-full">
                           THIS IS TO CERTIFY THAT{" "}
                           <b className="uppercase">{report?.name}</b> CLINICALLY
@@ -325,377 +344,392 @@ const Mer = () => {
                         <br />
                         <div className="flex justify-between items-center tracking-tighter text-[8px]">
                           <span>(Stamp of Health Care Organization)</span>
-                          <span className="border-dotted border-t border-black">
+                          <span className="border-dotted border-t mr-4 border-black">
                             (Stamp & Signature of Physician)
                           </span>
                         </div>
                       </div>
                     </div>
-                    <div className="relative flex pt-4 w-[50%]">
-                      <span className="absolute px-3 font-roboto top-2 whitespace-nowrap left-[50%] translate-x-[-50%] bg-black text-white">
-                        LABORATORY EXAMINATION
-                      </span>
-                      <div className="absolute w-full min-w-[744px] border border-collapse border-black flex justify-evenly text-center top-[51.5%] translate-y-[-50%] -rotate-90 -left-2 translate-x-[-50%]">
-                        <span className="border border-black flex-[5]">
-                          Other
+                    <div className="relative flex flex-col w-[50%] pr-2 border border-black">
+                      <div className="flex">
+                        <span className="absolute px-3 font-roboto -top-[15px] whitespace-nowrap left-[50%] translate-x-[-50%] bg-black text-white">
+                          LABORATORY EXAMINATION
                         </span>
-                        {/* 35 */}
-                        <span className="border border-black flex-[4]">
-                          Urine
-                        </span>
-                        <span className="border border-black flex-[6]">
-                          Serology
-                        </span>
-                        <span className="border border-black flex-[7]">
-                          BIOCHEMISTRY
-                        </span>
-                        <span className="border border-black flex-[13]">
-                          HEMATOLOGY
-                        </span>
-                      </div>
-                      <table className="border-collapse relative w-full mt-2 tbl border border-black">
-                        <thead>
-                          {/* <td rowSpan={2}></td> */}
-                          <tr>
-                            <th colSpan={2}>Blood Examination</th>
-                            <th colSpan={2}>Result</th>
-                            <th colSpan={2}>Referance Ranges</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {/* <td
+                        <div className="absolute w-[598px] border border-collapse border-black flex justify-evenly text-center top-[44.5%] translate-y-[-50%] -rotate-90 -left-2 translate-x-[-50%]">
+                          <span className="border border-black flex-[5]">
+                            Other
+                          </span>
+                          {/* 35 */}
+                          <span className="border border-black flex-[4]">
+                            Urine
+                          </span>
+                          <span className="border border-black flex-[6]">
+                            Serology
+                          </span>
+                          <span className="border border-black flex-[7]">
+                            BIOCHEMISTRY
+                          </span>
+                          <span className="border border-black flex-[13]">
+                            HEMATOLOGY
+                          </span>
+                        </div>
+                        <table className="border-collapse relative w-full mt-2 tbl border border-black">
+                          <thead>
+                            {/* <td rowSpan={2}></td> */}
+                            <tr>
+                              <th colSpan={2}>Blood Examination</th>
+                              <th colSpan={2}>Result</th>
+                              <th colSpan={2}>Referance Ranges</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {/* <td
                             rowSpan={12}
                             className="-rotate-90 max-w-10 whitespace-nowrap"
                           >
                             HEMATOLOGY
                           </td> */}
-                          <tr>
-                            <td colSpan={2}>Total WBC Count</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .totalWBCCount.value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .totalWBCCount.referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={6}>Differential Count:</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Neutrophils</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .differentialCount.neutrophils.value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .differentialCount.neutrophils.referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Lymphocytes</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .differentialCount.lymphocytes.value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .differentialCount.lymphocytes.referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Eosinophils</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .differentialCount.eosinophils.value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .differentialCount.eosinophils.referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Monocytes</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .differentialCount.monocytes.value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .differentialCount.monocytes.referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Basophils</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .differentialCount.basophils.value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .differentialCount.basophils.referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>ESR</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology.esr
-                                  .value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology.esr
-                                  .referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Hemoglobin</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .hemoglobin.value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.hematology
-                                  .hemoglobin.referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Malaria Parasite</td>
-                            <td colSpan={2}>Not Found</td>
-                            <td colSpan={2}></td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Micro Filaria</td>
-                            <td colSpan={2}>Not Found</td>
-                            <td colSpan={2}></td>
-                          </tr>
-                          {/* BIOCHEMISTRY */}
-                          {/* <td
+                            <tr>
+                              <td colSpan={2}>Total WBC Count</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .totalWBCCount.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .totalWBCCount.referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={6}>Differential Count:</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Neutrophils</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .differentialCount.neutrophils.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .differentialCount.neutrophils
+                                    .referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Lymphocytes</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .differentialCount.lymphocytes.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .differentialCount.lymphocytes
+                                    .referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Eosinophils</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .differentialCount.eosinophils.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .differentialCount.eosinophils
+                                    .referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Monocytes</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .differentialCount.monocytes.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .differentialCount.monocytes.referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Basophils</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .differentialCount.basophils.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .differentialCount.basophils.referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>ESR</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology.esr
+                                    .value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology.esr
+                                    .referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Hemoglobin</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .hemoglobin.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.hematology
+                                    .hemoglobin.referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Malaria Parasite</td>
+                              <td colSpan={2}>Not Found</td>
+                              <td colSpan={2}></td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Micro Filaria</td>
+                              <td colSpan={2}>Not Found</td>
+                              <td colSpan={2}></td>
+                            </tr>
+                            {/* BIOCHEMISTRY */}
+                            {/* <td
                             rowSpan={7}
                             className="-rotate-90 translate-y-8 max-w-10 whitespace-nowrap"
                           >
                             BIOCHEMISTRY
                           </td> */}
-                          <tr className="border-t-2 border-black">
-                            <td colSpan={2}>Random Blood Sugar</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry
-                                  .randomBloodSugar.value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry
-                                  .randomBloodSugar.referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Urea</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry.urea
-                                  .value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry.urea
-                                  .referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Creatinine</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry
-                                  .creatinine.value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry
-                                  .creatinine.referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>Bilirubin</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry
-                                  .bilirubin.totalDirect.value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry
-                                  .bilirubin.totalDirect.referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>SGPT</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry.sgpt
-                                  .value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry.sgpt
-                                  .referenceRange
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td colSpan={2}>SGOT</td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry.sgop
-                                  .value
-                              }
-                            </td>
-                            <td colSpan={2}>
-                              {
-                                report?.laboratoryExamination.biochemistry.sgop
-                                  .referenceRange
-                              }
-                            </td>
-                          </tr>
-                          {/* serology */}
-                          {/* <td
+                            <tr className="border-t-2 border-black">
+                              <td colSpan={2}>Random Blood Sugar</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .randomBloodSugar.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .randomBloodSugar.referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Urea</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .urea.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .urea.referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Creatinine</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .creatinine.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .creatinine.referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>Bilirubin</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .bilirubin.totalDirect.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .bilirubin.totalDirect.referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>SGPT</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .sgpt.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .sgpt.referenceRange
+                                }
+                              </td>
+                            </tr>
+                            <tr>
+                              <td colSpan={2}>SGOT</td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .sgop.value
+                                }
+                              </td>
+                              <td colSpan={2}>
+                                {
+                                  report?.laboratoryExamination.biochemistry
+                                    .sgop.referenceRange
+                                }
+                              </td>
+                            </tr>
+                            {/* serology */}
+                            {/* <td
                             rowSpan={7}
                             className="-rotate-90 translate-y-8 max-w-10 whitespace-nowrap"
                           >
                             SEROLOGY
                           </td> */}
-                          <tr className="border-t-2 border-black">
-                            <td colSpan={3}>Anti-HIV (1&2)</td>
-                            <td colSpan={3}>Non Reactive</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>HBs-Ag</td>
-                            <td colSpan={3}>Negative</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>Anti-HCV</td>
-                            <td colSpan={3}>Negative</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>VDRL/RPR</td>
-                            <td colSpan={3}>Non Reactive</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>TPHA</td>
-                            <td colSpan={3}>Non Reactive</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>ABO-Blood Group & Rh-type</td>
-                            <td colSpan={3} className="uppercase">
-                              Nil
-                            </td>
-                          </tr>
-                          {/* URINE */}
-                          {/* <td
+                            <tr className="border-t-2 border-black">
+                              <td colSpan={3}>Anti-HIV (1&2)</td>
+                              <td colSpan={3}>Non Reactive</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>HBs-Ag</td>
+                              <td colSpan={3}>Negative</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>Anti-HCV</td>
+                              <td colSpan={3}>Negative</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>VDRL/RPR</td>
+                              <td colSpan={3}>Non Reactive</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>TPHA</td>
+                              <td colSpan={3}>Non Reactive</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>ABO-Blood Group & Rh-type</td>
+                              <td colSpan={3} className="uppercase">
+                                {
+                                  report?.laboratoryExamination.serology
+                                    .BloodGroupRh
+                                }
+                              </td>
+                            </tr>
+                            {/* URINE */}
+                            {/* <td
                             rowSpan={5}
                             className="-rotate-90 max-w-10 whitespace-nowrap"
                           >
                             URINE
                           </td> */}
-                          <tr className="border-t-2 border-black">
-                            <td colSpan={3}>Albumin/Sugar</td>
-                            <td colSpan={3}>Nil</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>Pus Cells fapf</td>
-                            <td colSpan={3}>Nil</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>RBCs /hpf</td>
-                            <td colSpan={3}>Nil</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>Epithelial cells /hpf</td>
-                            <td colSpan={3}>Nil</td>
-                          </tr>
-                          {/* other */}
-                          {/* <td
+                            <tr className="border-t-2 border-black">
+                              <td colSpan={3}>Albumin/Sugar</td>
+                              <td colSpan={3}>Nil</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>Pus Cells fapf</td>
+                              <td colSpan={3}>Nil</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>RBCs /hpf</td>
+                              <td colSpan={3}>Nil</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>Epithelial cells /hpf</td>
+                              <td colSpan={3}>Nil</td>
+                            </tr>
+                            {/* other */}
+                            {/* <td
                             rowSpan={5}
                             className="-rotate-90 max-w-10 whitespace-nowrap"
                           >
                             OTHER
                           </td> */}
-                          <tr className="border-t-2 border-black">
-                            <td colSpan={3}>Opiates</td>
-                            <td colSpan={3}>Negative</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>Cannabies</td>
-                            <td colSpan={3}>Negative</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>Mantoux Test</td>
-                            <td colSpan={3}>N/A</td>
-                          </tr>
-                          <tr>
-                            <td colSpan={3}>
-                              Urine Pregnancy Test (for female)
-                            </td>
-                            <td colSpan={3}>
-                              {report?.sex === "female"
-                                ? report?.laboratoryExamination.other
-                                    .urinePregnancyTest || "N/A"
-                                : "N/A"}
-                            </td>
-                          </tr>
-                          <tr>
+                            <tr className="border-t-2 border-black">
+                              <td colSpan={3}>Opiates</td>
+                              <td colSpan={3}>Negative</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>Cannabies</td>
+                              <td colSpan={3}>Negative</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>Mantoux Test</td>
+                              <td colSpan={3}>N/A</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>
+                                Urine Pregnancy Test (for female)
+                              </td>
+                              <td colSpan={3}>
+                                {report?.sex === "female"
+                                  ? report?.laboratoryExamination.other
+                                      .urinePregnancyTest || "N/A"
+                                  : "N/A"}
+                              </td>
+                            </tr>
+                            {/* <tr>
                             <td
                               colSpan={6}
-                              className="text-[9px] text-center bg-slate-400"
+                              className="text-[8px] text-center bg-slate-400"
                             >
                               This Report is valid for Two months from the date
                               of Medical Examination.
                             </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                          </tr> */}
+                          </tbody>
+                        </table>
+                      </div>
+                      <p className="self-end mt-8 mb-2">
+                        .........................................
+                      </p>
+                      <p className="text-[10px] pb-4 text-center pl-1 bg-[#cfb5ce]">
+                        This Report is valid for Two months from the date of
+                        Medical Examination.
+                      </p>
                     </div>
                   </div>
                 </div>

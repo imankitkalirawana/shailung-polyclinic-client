@@ -30,7 +30,7 @@ const NewMer = () => {
   const location = useLocation();
   const currentUrl = location.pathname;
   useEffect(() => {
-    if (!loggedIn || (user?.role !== "admin" && user?.role !== "doctor")) {
+    if (!loggedIn || (user?.role !== "admin" && user?.role !== "recp")) {
       window.location.href = `/auth/login?redirect=${currentUrl}`;
     }
   }, [currentUrl]);
@@ -321,7 +321,7 @@ const NewMer = () => {
                   formik.touched.passportNumber && formik.errors.passportNumber
                 }
               />
-              <DatePicker
+              {/* <DatePicker
                 label="Passport Expiry"
                 onChange={(date) => {
                   formik.setFieldValue(
@@ -333,6 +333,12 @@ const NewMer = () => {
                 name="passportExpiry"
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
                 showMonthAndYearPickers
+              /> */}
+              <Input
+                label="Passport Expiry"
+                {...formik.getFieldProps("passportExpiry")}
+                className="col-span-6 sm:col-span-3 lg:col-span-2"
+                type="date"
               />
               <Input
                 label="Place of Birth"
@@ -340,7 +346,7 @@ const NewMer = () => {
                 {...formik.getFieldProps("placeOfBirth")}
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
               />
-              <DatePicker
+              {/* <DatePicker
                 label="Medical Examination Date"
                 onChange={(date) => {
                   formik.setFieldValue(
@@ -352,6 +358,12 @@ const NewMer = () => {
                 name="medicalExaminationDate"
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
                 showMonthAndYearPickers
+              /> */}
+              <Input
+                label="Medical Examination Date"
+                {...formik.getFieldProps("medicalExaminationDate")}
+                className="col-span-6 sm:col-span-3 lg:col-span-2"
+                type="date"
               />
               <Input
                 label="Applied Country"

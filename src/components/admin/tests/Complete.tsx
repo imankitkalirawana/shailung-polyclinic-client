@@ -80,7 +80,7 @@ const Complete = () => {
           age: data.testDetail.userData.age,
           userid: data.testDetail.userData._id,
           testid: data._id,
-          testnames: data.testDetail.testData.map(
+          testname: data.testDetail.testData.map(
             (test: AvailableTest) => test.name
           ),
           testids: data.testDetail.testData.map(
@@ -115,7 +115,7 @@ const Complete = () => {
       address: "",
       testid: "",
       testids: [],
-      testnames: [],
+      testname: [],
       reportType: "text",
       reportDate: new Date().toISOString().split("T")[0],
       collectiondate: new Date().toISOString().split("T")[0],
@@ -424,7 +424,7 @@ const Complete = () => {
                   <span className="label-text">Test Names</span>
                 </label>
                 <div className="flex gap-1">
-                  {formik.values.testnames.map((test, index) => (
+                  {formik.values.testname.map((test, index) => (
                     <Chip key={index}>{test}</Chip>
                   ))}
                 </div>
@@ -505,7 +505,7 @@ const Complete = () => {
                     >
                       <div className="flex justify-center">
                         <Chip color="primary" variant="flat">
-                          {formik.values.testnames[index]}
+                          {formik.values.testname[index]}
                         </Chip>
                       </div>
                       <FormTable

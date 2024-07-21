@@ -295,7 +295,7 @@ const AddTest = ({ newServiceModal }: AddTestProps) => {
         );
         toast.success("Service added successfully");
 
-        // navigate(0);
+        navigate(0);
         newServiceModal.onClose();
       } catch (error: any) {
         toast.error(error.response.statusText);

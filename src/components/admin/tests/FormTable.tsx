@@ -146,11 +146,11 @@ const FormTable = ({
     setValues(newValues);
   };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    formik.setFieldValue(name, value);
-    onDataChange && onDataChange(formik.values, tableid || "");
-  };
+  // const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = event.target;
+  //   formik.setFieldValue(name, value);
+  //   onDataChange && onDataChange(formik.values, tableid || "");
+  // };
 
   return (
     <form onSubmit={formik.handleSubmit} className="overflow-x-scroll">
