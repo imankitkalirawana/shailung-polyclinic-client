@@ -333,7 +333,6 @@ const Register = () => {
                           });
                         }
                       }}
-                      isRequired
                       isInvalid={formik.errors.email !== undefined}
                       errorMessage={formik.errors.email}
                     />
@@ -361,26 +360,26 @@ const Register = () => {
                       errorMessage={formik.errors.confirm_password}
                       isRequired
                     />
-                    <Button
-                      type="submit"
-                      isLoading={formik.isSubmitting}
-                      fullWidth
-                      color="primary"
-                      variant="flat"
-                      isDisabled={
-                        formik.isSubmitting ||
-                        formik.errors.email !== undefined ||
-                        formik.errors.phone !== undefined
-                      }
-                    >
-                      {isOtpVerified
-                        ? "Register"
-                        : isOtpSent
-                        ? "Verify OTP"
-                        : "Send OTP"}
-                    </Button>
                   </div>
                 )}
+                <Button
+                  type="submit"
+                  isLoading={formik.isSubmitting}
+                  fullWidth
+                  color="primary"
+                  variant="flat"
+                  isDisabled={
+                    formik.isSubmitting ||
+                    formik.errors.email !== undefined ||
+                    formik.errors.phone !== undefined
+                  }
+                >
+                  {isOtpVerified
+                    ? "Register"
+                    : isOtpSent
+                    ? "Verify OTP"
+                    : "Send OTP"}
+                </Button>
               </form>
             </div>
           </main>

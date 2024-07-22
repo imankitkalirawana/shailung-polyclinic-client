@@ -473,7 +473,6 @@ const AddUser = ({ addUserModal }: AddUserProps) => {
       .min(3, "Name must be at least 3 characters")
       .max(50, "Name must be at most 50 characters")
       .required("Name is required"),
-    email: yup.string().email().required("Email is required"),
     phone: yup.string().required("Phone is required"),
     dob: yup.string().required("Date of birth is required"),
     gender: yup.string().required("Gender is required"),
@@ -496,7 +495,6 @@ const AddUser = ({ addUserModal }: AddUserProps) => {
         if (values.phone && !values.phone.startsWith("+")) {
           values.phone = "+" + values.phone;
         }
-        console.log(values);
         await axios.post(`${API_BASE_URL}/api/admin/user`, values, {
           headers: {
             Authorization: `${localStorage.getItem("token")}`,
@@ -625,7 +623,6 @@ const AddUser = ({ addUserModal }: AddUserProps) => {
                 }
               }}
               value={formik.values.email}
-              isRequired
               isInvalid={
                 formik.touched.email && formik.errors.email ? true : false
               }
