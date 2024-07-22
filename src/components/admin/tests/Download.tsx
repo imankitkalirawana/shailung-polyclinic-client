@@ -7,7 +7,7 @@ import { SmartHomeIcon } from "../../icons/Icons";
 import { Doctor, Report } from "../../../interface/interface";
 import DynamicTable from "./DisplayReportTable";
 import { getDoctorsWithIds } from "../../../functions/get";
-import { Button, Card, Kbd } from "@nextui-org/react";
+import { Button, Kbd } from "@nextui-org/react";
 
 interface ReportSectionProps {
   report: Report;
@@ -30,15 +30,11 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
   };
 
   return (
-    <Card className="p-4 mb-4 min-h-[1240px] print:p-0 print:mb-0 print:border-0 print:shadow-none">
+    <>
       <div
-        className="relative mx-auto mb-8 justify-between"
+        className="relative mx-auto aspect-[1/1.414] w-[1000px] justify-between"
         data-theme="light"
         ref={reportArea}
-        style={{
-          width: "1000px",
-          height: "100%",
-        }}
       >
         <img
           src="/report-header.jpg"
@@ -156,7 +152,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
           Print
         </Button>
       </div>
-    </Card>
+    </>
   );
 };
 
@@ -194,8 +190,8 @@ const Download = () => {
   }, [reportId]);
 
   return (
-    <div className="max-w-6xl mx-auto my-24 print:my-0 print:w-[1000px]">
-      <div className="text-sm breadcrumbs print:hidden">
+    <>
+      <div className="text-sm mt-24 breadcrumbs print:hidden">
         <ul>
           <li>
             <Link
@@ -230,7 +226,7 @@ const Download = () => {
           ))}
         </>
       )}
-    </div>
+    </>
   );
 };
 
