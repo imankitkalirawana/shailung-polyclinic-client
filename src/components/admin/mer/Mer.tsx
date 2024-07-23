@@ -723,8 +723,10 @@ const Mer = () => {
                           </tbody>
                         </table>
                       </div>
-                      <p className="self-end mt-8 mb-2">
-                        .........................................
+                      <p className="self-end items-center mt-8 mb-2">
+                        .................................................
+                        <br />
+                        <span>(Signature of Lab Technician)</span>
                       </p>
                       <p className="text-[10px] pb-4 text-center pl-1 bg-[#cfb5ce]">
                         This Report is valid for Two months from the date of

@@ -321,7 +321,7 @@ const Tests = () => {
                           )}
                       </Dropdown>
                     </TableCell>
-                    <TableCell className="space-x-1">
+                    <TableCell className="space-x-1 flex">
                       {test.testDetail.testData.slice(0, 1).map((data) => {
                         return (
                           <>

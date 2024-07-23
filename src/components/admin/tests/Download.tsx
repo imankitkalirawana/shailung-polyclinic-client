@@ -2,12 +2,12 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { API_BASE_URL } from "../../../utils/config";
 import { toast } from "sonner";
-import { Link, useParams } from "react-router-dom";
-import { SmartHomeIcon } from "../../icons/Icons";
+import { useParams } from "react-router-dom";
 import { Doctor, Report } from "../../../interface/interface";
 import DynamicTable from "./DisplayReportTable";
 import { getDoctorsWithIds } from "../../../functions/get";
 import { Button, Kbd } from "@nextui-org/react";
+import { IconPrinter } from "@tabler/icons-react";
 
 interface ReportSectionProps {
   report: Report;
@@ -32,7 +32,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
   return (
     <>
       <div
-        className="relative mx-auto aspect-[1/1.414] w-[1000px] justify-between"
+        className="relative mx-auto aspect-[1/1.4] w-[1000px] justify-between"
         data-theme="light"
         ref={reportArea}
       >
@@ -133,7 +133,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
             <div className="relative">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${report?._id}/download`}
-                className="print:w-[80px] h-[100px] w-[100px] print:h-[80px] absolute bottom-[70px] right-[25px] print:bottom-[75px] print:right-[35px]"
+                className="h-[100px] w-[100px] absolute bottom-[70px] right-[25px]"
                 alt=""
               />
               <img src="/report-footer.jpg" loading="eager" />
@@ -146,7 +146,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
           onClick={handlePrint}
           color="primary"
           variant="flat"
-          className="mb-8"
+          className="mb-8 hidden"
           endContent={<Kbd keys={["command"]}>P</Kbd>}
         >
           Print
@@ -191,21 +191,15 @@ const Download = () => {
 
   return (
     <>
-      <div className="text-sm mt-24 breadcrumbs print:hidden">
-        <ul>
-          <li>
-            <Link
-              to={"/dashboard"}
-              className="btn btn-sm btn-circle btn-ghost -mr-2"
-            >
-              <SmartHomeIcon className="w-4 h-4" />
-            </Link>
-          </li>
-          <li>
-            <Link to="/appointment/history">Reports</Link>
-          </li>
-          <li>{reportId}</li>
-        </ul>
+      <div className="flex justify-center print:hidden mt-36 mb-2">
+        <Button
+          endContent={<IconPrinter size={18} />}
+          onClick={() => window.print()}
+          color="primary"
+          variant="flat"
+        >
+          Print
+        </Button>
       </div>
       {loading ? (
         <div className="flex flex-col items-center justify-center min-h-96">

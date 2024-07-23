@@ -47,6 +47,16 @@ const Navbar = () => {
     onSubmit: async () => {},
   });
 
+  // check if localStorage has theme if not then set light theme
+  useEffect(() => {
+    const theme = localStorage.getItem("theme");
+    if (theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+    } else {
+      setTheme("light");
+    }
+  }, []);
+
   useEffect(() => {
     const fetchUser = async () => {
       const data = await getWebsite();
@@ -80,7 +90,11 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="bg-base-300/40 print:hidden backdrop-blur-lg shadow-xl fixed top-0 left-0 w-full z-50">
+      <header
+        className={`bg-base-300/40 print:hidden backdrop-blur-lg ${
+          !loggedIn ? "hidden" : ""
+        } shadow-xl fixed top-0 left-0 w-full z-50`}
+      >
         <nav
           className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
           aria-label="Global"
