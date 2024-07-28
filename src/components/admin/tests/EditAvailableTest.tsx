@@ -19,6 +19,8 @@ const EditAvailableTest = () => {
   const { user } = isLoggedIn();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isFetching, setIsFetching] = useState(true);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true); // State to manage button disabled status
 
   useEffect(() => {
     if (user?.role !== "admin" && user?.role !== "doctor") {
@@ -38,6 +40,7 @@ const EditAvailableTest = () => {
       );
       const data = response.data;
       formik.setValues(data);
+      setIsFetching(false);
     };
 
     fetchUser();
@@ -54,6 +57,7 @@ const EditAvailableTest = () => {
       status: "active",
       doctors: [] as string[],
       summary: "",
+      data: {} as { [key: string]: any }[],
     },
 
     onSubmit: async (values) => {
@@ -102,7 +106,17 @@ const EditAvailableTest = () => {
     });
   };
 
-  console.log(formData);
+  // keep the update button disable for 5 secs of page loading
+
+  useEffect(() => {
+    // Enable the button after 5 seconds
+    const timer = setTimeout(() => {
+      setIsButtonDisabled(false);
+    }, 5000);
+
+    return () => clearTimeout(timer); // Cleanup the timer on unmount
+  }, []);
+
   return (
     <>
       <form onSubmit={formik.handleSubmit}>
@@ -122,7 +136,7 @@ const EditAvailableTest = () => {
             <Button
               type="submit"
               isLoading={formik.isSubmitting}
-              isDisabled={formik.isSubmitting}
+              isDisabled={formik.isSubmitting || isButtonDisabled}
               variant="flat"
               color="primary"
             >

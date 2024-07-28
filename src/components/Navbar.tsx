@@ -598,9 +598,9 @@ if (user?.role === "admin") {
 }
 if (user?.role === "user") {
   appointments.unshift({
-    name: "View Appointments",
+    name: "New Appointment",
     description: "View all the appointments booked by the patients",
-    href: "/dashboard/appointments",
+    href: "/dashboard/appointments/new",
     icon: IconCalendarClock,
   });
 }
