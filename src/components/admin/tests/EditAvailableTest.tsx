@@ -19,7 +19,6 @@ const EditAvailableTest = () => {
   const { user } = isLoggedIn();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isFetching, setIsFetching] = useState(true);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true); // State to manage button disabled status
 
   useEffect(() => {
@@ -40,7 +39,6 @@ const EditAvailableTest = () => {
       );
       const data = response.data;
       formik.setValues(data);
-      setIsFetching(false);
     };
 
     fetchUser();

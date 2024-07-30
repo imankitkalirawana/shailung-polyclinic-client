@@ -13,17 +13,11 @@ import { parseDate } from "@internationalized/date";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import * as Yup from "yup";
 
-import {
-  IconHistory,
-  IconInfoCircle,
-  IconInfoCircleFilled,
-  IconXboxX,
-} from "@tabler/icons-react";
+import { IconHistory, IconInfoCircle, IconXboxX } from "@tabler/icons-react";
 import { getUnknownUser, getUserWithId } from "../../functions/get";
 import {
   Button,
   Card,
-  Checkbox,
   Chip,
   DatePicker,
   Input,
@@ -37,6 +31,7 @@ import {
   Tooltip,
   CardBody,
   CardFooter,
+  ScrollShadow,
 } from "@nextui-org/react";
 
 interface Tests {
@@ -208,18 +203,18 @@ const New = () => {
     },
   });
 
-  const fetchSelectedTest = async (id: string) => {
-    try {
-      if (id === "") return setSelectedTest({} as Tests);
-      const { data } = await axios.get(
-        `${API_BASE_URL}/api/available-test/${id}`
-      );
-      setSelectedTest(data);
-    } catch (error) {
-      toast.error("Failed to fetch test");
-      console.error(error);
-    }
-  };
+  // const fetchSelectedTest = async (id: string) => {
+  //   try {
+  //     if (id === "") return setSelectedTest({} as Tests);
+  //     const { data } = await axios.get(
+  //       `${API_BASE_URL}/api/available-test/${id}`
+  //     );
+  //     setSelectedTest(data);
+  //   } catch (error) {
+  //     toast.error("Failed to fetch test");
+  //     console.error(error);
+  //   }
+  // };
 
   const handleSearch = (test: any) => {
     if (searchQuery === "") return true;
@@ -440,42 +435,29 @@ const New = () => {
                     <label className="label">
                       <span className="label-text">Select Tests</span>
                     </label>
-                    <div className="max-h-36 overflow-y-scroll">
+                    <ScrollShadow className="h-48 overflow-y-scroll">
                       {tests
                         .filter((test) => handleSearch(test))
                         .sort((a, b) => a.name.localeCompare(b.name))
-                        .map((test, index) => (
-                          <div
-                            className="flex items-center justify-between"
-                            key={index}
-                          >
-                            <Checkbox
-                              name="testids"
-                              value={test._id}
-                              onChange={formik.handleChange}
-                            >
-                              <span className="w flex whitespace-nowrap text-ellipsis max-w-[280px] sm:max-w-[400px] overflow-hidden">
-                                {test.name}
-                              </span>
-                            </Checkbox>
-                            <Button
-                              variant="flat"
-                              size="sm"
-                              isIconOnly
-                              radius="full"
-                              onClick={() => fetchSelectedTest(test._id)}
-                            >
-                              <IconInfoCircleFilled
-                                className={`${
-                                  selectedTest._id === test._id
-                                    ? "text-info"
-                                    : "text-gray-500"
-                                } h-6 w-6`}
+                        .map((test) => (
+                          <div className="form-control" key={test._id}>
+                            <label className="label cursor-pointer">
+                              <span className="label-text">{test.name}</span>
+                              <input
+                                type="checkbox"
+                                className="checkbox"
+                                name="testids"
+                                value={test._id}
+                                onChange={formik.handleChange}
+                                checked={formik.values.testids.includes(
+                                  // @ts-ignore
+                                  test._id
+                                )}
                               />
-                            </Button>
+                            </label>
                           </div>
                         ))}
-                    </div>
+                    </ScrollShadow>
                     {formik.touched.testids && formik.errors.testids && (
                       <label className="label">
                         <span className="label-text text-error">
@@ -525,6 +507,35 @@ const New = () => {
                   </CardFooter>
                 </Card>
               )}
+              {formik.values.testids.length > 0 && (
+                <div className="col-span-2">
+                  <label className="label">
+                    <span className="label-text">Selected Tests</span>
+                  </label>
+                  <div className="flex gap-2 flex-wrap">
+                    {formik.values.testids.map((testid, index) => {
+                      const test = tests.find((t) => t._id === testid);
+                      return (
+                        <Chip
+                          key={index}
+                          variant="flat"
+                          className="flex items-center justify-between"
+                          onClose={() => {
+                            formik.setFieldValue(
+                              "testids",
+                              formik.values.testids.filter(
+                                (tid) => tid !== testid
+                              )
+                            );
+                          }}
+                        >
+                          <span>{test?.name}</span>
+                        </Chip>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               <div className="form-control col-span-2">
                 <Button
                   variant="flat"
@@ -550,7 +561,22 @@ const New = () => {
               <ModalHeader>
                 <p>Are you sure you want to book this appointment?</p>
               </ModalHeader>
-              <ModalBody></ModalBody>
+              <ModalBody>
+                <div className="flex gap-2 flex-wrap">
+                  {formik.values.testids.map((testid, index) => {
+                    const test = tests.find((t) => t._id === testid);
+                    return (
+                      <Chip
+                        key={index}
+                        variant="flat"
+                        className="flex items-center justify-between"
+                      >
+                        <span>{test?.name}</span>
+                      </Chip>
+                    );
+                  })}
+                </div>
+              </ModalBody>
               <ModalFooter className="flex-col-reverse sm:flex-row">
                 <Button
                   color="default"
