@@ -43,6 +43,8 @@ import NewMer from "./components/admin/mer/NewMer";
 import Mer from "./components/admin/mer/Mer";
 import EditMer from "./components/admin/mer/EditMer";
 import RoughApp from "./components/admin/tests/AppRough";
+import MERHistory from "./components/admin/mer/MERHistory";
+import UserMer from "./components/admin/mer/UserMer";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -112,10 +114,20 @@ function App() {
                     </Route>
 
                     <Route path="medical-examination/*" element={<Outlet />}>
-                      <Route path="" element={<Mers />} />
+                      <Route
+                        path=""
+                        element={
+                          user?.role === "admin" || user?.role === "recp" ? (
+                            <UserMer />
+                          ) : (
+                            <Mers />
+                          )
+                        }
+                      />
                       <Route path="new" element={<NewMer />} />
                       <Route path=":id" element={<Mer />} />
                       <Route path=":id/edit" element={<EditMer />} />
+                      <Route path="history" element={<MERHistory />}></Route>
                     </Route>
 
                     {/* reports */}
