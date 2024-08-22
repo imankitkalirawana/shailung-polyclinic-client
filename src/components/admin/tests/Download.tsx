@@ -116,7 +116,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
                     <span className="flex items-center justify-center">
                       <img
                         src={`${API_BASE_URL}/api/upload/single/${doc.sign}`}
-                        className="w-16 aspect-[4/3] object-contain"
+                        className="w-32 aspect-[4/3] object-contain"
                       />
                     </span>
                     <p className="text-xs font-semibold">

@@ -78,7 +78,7 @@ const Mer = () => {
             >
               <img
                 className="absolute top-[50%] left-[50%] translate-x-[-50%] opacity-10 mix-blend-multiply translate-y-[-50%] w-[90%]"
-                src="/mer.webp"
+                src="/mer.png"
                 loading="eager"
               />
               <div className="w-full h-full p-2 border-1 border-black flex flex-col">
@@ -164,7 +164,7 @@ const Mer = () => {
                     </table>
                     <img
                       src={`${API_BASE_URL}/api/upload/single/${report?.photo}`}
-                      alt="Shailung Polyclinic"
+                      alt={report?.name}
                       width={100}
                       height={100}
                     />

@@ -580,7 +580,25 @@ if (user?.role === "admin") {
     href: "/dashboard/users?action=new",
     icon: IconNewSection,
   });
-} else if (user?.role === "recp") {
+}
+if (user?.role === "doctor") {
+  tests.unshift(
+    {
+      name: "View All Tests",
+      description: "View all the tests registered in the system",
+      href: "/dashboard/tests?status=all",
+      icon: IconStethoscope,
+    },
+    {
+      name: "View All Reports",
+      description: "View all the reports generated in the system",
+      href: "/dashboard/reports",
+      icon: IconReportMedical,
+    }
+  );
+}
+
+if (user?.role === "recp") {
   appointments.unshift(
     {
       name: "New Appointment (Existing User)",

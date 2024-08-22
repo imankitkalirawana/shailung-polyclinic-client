@@ -1,9 +1,8 @@
 // export const API_BASE_URL = "http://localhost:3000";
 // export const API_BASE_URL = "https://backend.shailungpolyclinic.com";
 const CurrentDate = new Date();
-const ExpiryDate = new Date("2024-08-11");
+const ExpiryDate = new Date("2024-09-11");
 const IsExpired = CurrentDate > ExpiryDate;
-console.log(IsExpired)
 export const API_BASE_URL = IsExpired ? "http://localhost:3000" : "https://backend.shailungpolyclinic.com";
 export const Roles = [
     {
