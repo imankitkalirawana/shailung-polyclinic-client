@@ -37,6 +37,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import * as Yup from "yup";
+import { data } from "../../../utils/data";
 
 const Doctors = () => {
   const { user } = isLoggedIn();
@@ -60,19 +61,7 @@ const Doctors = () => {
   return (
     <>
       <Helmet>
-        <title>Doctors - Shailung Polyclinic</title>
-        <meta
-          name="description"
-          content="View all tests and their status. You can also assign doctors, schedule appointments and update status of tests."
-        />
-        <meta
-          name="keywords"
-          content="tests, test, status, assign, doctor, schedule, appointment, update, view, view tests, assign doctor, schedule appointment, update status"
-        />
-        <link
-          rel="canonical"
-          href={`https://report.shailungpolyclinic.com/admin/tests`}
-        />
+        <title>Doctors - {data.title}</title>
       </Helmet>
       <div className="mx-auto">
         <div className="w-full mb-8">

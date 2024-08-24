@@ -1,9 +1,9 @@
 // export const API_BASE_URL = "http://localhost:3000";
 // export const API_BASE_URL = "https://backend.shailungpolyclinic.com";
-const CurrentDate = new Date();
-const ExpiryDate = new Date("2024-09-11");
-const IsExpired = CurrentDate > ExpiryDate;
-export const API_BASE_URL = IsExpired ? "http://localhost:3000" : "https://backend.shailungpolyclinic.com";
+const isDev = true;
+
+export const API_BASE_URL = isDev ? "http://localhost:3000" : "https://api.prvaha.com";
+
 export const Roles = [
     {
         value: "admin",
@@ -29,6 +29,8 @@ export const Roles = [
         color: "primary"
     }
 ]
+
+
 
 export const TestStatus = [
     {

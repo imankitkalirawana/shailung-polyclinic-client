@@ -38,13 +38,15 @@ import Doctor from "./components/admin/doctors/Doctor";
 import ViewDoctor from "./components/admin/doctors/ViewDoctor";
 import Stats from "./components/admin/Stats";
 import CompleteHold from "./components/admin/tests/CompleteHold";
-import Mers from "./components/admin/mer/Mers";
 import NewMer from "./components/admin/mer/NewMer";
 import Mer from "./components/admin/mer/Mer";
 import EditMer from "./components/admin/mer/EditMer";
 import RoughApp from "./components/admin/tests/AppRough";
 import MERHistory from "./components/admin/mer/MERHistory";
 import UserMer from "./components/admin/mer/UserMer";
+import MERReport from "./components/admin/mer/MERReport";
+import { data } from "./utils/data";
+import Mers from "./components/admin/mer/Mers";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -58,16 +60,13 @@ function App() {
   return (
     <>
       <Helmet>
-        <title>Home - Shailung Polyclinic</title>
-        <meta
-          name="description"
-          content="Shailung Polyclinic is a medical facility that provides various health services to the people of Nepal."
+        <title>Home - {data.title}</title>
+        <meta name="description" content={data.description} />
+        <meta name="keywords" content={data.keywords} />
+        <link
+          rel="canonical"
+          href={`${data.url}${window.location.pathname}${window.location.search}`}
         />
-        <meta
-          name="keywords"
-          content="Shailung Polyclinic, Healthcare, Clinic, Consultation, Diagnostics, Treatments, Doctors, Staff, Care"
-        />
-        <link rel="canonical" href="https://report.shailungpolyclinic.com/" />
       </Helmet>
       <Router>
         <Routes>
@@ -112,18 +111,19 @@ function App() {
                       <Route path=":id" element={<ViewDoctor />} />
                       <Route path=":id/edit" element={<Doctor />} />
                     </Route>
-
                     <Route path="medical-examination/*" element={<Outlet />}>
                       <Route
                         path=""
                         element={
                           user?.role === "admin" || user?.role === "recp" ? (
-                            <UserMer />
-                          ) : (
                             <Mers />
+                          ) : (
+                            <UserMer />
                           )
                         }
                       />
+                      {/* <Route path="" element={<MERReport />} /> */}
+                      <Route path="reports" element={<MERReport />} />
                       <Route path="new" element={<NewMer />} />
                       <Route path=":id" element={<Mer />} />
                       <Route path=":id/edit" element={<EditMer />} />

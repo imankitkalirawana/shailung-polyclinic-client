@@ -45,6 +45,7 @@ import {
   Tooltip,
   useDisclosure,
 } from "@nextui-org/react";
+import { data } from "../../../utils/data";
 
 export const testStatus = async (testId: any, status: string) => {
   try {
@@ -168,7 +169,7 @@ const Tests = () => {
   return (
     <>
       <Helmet>
-        <title>Tests - Shailung Polyclinic</title>
+        <title>Tests - {data.title}</title>
         <meta
           name="description"
           content="View all tests and their status. You can also assign doctors, schedule appointments and update status of tests."

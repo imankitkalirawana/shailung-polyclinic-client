@@ -27,6 +27,7 @@ import {
   TableRow,
   Tooltip,
 } from "@nextui-org/react";
+import { data } from "../../utils/data";
 
 const humanReadableDate = (date: string) => {
   return new Date(date).toLocaleDateString("en-US", {
@@ -86,8 +87,8 @@ const Dashboard = () => {
               Welcome back, {user?.name}
             </h1>
             <p className="mt-1 text-sm leading-6 text-base-neutral">
-              Get an inside look at the Shailung Polyclinic's {user?.role}{" "}
-              dashboard for managing tests, appointments, and more.
+              Get an inside look at the {data.title}'s {user?.role} dashboard
+              for managing tests, appointments, and more.
             </p>
           </div>
           {user?.role === "admin" && (

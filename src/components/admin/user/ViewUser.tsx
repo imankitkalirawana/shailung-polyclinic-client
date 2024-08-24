@@ -21,6 +21,7 @@ import {
   CardFooter,
 } from "@nextui-org/react";
 import { IconPencil } from "@tabler/icons-react";
+import { data } from "../../../utils/data";
 
 const ViewUser = () => {
   const { id }: any = useParams();
@@ -49,19 +50,9 @@ const ViewUser = () => {
   return (
     <>
       <Helmet>
-        <title>{`${getUser.name}`} - Shailung Polyclinic</title>
-        <meta
-          name="description"
-          content={`View ${getUser.name}'s information on Shailung Polyclinic in Itahari, Nepal`}
-        />
-        <meta
-          name="keywords"
-          content="Shailung Polyclinic, Shailung, Polyclinic, Hospital, Clinic, Health, Health Care, Medical, Medical Care, Itahari, Nepal, User, User Information, User Details, User Profile, User Profile Information, User Profile Details, User Profile Information Details, User Profile Information Details Page, User Profile Information Details Page of Shailung Polyclinic, User Profile Information Details Page of Shailung Polyclinic in Itahari, User Profile Information Details Page of Shailung Polyclinic in Itahari, Nepal, Shailung Polyclinic User Profile Information Details Page, Shailung Polyclinic User Profile Information Details Page in Itahari, Shailung Polyclinic User Profile Information Details Page in Itahari, Nepal"
-        />
-        <link
-          rel="canonical"
-          href={`https://report.shailungpolyclinic.com/admin/user/${id}`}
-        />
+        <title>
+          {`${getUser.name}`} - {data.title}
+        </title>
       </Helmet>
       <div className="flex h-full  w-full items-start justify-center overflow-scroll">
         <Card className="my-10 w-[400px]">

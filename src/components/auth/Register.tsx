@@ -13,6 +13,7 @@ import {
   SelectItem,
 } from "@nextui-org/react";
 import { parseDate } from "@internationalized/date";
+import { data } from "../../utils/data";
 
 const Register = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
@@ -132,8 +133,8 @@ const Register = () => {
       // console.log(res.data.otp);
       const api_key = "26614D70EA4E26";
       const contact = formik.values.phone;
-      // const from = "SHAILUNG POLYCLINIC";
-      const message = `Your OTP for Shailung Polyclinic is ${formik.values.dbOtp}`;
+      // const from = ${data.title};
+      const message = `Your OTP for ${data.title} is ${formik.values.dbOtp}`;
       // const api_url = `https://samayasms.com.np/smsapi/index.php?key=${api_key}&campaign=XXXXXX&routeid=XXXXXX&type=text&contacts=${contact}&senderid=${from}&msg=${message}`;
       const api_url = `https://samayasms.com.np/smsapi/index?key=${api_key}&routeid=116&contacts=${contact}&senderid=SMSBit&msg=${message}&responsetype=json`;
       setIsOtpSent(true);
@@ -200,12 +201,12 @@ const Register = () => {
                 <img
                   className="mx-auto h-24 w-auto"
                   src="/logo.webp"
-                  alt="Shailung Polyclinic"
+                  alt={data.title}
                 />
               </div>
 
               <h1 className="mt-6 text-2xl font-bold sm:text-3xl md:text-4xl">
-                Register into Shailung Polyclinic 🏥
+                Register into {data.title} 🏥
               </h1>
 
               <p className="mt-4 leading-relaxed">

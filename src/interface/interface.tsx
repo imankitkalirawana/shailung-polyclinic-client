@@ -250,3 +250,28 @@ export interface MER {
   updatedAt: string;
   addedby: string;
 }
+
+export interface MERAppointment {
+  _id: string;
+  name: string;
+  phone: string;
+  addedby: string;
+  patiendid: string;
+  status: string;
+  appointmentdate: string;
+  completeddate: string;
+  createdAt: string;
+  updatedAt: string;
+  reportId: string;
+}
+
+export interface Website {
+  title: string;
+  email: string;
+  phone: string;
+  address: string;
+  description: string;
+  keywords: string;
+  url: string;
+  regno: string;
+}

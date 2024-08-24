@@ -32,6 +32,7 @@ import {
   Tooltip,
   useDisclosure,
 } from "@nextui-org/react";
+import { data } from "../../utils/data";
 
 const History = () => {
   const { loggedIn, user } = isLoggedIn();
@@ -117,19 +118,7 @@ const History = () => {
   return (
     <>
       <Helmet>
-        <title>Appointment History - Shailung Polyclinic</title>
-        <meta
-          name="description"
-          content="View your appointment history at Shailung Polyclinic in Itahari, Nepal."
-        />
-        <meta
-          name="keywords"
-          content="appointment, history, shailung, polyclinic, itahari, nepal, test, report, schedule, cancel"
-        />
-        <link
-          rel="canonical"
-          href="https://report.shailungpolyclinic.com/appointment/history"
-        />
+        <title>Appointment History - {data.title}</title>
       </Helmet>
       <div className="mx-auto max-w-6xl my-24">
         <div className="flex mb-4 justify-between items-center">

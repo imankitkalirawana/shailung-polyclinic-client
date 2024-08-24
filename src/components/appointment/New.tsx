@@ -33,6 +33,7 @@ import {
   CardFooter,
   ScrollShadow,
 } from "@nextui-org/react";
+import { data } from "../../utils/data";
 
 interface Tests {
   _id: string;
@@ -232,19 +233,7 @@ const New = () => {
   return (
     <>
       <Helmet>
-        <title>New Appointment - Shailung Polyclinic</title>
-        <meta
-          name="description"
-          content="Book an appointment for a test at Shailung Polyclinic in Itahari, Nepal"
-        />
-        <meta
-          name="keywords"
-          content="appointment, book, test, shailung polyclinic, itahari, nepal, health, medical, clinic"
-        />
-        <link
-          rel="canonical"
-          href="https://report.shailungpolyclinic.com/appointment/new"
-        />
+        <title>New Appointment - {data.title}</title>
       </Helmet>
       <div className="w-full p-4 mt-24 max-w-6xl mx-auto shadow-xs">
         <div className="flex justify-between items-center">

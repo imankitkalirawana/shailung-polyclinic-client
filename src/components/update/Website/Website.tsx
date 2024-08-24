@@ -15,6 +15,7 @@ import {
   Input,
   Textarea,
 } from "@nextui-org/react";
+import { data } from "../../../utils/data";
 
 // get domain name from url
 
@@ -69,19 +70,7 @@ const Website = () => {
   return (
     <>
       <Helmet>
-        <title>Website - Shailung Polyclinic</title>
-        <meta
-          name="description"
-          content="Get an inside look at the Shailung Polyclinic's website information and team members."
-        />
-        <meta
-          name="keywords"
-          content="Shailung Polyclinic, Website, Information, Team, Members, Address, Phone, Email, Description"
-        />
-        <link
-          rel="canonical"
-          href="https://report.shailungpolyclinic.com/dashboard/website"
-        />
+        <title>Website - {data.title}</title>
       </Helmet>
       <div>
         <Card
@@ -102,7 +91,7 @@ const Website = () => {
                 id="title"
                 name="title"
                 type="text"
-                placeholder="eg. Shailung Polyclinic"
+                placeholder="eg. Prvaha"
                 label="Title"
                 value={formik.values.title}
                 onChange={formik.handleChange}
@@ -146,7 +135,7 @@ const Website = () => {
               <Textarea
                 id="website-description"
                 name="description"
-                placeholder="eg: Shailung Polyclinic is a medical facility that provides various health services to the people of Nepal."
+                placeholder="eg: Prvaha is a medical facility that provides various health services to the people of Nepal."
                 label="Description"
                 value={formik.values.description}
                 onChange={formik.handleChange}

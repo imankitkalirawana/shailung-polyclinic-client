@@ -4,8 +4,6 @@ import { API_BASE_URL } from "../utils/config";
 import { Link, useNavigate } from "react-router-dom";
 import { isLoggedIn } from "../utils/auth";
 import { useFormik } from "formik";
-import { data } from "../utils/data";
-import { getWebsite } from "../functions/get";
 import {
   IconCalendarClock,
   IconChevronDown,
@@ -25,7 +23,8 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { Dialog, Disclosure, Popover, Transition } from "@headlessui/react";
-import { Button, Card } from "@nextui-org/react";
+import { Avatar, Button, Card } from "@nextui-org/react";
+import { data } from "../utils/data";
 
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(" ");
@@ -38,7 +37,6 @@ const Navbar = () => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   };
-  const [websiteData, setWebsiteData] = useState<any>({});
 
   const formik = useFormik({
     initialValues: {
@@ -59,8 +57,6 @@ const Navbar = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const data = await getWebsite();
-      setWebsiteData(data);
       await axios
         .get(`${API_BASE_URL}/api/user/profile`, {
           headers: {
@@ -101,25 +97,10 @@ const Navbar = () => {
         >
           <div className="flex lg:flex-1">
             <Button as={Link} variant="light" to="/" className="-m-1.5 p-1.5">
-              <span className="sr-only">
-                {websiteData.title || data.websiteData.title}
-              </span>
+              <span className="sr-only">{data.title}</span>
               <div className="flex items-center gap-2">
-                <img
-                  src={
-                    `${API_BASE_URL}/api/upload/single/logo.webp` ||
-                    "/logo.webp"
-                  }
-                  alt="logo"
-                  className="w-10 aspect-square rounded-full"
-                  title="Shailung Polyclinic"
-                  width={30}
-                  height={30}
-                  loading="eager"
-                />
-                <span className="text-xl font-semibold">
-                  {websiteData.title || data.websiteData.title}
-                </span>
+                <Avatar name="P" color="primary" className="text-lg" />
+                <span className="text-xl font-semibold">{data.title}</span>
               </div>
             </Button>
           </div>
@@ -320,23 +301,21 @@ const Navbar = () => {
           <Dialog.Panel className="fixed inset-y-0 right-0 z-50 bg-base-300 w-full overflow-y-auto px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
               <Link to="/dashboard" className="-m-1.5 p-1.5">
-                <span className="sr-only">Shailung Polyclinic</span>
+                <span className="sr-only">{data.title}</span>
                 <div className="flex items-center gap-2">
                   <img
                     src={
                       `${API_BASE_URL}/api/upload/single/logo.webp` ||
                       "/logo.webp"
                     }
-                    alt="logo"
+                    alt={data.title}
                     className="w-10 aspect-square rounded-full"
-                    title="Shailung Polyclinic"
+                    title={data.title}
                     width={30}
                     height={30}
                     loading="eager"
                   />
-                  <span className="text-xl font-semibold">
-                    {websiteData.title || data.websiteData.title}
-                  </span>
+                  <span className="text-xl font-semibold">{data.title}</span>
                 </div>
               </Link>
               <button

@@ -13,6 +13,7 @@ import {
   Input,
 } from "@nextui-org/react";
 import { useEffect } from "react";
+import { data } from "../../utils/data";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -69,7 +70,7 @@ const ResetPassword = () => {
             <img
               className="mx-auto h-24 w-auto"
               src="/logo.webp"
-              alt="Shailung Polyclinic"
+              alt={data.title}
             />
           </div>
           <h1 className="mt-6 text-2xl text-center">Forgot Password</h1>

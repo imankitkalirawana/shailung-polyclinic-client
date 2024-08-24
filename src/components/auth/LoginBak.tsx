@@ -5,6 +5,7 @@ import { API_BASE_URL } from "../../utils/config";
 import { useFormik } from "formik";
 import { toast } from "sonner";
 import { Card, CardBody, CardHeader, Input } from "@nextui-org/react";
+import { data } from "../../utils/data";
 
 const Login = () => {
   const [searchParams] = useSearchParams();
@@ -55,7 +56,6 @@ const Login = () => {
     }
   };
 
-
   return (
     <>
       <section className="">
@@ -73,11 +73,11 @@ const Login = () => {
                     <img
                       className="mx-auto h-24 w-auto"
                       src="/logo.webp"
-                      alt="Shailung Polyclinic"
+                      alt={data.title}
                     />
                   </div>
                   <h1 className="mt-6 text-2xl text-center">
-                    Welcome to Shailung Polyclinic 🏥
+                    Welcome to {data.title} 🏥
                   </h1>
                 </CardHeader>
                 <CardBody>

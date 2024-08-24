@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "../utils/config";
+import { Website } from "../interface/interface";
 
 export const getAllUsers = async (role: string) => {
     const response = await axios.get(`${API_BASE_URL}/api/admin/users/${role}`, {
@@ -130,7 +131,7 @@ export const getAllAvailableTests = async () => {
 export const getWebsite = async () => {
     const response = await axios.get(`${API_BASE_URL}/api/website`);
     const data = response.data;
-    return data;
+    return data as Website;
 }
 
 export const getAllReports = async () => {
@@ -145,6 +146,16 @@ export const getAllReports = async () => {
 
 export const getAllMER = async () => {
     const response = await axios.get(`${API_BASE_URL}/api/mer/`, {
+        headers: {
+            Authorization: `${localStorage.getItem("token")}`,
+        },
+    });
+    const data = response.data;
+    return data.reverse();
+}
+
+export const getAllMERAppointments = async () => {
+    const response = await axios.get(`${API_BASE_URL}/api/mer/appointments-by-status/all`, {
         headers: {
             Authorization: `${localStorage.getItem("token")}`,
         },

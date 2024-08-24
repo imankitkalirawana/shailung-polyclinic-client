@@ -15,6 +15,7 @@ import {
   Link as NextLink,
 } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
+import { data } from "../../utils/data";
 
 const ForgotPassword = () => {
   const [isSent, setIsSent] = useState(false);
@@ -86,7 +87,7 @@ const ForgotPassword = () => {
                 <img
                   className="mx-auto h-24 w-auto"
                   src="/logo.webp"
-                  alt="Shailung Polyclinic"
+                  alt={data.title}
                 />
               </div>
               <h1 className="mt-6 text-2xl text-center">Forgot Password</h1>

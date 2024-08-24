@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { UploadSingleFile } from "../../../utils/FileHandling";
 import { Button, Card, Image, Input } from "@nextui-org/react";
+import { data } from "../../../utils/data";
 
 const Doctor = () => {
   const { id }: any = useParams();
@@ -88,19 +89,9 @@ const Doctor = () => {
   return (
     <>
       <Helmet>
-        <title>Manage {`${formik.values.name}`} - Shailung Polyclinic</title>
-        <meta
-          name="description"
-          content={`Manage ${formik.values.name}'s information on Shailung Polyclinic in Itahari, Nepal`}
-        />
-        <meta
-          name="keywords"
-          content="Shailung Polyclinic, Shailung, Polyclinic, Hospital, Clinic, Health, Health Care, Medical, Medical Care, Itahari, Nepal, User, User Information, User Details, User Profile, User Profile Information, User Profile Details, User Profile Information Details, User Profile Information Details Page, User Profile Information Details Page of Shailung Polyclinic, User Profile Information Details Page of Shailung Polyclinic in Itahari, User Profile Information Details Page of Shailung Polyclinic in Itahari, Nepal, Shailung Polyclinic User Profile Information Details Page, Shailung Polyclinic User Profile Information Details Page in Itahari, Shailung Polyclinic User Profile Information Details Page in Itahari, Nepal"
-        />
-        <link
-          rel="canonical"
-          href={`https://report.shailungpolyclinic.com/admin/user/${id}/edit`}
-        />
+        <title>
+          Manage {`${formik.values.name}`} - {data.title}
+        </title>
       </Helmet>
       <div className="col-span-full lg:col-span-9">
         <Card

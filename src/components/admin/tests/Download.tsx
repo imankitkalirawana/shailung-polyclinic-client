@@ -8,6 +8,7 @@ import DynamicTable from "./DisplayReportTable";
 import { getDoctorsWithIds } from "../../../functions/get";
 import { Button, Kbd } from "@nextui-org/react";
 import { IconPrinter } from "@tabler/icons-react";
+import { data } from "../../../utils/data";
 
 interface ReportSectionProps {
   report: Report;
@@ -132,7 +133,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
             </footer>
             <div className="relative">
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${report?._id}/download`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data.url}/report/${report?._id}/download`}
                 className="h-[100px] w-[100px] absolute bottom-[70px] right-[25px]"
                 alt=""
               />

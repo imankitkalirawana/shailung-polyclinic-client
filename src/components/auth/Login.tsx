@@ -14,6 +14,7 @@ import {
 } from "@nextui-org/react";
 import { isLoggedIn } from "../../utils/auth";
 import { useEffect } from "react";
+import { data } from "../../utils/data";
 
 const Login = () => {
   const { user } = isLoggedIn();
@@ -36,6 +37,7 @@ const Login = () => {
       try {
         const res = await axios.post(`${API_BASE_URL}/api/user/login`, values);
         const { data } = res;
+        console.log("Login");
         if (data) {
           localStorage.setItem("token", data.token);
           localStorage.setItem("userData", JSON.stringify(data));
@@ -70,7 +72,7 @@ const Login = () => {
   return (
     <>
       <main className="flex h-screen items-center justify-center p-8">
-        <div className="max-w-md mx-auto">
+        <div className="max-w-sm w-full mx-auto">
           <Card
             as={"form"}
             className="p-4"
@@ -85,11 +87,11 @@ const Login = () => {
                 <img
                   className="mx-auto h-24 w-auto"
                   src="/logo.webp"
-                  alt="Shailung Polyclinic"
+                  alt={data.title}
                 />
               </div>
               <h1 className="mt-6 text-2xl text-center">
-                Welcome to Shailung Polyclinic 🏥
+                Welcome to {data.title} 🏥
               </h1>
             </CardHeader>
             <CardBody className="flex flex-col gap-3">

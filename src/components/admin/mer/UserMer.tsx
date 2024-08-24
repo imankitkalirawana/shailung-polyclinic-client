@@ -2,11 +2,9 @@ import {
   Button,
   Card,
   CardBody,
-  Chip,
   DatePicker,
   Input,
   Modal,
-  ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -18,9 +16,13 @@ import { parseDate, getLocalTimeZone, today } from "@internationalized/date";
 import axios from "axios";
 import { API_BASE_URL } from "../../../utils/config";
 import { useEffect } from "react";
+import { toast } from "sonner";
+import MERHistory from "./MERHistory";
+import { useNavigate } from "react-router-dom";
 
 const UserMer = () => {
   const confirmModal = useDisclosure();
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchUserByProfile = async () => {
       try {
@@ -32,8 +34,8 @@ const UserMer = () => {
         formik.setValues((previousValues) => {
           return {
             ...previousValues,
+            patientid: data._id,
             name: data.name,
-            age: data.age,
             phone: data.phone.replace(/^\+977/, ""),
           };
         });
@@ -44,81 +46,86 @@ const UserMer = () => {
     };
     fetchUserByProfile();
   }, []);
+
   const validationSchema = Yup.object().shape({
     name: Yup.string().min(3, "Name is too short"),
     age: Yup.number()
       .min(1, "You are too young to apply")
       .max(120, "Age too large"),
-    phone: Yup.string().matches(
-      /^(\+\d{1,3}[- ]?)?\d{10}$/,
-      "Invalid phone number format"
-    ),
+    phone: Yup.string(),
   });
 
   const formik = useFormik({
     initialValues: {
+      patientid: "",
       name: "",
-      age: "",
       phone: "",
       appointmentdate: new Date().toISOString().split("T")[0],
     },
     validationSchema,
     onSubmit: async (values) => {
-      console.log(values);
+      try {
+        await axios
+          .post(`${API_BASE_URL}/api/mer/book-appointment`, values, {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          })
+          .then(() => {
+            toast.success("Application submitted successfully");
+            confirmModal.onOpenChange();
+            navigate(0);
+          });
+      } catch (error: any) {
+        toast.error(error.response.data.error);
+        console.error(error);
+      }
     },
   });
   return (
     <>
       <Card className="p-4">
-        <CardBody className="flex flex-row justify-between gap-8">
-          <div className="w-full">
+        <CardBody className="flex md:flex-row flex-col justify-between h-full gap-8">
+          <div className="w-full sm:min-w-[350px]">
             <h3>Apply for New Medical Examination Test </h3>
-            <div className="mt-4 flex flex-col gap-4">
-              <Input
-                label="Name"
-                name="name"
-                onChange={formik.handleChange}
-                value={formik.values.name}
-                isInvalid={
-                  formik.touched.name && formik.errors.name ? true : false
-                }
-                errorMessage={formik.errors.name}
-              />
-              <Input
-                label="Age"
-                name="age"
-                onChange={formik.handleChange}
-                value={formik.values.age}
-                type="number"
-                isInvalid={
-                  formik.touched.age && formik.errors.age ? true : false
-                }
-                errorMessage={formik.errors.age}
-              />
-              <Input
-                label="Mobile Number"
-                name="phone"
-                onChange={formik.handleChange}
-                value={formik.values.phone}
-                isInvalid={
-                  formik.touched.phone && formik.errors.phone ? true : false
-                }
-                errorMessage={formik.errors.phone}
-              />
-              <DatePicker
-                label="Date of Appointment"
-                onChange={(date) => {
-                  formik.setFieldValue(
-                    "appointmentdate",
-                    date.toString().split("T")[0]
-                  );
-                }}
-                value={parseDate(formik.values.appointmentdate)}
-                minValue={today(getLocalTimeZone())}
-                isInvalid={formik.errors.appointmentdate ? true : false}
-                errorMessage={formik.errors.appointmentdate}
-                showMonthAndYearPickers
-              />
+            <div className="mt-4 flex justify-between h-[90%] flex-col gap-4">
+              <div className="flex flex-col gap-4">
+                <Input
+                  label="Name"
+                  name="name"
+                  onChange={formik.handleChange}
+                  value={formik.values.name}
+                  isInvalid={
+                    formik.touched.name && formik.errors.name ? true : false
+                  }
+                  errorMessage={formik.errors.name}
+                />
+
+                <Input
+                  label="Mobile Number"
+                  name="phone"
+                  onChange={formik.handleChange}
+                  value={formik.values.phone}
+                  isInvalid={
+                    formik.touched.phone && formik.errors.phone ? true : false
+                  }
+                  errorMessage={formik.errors.phone}
+                />
+                <DatePicker
+                  label="Date of Appointment"
+                  onChange={(date) => {
+                    formik.setFieldValue(
+                      "appointmentdate",
+                      date.toString().split("T")[0]
+                    );
+                  }}
+                  value={parseDate(formik.values.appointmentdate)}
+                  minValue={today(getLocalTimeZone())}
+                  isInvalid={formik.errors.appointmentdate ? true : false}
+                  errorMessage={formik.errors.appointmentdate}
+                  showMonthAndYearPickers
+                />
+              </div>
               <Button
                 color="primary"
                 variant="flat"
@@ -130,14 +137,7 @@ const UserMer = () => {
             </div>
           </div>
           <div className="border-default rounded-full border-2"></div>
-          <div className="w-full">
-            <h3>Your Previous Examinations</h3>
-            <div className="mt-4">
-              <Card>
-                <CardBody>THis is your last test report</CardBody>
-              </Card>
-            </div>
-          </div>
+          <MERHistory />
         </CardBody>
       </Card>
       <Modal

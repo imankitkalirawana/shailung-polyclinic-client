@@ -30,6 +30,7 @@ import {
 } from "@nextui-org/react";
 import { IconPencil } from "@tabler/icons-react";
 import { parseDate } from "@internationalized/date";
+import { data } from "../utils/data";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -167,19 +168,7 @@ const Profile = () => {
   return (
     <>
       <Helmet>
-        <title>Profile - Shailung Polyclinic</title>
-        <meta
-          name="description"
-          content="Update your profile information. Use a permanent address where you can receive mail."
-        />
-        <meta
-          name="keywords"
-          content="Shailung Polyclinic, Profile, Update Profile, User Profile, Shailung Polyclinic Profile, Shailung Polyclinic User Profile, Shailung Polyclinic Profile Update, nepal, itahari, sunsari, shailung, polyclinic, hospital, health, health care, health care center, health care center in itahari, health care center in sunsari, health care center in nepal, health care center in shailung, health care center in polyclinic, health care center in shailung polyclinic, shailung polyclinic health care center, shailung polyclinic health care center in itahari, shailung polyclinic health care center in sunsari, shailung polyclinic health care center in nepal, shailung polyclinic health care center in shailung, shailung polyclinic health care center in polyclinic"
-        />
-        <link
-          rel="canonical"
-          href="https://report.shailungpolyclinic.com/profile"
-        />
+        <title>Profile - {data.title}</title>
       </Helmet>
 
       <div className="col-span-full lg:col-span-9 max-w-6xl mx-auto my-24 px-8 space-y-8">
