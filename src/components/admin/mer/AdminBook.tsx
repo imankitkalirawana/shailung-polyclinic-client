@@ -1,12 +1,3 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { IconUserEdit, IconUserPlus } from "@tabler/icons-react";
-import { getBothUsers, getUserWithId } from "../../../functions/get";
-import { User } from "../../../interface/interface";
-import axios from "axios";
-import { useFormik } from "formik";
-import { toast } from "sonner";
-import { API_BASE_URL } from "../../../utils/config";
 import {
   Autocomplete,
   AutocompleteItem,
@@ -25,12 +16,21 @@ import {
   Tab,
   Tabs,
 } from "@nextui-org/react";
-import { humanReadableDate } from "../user/Users";
-import * as Yup from "yup";
-import { isLoggedIn } from "../../../utils/auth";
+import { IconHistory, IconUserEdit, IconUserPlus } from "@tabler/icons-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { calculateAge } from "../../../functions/agecalculator";
+import { API_BASE_URL } from "../../../utils/config";
+import { humanReadableDate } from "../user/Users";
+import { useState, useEffect } from "react";
+import { getBothUsers, getUserWithId } from "../../../functions/get";
+import { User } from "../../../interface/interface";
+import { isLoggedIn } from "../../../utils/auth";
+import axios from "axios";
+import { toast } from "sonner";
+import * as Yup from "yup";
+import { useFormik } from "formik";
 
-const NewAppointment = () => {
+const AdminBook = () => {
   const { user } = isLoggedIn();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,7 +47,7 @@ const NewAppointment = () => {
 
   useEffect(() => {
     if (!userType) {
-      navigate("/dashboard/tests/appointment?user=new");
+      navigate("/dashboard/medical-examination?user=new");
     }
   }, [userType]);
 
@@ -89,12 +89,57 @@ const NewAppointment = () => {
     }
   }, []);
 
+  const handleBooking = async () => {
+    if (selectedUser) {
+      await axios
+        .post(
+          `${API_BASE_URL}/api/mer/book-appointment`,
+          {
+            patientid: selectedUser._id,
+            name: selectedUser.name,
+            age: calculateAge(selectedUser.dob),
+            phone: selectedUser.phone,
+            appointmentdate: new Date().toISOString().split("T")[0],
+          },
+          {
+            headers: {
+              Authorization: `${localStorage.getItem("token")}`,
+            },
+          }
+        )
+        .then(() => {
+          //   toast.success("Application submitted successfully");
+          toast("Application submitted successfully", {
+            action: {
+              label: "View",
+              onClick: () =>
+                navigate("/dashboard/medical-examination/appointments"),
+            },
+          });
+        })
+        .catch(() => {
+          toast.error("Failed to submit application");
+        });
+    }
+  };
+
   return (
     <>
       <div className="mx-auto">
         <div className="w-full card shadow-xs">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold">New Appointment</h1>
+            <h1 className="text-2xl font-semibold">
+              New Medical Examination Appointment
+            </h1>
+            <Button
+              variant="flat"
+              color="primary"
+              as={Link}
+              to={"/dashboard/medical-examination/appointments"}
+              startContent={<IconHistory size={16} />}
+            >
+              Appointment History
+            </Button>
           </div>
           <div className="flex flex-col gap-4 py-8">
             <div className="max-w-md mx-auto flex flex-col-reverse sm:flex-row-reverse gap-6">
@@ -107,7 +152,7 @@ const NewAppointment = () => {
                       <span>Existing User</span>
                     </div>
                   }
-                  href="/dashboard/tests/appointment?user=existing"
+                  href="/dashboard/medical-examination?user=existing"
                 />
                 <Tab
                   key="new"
@@ -117,7 +162,7 @@ const NewAppointment = () => {
                       <span>New User</span>
                     </div>
                   }
-                  href="/dashboard/tests/appointment?user=new&phone=true"
+                  href="/dashboard/medical-examination?user=new&phone=true"
                 />
               </Tabs>
             </div>
@@ -168,9 +213,8 @@ const NewAppointment = () => {
                             {selectedUser.name}
                           </p>
                           <p className="max-w-[90%] text-small text-default-400">
-                            {selectedUser.email
-                              ? selectedUser.email + " | "
-                              : "" + (selectedUser.phone || "")}
+                            {selectedUser.email &&
+                              `${selectedUser.email} | ${selectedUser.phone}`}
                           </p>
                           <div className="flex gap-2 pb-1 pt-2">
                             {selectedUser.dob && (
@@ -213,10 +257,7 @@ const NewAppointment = () => {
                           </div>
                         </div>
                         <Button
-                          as={Link}
-                          to={`/appointment/new?user=${selectedUser._id}${
-                            selectedUser.phone ? "&phone=true" : "&phone=false"
-                          }`}
+                          onClick={() => handleBooking()}
                           variant="flat"
                           color="primary"
                           fullWidth
@@ -236,7 +277,7 @@ const NewAppointment = () => {
   );
 };
 
-const AddUser = () => {
+export const AddUser = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const isPhone = searchParams.get("phone");
@@ -288,9 +329,7 @@ const AddUser = () => {
           )
           .then((res) => {
             toast.success("User added successfully");
-            window.location.href = `/appointment/new?user=${res.data._id}${
-              values.phone ? "&phone=true" : "&phone=false"
-            }`;
+            window.location.href = `/dashboard/medical-examination?user=existing&userId=${res.data._id}`;
           });
       } catch (error: any) {
         toast.error(error.response.data.error);
@@ -464,4 +503,4 @@ const AddUser = () => {
   );
 };
 
-export default NewAppointment;
+export default AdminBook;

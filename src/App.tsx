@@ -43,10 +43,12 @@ import Mer from "./components/admin/mer/Mer";
 import EditMer from "./components/admin/mer/EditMer";
 import RoughApp from "./components/admin/tests/AppRough";
 import MERHistory from "./components/admin/mer/MERHistory";
-import UserMer from "./components/admin/mer/UserMer";
 import MERReport from "./components/admin/mer/MERReport";
 import { data } from "./utils/data";
-import Mers from "./components/admin/mer/Mers";
+// @ts-ignore
+import BookMER from "./components/admin/mer/MERHome";
+import MERHome from "./components/admin/mer/MERHome";
+import Appointments from "./components/admin/mer/Appointments";
 
 const MainLayout = ({ children }: any) => (
   <>
@@ -94,9 +96,11 @@ function App() {
                         )
                       }
                     />
+
                     <Route path="users" element={<Users />} />
                     <Route path="users/:id" element={<ViewUser />} />
                     <Route path="users/:id/edit" element={<User />} />
+
                     <Route path="tests/" element={<Outlet />}>
                       <Route path="" element={<Tests />} />
                       <Route path="complete/:id" element={<Complete />} />
@@ -106,23 +110,16 @@ function App() {
                       />
                       <Route path="appointment" element={<NewAppointment />} />
                     </Route>
+
                     <Route path="doctors/*" element={<Outlet />}>
                       <Route path="" element={<Doctors />} />
                       <Route path=":id" element={<ViewDoctor />} />
                       <Route path=":id/edit" element={<Doctor />} />
                     </Route>
+
                     <Route path="medical-examination/*" element={<Outlet />}>
-                      <Route
-                        path=""
-                        element={
-                          user?.role === "admin" || user?.role === "recp" ? (
-                            <Mers />
-                          ) : (
-                            <UserMer />
-                          )
-                        }
-                      />
-                      {/* <Route path="" element={<MERReport />} /> */}
+                      <Route path="" element={<MERHome />} />
+                      <Route path="appointments" element={<Appointments />} />
                       <Route path="reports" element={<MERReport />} />
                       <Route path="new" element={<NewMer />} />
                       <Route path=":id" element={<Mer />} />

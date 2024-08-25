@@ -256,7 +256,7 @@ export interface MERAppointment {
   name: string;
   phone: string;
   addedby: string;
-  patiendid: string;
+  patientid: string;
   status: string;
   appointmentdate: string;
   completeddate: string;

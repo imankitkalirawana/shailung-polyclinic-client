@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import MERHistory from "./MERHistory";
 import { useNavigate } from "react-router-dom";
 
-const UserMer = () => {
+const SelfBook = () => {
   const confirmModal = useDisclosure();
   const navigate = useNavigate();
   useEffect(() => {
@@ -182,4 +182,4 @@ const UserMer = () => {
   );
 };
 
-export default UserMer;
+export default SelfBook;

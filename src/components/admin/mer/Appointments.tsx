@@ -22,7 +22,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { Helmet } from "react-helmet-async";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ExportTableIcon } from "../../icons/Icons";
 import { useEffect, useState } from "react";
 import { isLoggedIn } from "../../../utils/auth";
@@ -42,11 +42,11 @@ import { API_BASE_URL, TestStatus } from "../../../utils/config";
 import { humanReadableDate } from "../user/Users";
 import { toast } from "sonner";
 import { data } from "../../../utils/data";
-import { getAllMERAppointments, getAllTests } from "../../../functions/get";
+import { getAllMERAppointments } from "../../../functions/get";
 import { useFormik } from "formik";
 import AppointmentWidget from "./AppointmentWidget";
 
-const Mers = () => {
+const Appointments = () => {
   const navigate = useNavigate();
   const { user } = isLoggedIn();
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,7 +72,9 @@ const Mers = () => {
   ) => {
     try {
       if (status === "completed") {
-        navigate(`/dashboard/medical-examination/${appointment._id}`);
+        navigate(
+          `/dashboard/medical-examination/new?appointment-id=${appointment._id}&patient-id=${appointment.patientid}`
+        );
         return;
       }
       await axios
@@ -119,23 +121,10 @@ const Mers = () => {
                   variant="flat"
                   color="primary"
                   as={Link}
-                  to="/dashboard/tests/appointment"
+                  to="/dashboard/medical-examination/"
                 >
                   New Appointment
                 </Button>
-              )}
-
-              {user?.role === "admin" && (
-                <Tooltip content="Export to Excel">
-                  <Button
-                    radius="full"
-                    variant="bordered"
-                    data-tip="Export to Excel"
-                    isIconOnly
-                  >
-                    <ExportTableIcon className="w-4 h-4" />
-                  </Button>
-                </Tooltip>
               )}
             </div>
           </div>
@@ -269,19 +258,7 @@ const Mers = () => {
                           >
                             Edit Test
                           </DropdownItem>
-                          <DropdownItem
-                            className={`${
-                              appointment.status === "completed" ? "" : "hidden"
-                            }`}
-                            key="download"
-                            startContent={<IconDownload size={16} />}
-                            onClick={() => {
-                              navigate(`/report/${appointment._id}/download`);
-                            }}
-                            textValue="Download Report"
-                          >
-                            Download Report
-                          </DropdownItem>
+
                           <DropdownItem
                             className={`${
                               appointment.status === "completed" ||
@@ -535,4 +512,4 @@ const DeleteModal = ({ test, setTests, deleteTestModal }: DeleteModalProps) => {
   );
 };
 
-export default Mers;
+export default Appointments;

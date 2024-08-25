@@ -1,6 +1,6 @@
 import { useFormik } from "formik";
 import { isLoggedIn } from "../../../utils/auth";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import {
@@ -22,6 +22,7 @@ import * as Yup from "yup";
 import axios from "axios";
 import { toast } from "sonner";
 import { DeleteFile, UploadSingleFile } from "../../../utils/FileHandling";
+import { getUserWithId } from "../../../functions/get";
 
 const NewMer = () => {
   const { loggedIn, user } = isLoggedIn();
@@ -34,6 +35,24 @@ const NewMer = () => {
   }, [currentUrl]);
   //   @ts-ignore
   const [file, setFile] = useState<File | null>(null);
+  const [searchParams] = useSearchParams();
+  const appointmentId = searchParams.get("appointment-id");
+  const patientId = searchParams.get("patient-id");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      await getUserWithId(patientId || "").then((res) => {
+        formik.setValues((previousValues) => {
+          return { ...previousValues, ...res.data };
+        });
+        formik.setFieldValue("appointmentId", appointmentId);
+        formik.setFieldValue("patientId", patientId);
+      });
+    };
+    if (patientId) {
+      fetchUser();
+    }
+  }, [patientId]);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string()
@@ -78,6 +97,8 @@ const NewMer = () => {
 
   const formik = useFormik({
     initialValues: {
+      appointmentId: "",
+      patientId: "",
       name: "",
       age: 0,
       sex: "",
