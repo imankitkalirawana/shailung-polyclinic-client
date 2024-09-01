@@ -2,8 +2,12 @@ import { useFormik } from "formik";
 import { isLoggedIn } from "../../../utils/auth";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import countries from "../../../utils/countries.json";
+import bloodgroup from "../../../utils/bloodgroup.json";
 
 import {
+  Autocomplete,
+  AutocompleteItem,
   Avatar,
   Badge,
   Button,
@@ -371,18 +375,39 @@ const EditMer = () => {
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
                 type="date"
               />
-              <Input
+              <Autocomplete
                 label="Applied Country"
-                placeholder="Enter applied country"
-                {...formik.getFieldProps("appliedCountry")}
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Nationality"
-                placeholder="Enter Nationality"
-                {...formik.getFieldProps("nationality")}
+                selectedKey={formik.values.appliedCountry}
+                onSelectionChange={(e) => {
+                  formik.setFieldValue("appliedCountry", e);
+                }}
+                defaultItems={countries}
+                placeholder="UAE"
+              >
+                {(item) => (
+                  <AutocompleteItem key={item.name}>
+                    {item.name}
+                  </AutocompleteItem>
+                )}
+              </Autocomplete>
+
+              <Autocomplete
+                label="Enter Nationality"
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
+                selectedKey={formik.values.nationality}
+                onSelectionChange={(e) => {
+                  formik.setFieldValue("nationality", e);
+                }}
+                defaultItems={countries}
+                placeholder="Nepal"
+              >
+                {(item) => (
+                  <AutocompleteItem key={item.name}>
+                    {item.name}
+                  </AutocompleteItem>
+                )}
+              </Autocomplete>
             </CardBody>
           </Card>
           <Card className="mt-8">
@@ -634,14 +659,27 @@ const EditMer = () => {
               />
               <Divider className="my-4 col-span-full" />
               <p className="text-base col-span-full">Serology</p>
-              <Input
+              <Autocomplete
                 label="Blood Group Rh"
-                placeholder="Enter Blood Group Rh"
-                {...formik.getFieldProps(
-                  "laboratoryExamination.serology.BloodGroupRh"
-                )}
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
+                selectedKey={
+                  formik.values.laboratoryExamination.serology.BloodGroupRh
+                }
+                onSelectionChange={(e) => {
+                  formik.setFieldValue(
+                    "laboratoryExamination.serology.BloodGroupRh",
+                    e
+                  );
+                }}
+                defaultItems={bloodgroup}
+                placeholder="A+VE"
+              >
+                {(item) => (
+                  <AutocompleteItem key={item.name}>
+                    {item.name}
+                  </AutocompleteItem>
+                )}
+              </Autocomplete>
               {formik.values.sex === "female" && (
                 <>
                   <Divider className="my-4 col-span-full" />

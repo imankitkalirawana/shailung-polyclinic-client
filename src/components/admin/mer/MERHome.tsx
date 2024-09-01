@@ -1,4 +1,3 @@
-import React from "react";
 import { isLoggedIn } from "../../../utils/auth";
 import SelfBook from "./SelfBook";
 import AdminBook from "./AdminBook";

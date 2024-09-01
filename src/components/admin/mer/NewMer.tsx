@@ -4,6 +4,8 @@ import { useLocation, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import {
+  Autocomplete,
+  AutocompleteItem,
   Avatar,
   Badge,
   Button,
@@ -23,6 +25,8 @@ import axios from "axios";
 import { toast } from "sonner";
 import { DeleteFile, UploadSingleFile } from "../../../utils/FileHandling";
 import { getUserWithId } from "../../../functions/get";
+import countries from "../../../utils/countries.json";
+import bloodgroup from "../../../utils/bloodgroup.json";
 
 const NewMer = () => {
   const { loggedIn, user } = isLoggedIn();
@@ -340,19 +344,7 @@ const NewMer = () => {
                   formik.touched.passportNumber && formik.errors.passportNumber
                 }
               />
-              {/* <DatePicker
-                label="Passport Expiry"
-                onChange={(date) => {
-                  formik.setFieldValue(
-                    "passportExpiry",
-                    date.toString().split("T")[0]
-                  );
-                }}
-                value={parseDate(formik.values.passportExpiry)}
-                name="passportExpiry"
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-                showMonthAndYearPickers
-              /> */}
+
               <Input
                 label="Passport Expiry"
                 {...formik.getFieldProps("passportExpiry")}
@@ -365,37 +357,47 @@ const NewMer = () => {
                 {...formik.getFieldProps("placeOfBirth")}
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
               />
-              {/* <DatePicker
-                label="Medical Examination Date"
-                onChange={(date) => {
-                  formik.setFieldValue(
-                    "medicalExaminationDate",
-                    date.toString().split("T")[0]
-                  );
-                }}
-                value={parseDate(formik.values.medicalExaminationDate)}
-                name="medicalExaminationDate"
-                className="col-span-6 sm:col-span-3 lg:col-span-2"
-                showMonthAndYearPickers
-              /> */}
+
               <Input
                 label="Medical Examination Date"
                 {...formik.getFieldProps("medicalExaminationDate")}
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
                 type="date"
               />
-              <Input
+
+              <Autocomplete
                 label="Applied Country"
-                placeholder="Enter applied country"
-                {...formik.getFieldProps("appliedCountry")}
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
-              <Input
-                label="Nationality"
-                placeholder="Enter Nationality"
-                {...formik.getFieldProps("nationality")}
+                selectedKey={formik.values.appliedCountry}
+                onSelectionChange={(e) => {
+                  formik.setFieldValue("appliedCountry", e);
+                }}
+                defaultItems={countries}
+                placeholder="UAE"
+              >
+                {(item) => (
+                  <AutocompleteItem key={item.name}>
+                    {item.name}
+                  </AutocompleteItem>
+                )}
+              </Autocomplete>
+
+              <Autocomplete
+                label="Enter Nationality"
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
+                selectedKey={formik.values.nationality}
+                onSelectionChange={(e) => {
+                  formik.setFieldValue("nationality", e);
+                }}
+                defaultItems={countries}
+                placeholder="Nepal"
+              >
+                {(item) => (
+                  <AutocompleteItem key={item.name}>
+                    {item.name}
+                  </AutocompleteItem>
+                )}
+              </Autocomplete>
             </CardBody>
           </Card>
           <Card className="mt-8">
@@ -650,14 +652,35 @@ const NewMer = () => {
               <Divider className="my-4 col-span-full" />
               <p className="text-base col-span-full">Serology</p>
 
-              <Input
+              {/* <Input
                 label="Blood Group Rh"
                 placeholder="Enter Blood Group Rh"
                 {...formik.getFieldProps(
                   "laboratoryExamination.serology.BloodGroupRh"
                 )}
                 className="col-span-6 sm:col-span-3 lg:col-span-2"
-              />
+              /> */}
+              <Autocomplete
+                label="Blood Group Rh"
+                className="col-span-6 sm:col-span-3 lg:col-span-2"
+                selectedKey={
+                  formik.values.laboratoryExamination.serology.BloodGroupRh
+                }
+                onSelectionChange={(e) => {
+                  formik.setFieldValue(
+                    "laboratoryExamination.serology.BloodGroupRh",
+                    e
+                  );
+                }}
+                defaultItems={bloodgroup}
+                placeholder="A+VE"
+              >
+                {(item) => (
+                  <AutocompleteItem key={item.name}>
+                    {item.name}
+                  </AutocompleteItem>
+                )}
+              </Autocomplete>
               {formik.values.sex === "female" && (
                 <>
                   <Divider className="my-4 col-span-full" />

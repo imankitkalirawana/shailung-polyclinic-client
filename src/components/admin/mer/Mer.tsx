@@ -12,7 +12,6 @@ import {
   CardFooter,
   CardHeader,
 } from "@nextui-org/react";
-import { data } from "../../../utils/data";
 
 const Mer = () => {
   const { id }: any = useParams();
@@ -88,16 +87,18 @@ const Mer = () => {
                     <div className="flex justify-between w-full max-w-[630px]">
                       <p className="text-xs">S.N-</p>
                       <p className="text-xs justify-self-end">
-                        Gov. Reg. No.{data.regno}
+                        Gov. Reg. No. 66087/066/067
                       </p>
                     </div>
-                    <h1 className="font-semibold text-lg uppercase">
-                      {data.title}
+                    <h1 className="font-semibold text-lg">
+                      Shailung Polyclinic & Diagnostic Center Pvt. Ltd.
                     </h1>
                     <i className="text-xs">
-                      {data.address} Phone no:{data.phone}
+                      Itahari - 1 Sunsari, Phone no:025-585541
                     </i>
-                    <span className="text-xs">E-mail:{data.email}</span>
+                    <span className="text-xs">
+                      E-mail:shailungpdc@gmail.com / ghimircbab@gmail.com
+                    </span>
                     <b className="text-xs">
                       (Nepal Medical Occupational's Organization)
                     </b>

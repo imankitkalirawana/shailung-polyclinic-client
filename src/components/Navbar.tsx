@@ -7,10 +7,11 @@ import { useFormik } from "formik";
 import {
   IconCalendarClock,
   IconChevronDown,
+  IconClipboardText,
+  IconHistory,
   IconMenu2,
   IconMoon,
   IconNewSection,
-  IconReportMedical,
   IconStethoscope,
   IconSun,
   IconTableExport,
@@ -99,7 +100,13 @@ const Navbar = () => {
             <Button as={Link} variant="light" to="/" className="-m-1.5 p-1.5">
               <span className="sr-only">{data.title}</span>
               <div className="flex items-center gap-2">
-                <Avatar name="P" color="primary" className="text-lg" />
+                <Avatar
+                  name="P"
+                  src="/logo.png"
+                  color="primary"
+                  className="text-lg"
+                  fallback
+                />
                 <span className="text-xl font-semibold">{data.title}</span>
               </div>
             </Button>
@@ -267,14 +274,54 @@ const Navbar = () => {
                 </Popover>
               </>
             ) : null}
-            {(user?.role === "admin" || user?.role === "recp") && (
-              <Link
-                to="/dashboard/medical-examination"
-                className="text-sm font-semibold leading-6"
-              >
-                Medical Examination
-              </Link>
-            )}
+            <>
+              <Popover className="relative">
+                <Popover.Button className="flex items-center gap-x-1 text-sm font-semibold outline-none leading-6">
+                  Medical Examination
+                  <IconChevronDown
+                    className="h-5 w-5 flex-none"
+                    aria-hidden="true"
+                  />
+                </Popover.Button>
+
+                <Transition
+                  as={Fragment}
+                  enter="transition ease-out duration-200"
+                  enterFrom="opacity-0 translate-y-1"
+                  enterTo="opacity-100 translate-y-0"
+                  leave="transition ease-in duration-150"
+                  leaveFrom="opacity-100 translate-y-0"
+                  leaveTo="opacity-0 translate-y-1"
+                >
+                  <Popover.Panel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-md overflow-hidden rounded-3xl shadow-2xl">
+                    <Card className="p-4" shadow="lg">
+                      {medicalExaminations.map((item) => (
+                        <div
+                          key={item.name}
+                          className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm leading-6 hover:bg-base-300"
+                        >
+                          <div className="flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-base-300 group-hover:bg-base-100">
+                            <item.icon
+                              className="h-6 w-6 group-hover:text-primary"
+                              aria-hidden="true"
+                            />
+                          </div>
+                          <div className="flex-auto">
+                            <Link
+                              to={item.href}
+                              className="block outline-none font-semibold"
+                            >
+                              {item.name}
+                              <span className="absolute inset-0" />
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+                    </Card>
+                  </Popover.Panel>
+                </Transition>
+              </Popover>
+            </>
           </Popover.Group>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
             {loggedIn ? (
@@ -508,6 +555,15 @@ const tests = [
   },
 ];
 
+const medicalExaminations = [
+  {
+    name: "New Appointment",
+    description: "View your previously booked medical examinations",
+    href: "/dashboard/medical-examination",
+    icon: IconNewSection,
+  },
+];
+
 const users = [
   {
     name: "View All Users",
@@ -550,7 +606,7 @@ if (user?.role === "admin") {
       name: "View All Reports",
       description: "View all the reports generated in the system",
       href: "/dashboard/reports",
-      icon: IconReportMedical,
+      icon: IconClipboardText,
     }
   );
   users.push({
@@ -559,6 +615,26 @@ if (user?.role === "admin") {
     href: "/dashboard/users?action=new",
     icon: IconNewSection,
   });
+  medicalExaminations.unshift(
+    {
+      name: "New Medical Examination",
+      description: "Create a new medical examination",
+      href: "/dashboard/medical-examination/new",
+      icon: IconNewSection,
+    },
+    {
+      name: "Medical Examinations Reports",
+      description: "View all the medical examinations registered in the system",
+      href: "/dashboard/medical-examination/reports",
+      icon: IconClipboardText,
+    },
+    {
+      name: "Appointment History",
+      description: "View all the medical examinations registered in the system",
+      href: "/dashboard/medical-examination/appointments",
+      icon: IconCalendarClock,
+    }
+  );
 }
 if (user?.role === "doctor") {
   tests.unshift(
@@ -572,7 +648,7 @@ if (user?.role === "doctor") {
       name: "View All Reports",
       description: "View all the reports generated in the system",
       href: "/dashboard/reports",
-      icon: IconReportMedical,
+      icon: IconClipboardText,
     }
   );
 }
@@ -592,6 +668,26 @@ if (user?.role === "recp") {
       icon: IconUserScan,
     }
   );
+  medicalExaminations.unshift(
+    {
+      name: "New Medical Examination",
+      description: "Create a new medical examination",
+      href: "/dashboard/medical-examination/new",
+      icon: IconNewSection,
+    },
+    {
+      name: "Medical Examinations Reports",
+      description: "View all the medical examinations registered in the system",
+      href: "/dashboard/medical-examination/reports",
+      icon: IconClipboardText,
+    },
+    {
+      name: "Appointment History",
+      description: "View all the medical examinations registered in the system",
+      href: "/dashboard/medical-examination/appointments",
+      icon: IconCalendarClock,
+    }
+  );
 }
 if (user?.role === "user") {
   appointments.unshift({
@@ -599,6 +695,12 @@ if (user?.role === "user") {
     description: "View all the appointments booked by the patients",
     href: "/dashboard/appointments/new",
     icon: IconCalendarClock,
+  });
+  medicalExaminations.push({
+    name: "Appointment History",
+    description: "View the medical examination details",
+    href: "/dashboard/medical-examination/history",
+    icon: IconHistory,
   });
 }
 

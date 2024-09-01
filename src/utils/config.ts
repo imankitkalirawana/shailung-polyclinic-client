@@ -1,8 +1,6 @@
 // export const API_BASE_URL = "http://localhost:3000";
-// export const API_BASE_URL = "https://backend.shailungpolyclinic.com";
-const isDev = true;
-
-export const API_BASE_URL = isDev ? "http://localhost:3000" : "https://api.prvaha.com";
+export const API_BASE_URL = "https://backend.shailungpolyclinic.com";
+// export const API_BASE_URL = "https://api.prvaha.com";
 
 export const Roles = [
     {

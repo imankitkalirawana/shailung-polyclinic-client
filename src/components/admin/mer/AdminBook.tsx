@@ -15,8 +15,14 @@ import {
   SelectItem,
   Tab,
   Tabs,
+  Tooltip,
 } from "@nextui-org/react";
-import { IconHistory, IconUserEdit, IconUserPlus } from "@tabler/icons-react";
+import {
+  IconHistory,
+  IconReport,
+  IconUserEdit,
+  IconUserPlus,
+} from "@tabler/icons-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { calculateAge } from "../../../functions/agecalculator";
 import { API_BASE_URL } from "../../../utils/config";
@@ -131,15 +137,27 @@ const AdminBook = () => {
             <h1 className="text-2xl font-semibold">
               New Medical Examination Appointment
             </h1>
-            <Button
-              variant="flat"
-              color="primary"
-              as={Link}
-              to={"/dashboard/medical-examination/appointments"}
-              startContent={<IconHistory size={16} />}
-            >
-              Appointment History
-            </Button>
+            <div className="flex gap-4">
+              <Tooltip content="Reports">
+                <Button
+                  variant="bordered"
+                  isIconOnly
+                  as={Link}
+                  to={"/dashboard/medical-examination/reports"}
+                >
+                  <IconReport size={16} />
+                </Button>
+              </Tooltip>
+              <Button
+                variant="flat"
+                color="primary"
+                as={Link}
+                to={"/dashboard/medical-examination/appointments"}
+                startContent={<IconHistory size={16} />}
+              >
+                Appointment History
+              </Button>
+            </div>
           </div>
           <div className="flex flex-col gap-4 py-8">
             <div className="max-w-md mx-auto flex flex-col-reverse sm:flex-row-reverse gap-6">

@@ -23,7 +23,6 @@ import {
 } from "@nextui-org/react";
 import { Helmet } from "react-helmet-async";
 import { Link, useNavigate } from "react-router-dom";
-import { ExportTableIcon } from "../../icons/Icons";
 import { useEffect, useState } from "react";
 import { isLoggedIn } from "../../../utils/auth";
 import { parseDate } from "@internationalized/date";
@@ -31,8 +30,8 @@ import { getLocalTimeZone, today } from "@internationalized/date";
 import {
   IconCalendarClock,
   IconDotsVertical,
-  IconDownload,
   IconPencil,
+  IconReport,
   IconSearch,
   IconTrash,
 } from "@tabler/icons-react";
@@ -104,6 +103,28 @@ const Appointments = () => {
     };
     fetchAppointments();
   }, []);
+
+  // handle search
+  const handleSearch = (appointment: MERAppointment) => {
+    if (searchQuery === "") {
+      return appointment;
+    } else if (
+      (appointment.name &&
+        appointment.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      appointment._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (appointment.phone &&
+        appointment.phone.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      humanReadableDate(appointment.appointmentdate)
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+      humanReadableDate(appointment.createdAt)
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
+    ) {
+      return true;
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -115,7 +136,17 @@ const Appointments = () => {
             <h1 className="text-2xl font-semibold">
               Medical Examination Appointments
             </h1>
-            <div className="flex gap-2 flex-row-reverse">
+            <div className="flex gap-2">
+              <Tooltip content="Reports">
+                <Button
+                  variant="bordered"
+                  isIconOnly
+                  as={Link}
+                  to={"/dashboard/medical-examination/reports"}
+                >
+                  <IconReport size={16} />
+                </Button>
+              </Tooltip>
               {(user?.role === "admin" || user?.role === "recp") && (
                 <Button
                   variant="flat"
@@ -149,159 +180,166 @@ const Appointments = () => {
               <TableColumn>Booked On</TableColumn>
               <TableColumn>Actions</TableColumn>
             </TableHeader>
-            <TableBody emptyContent={"No Test to display"}>
-              {appointments.map((appointment) => (
-                <TableRow key={appointment._id}>
-                  <TableCell>
-                    <Dropdown
-                      isDisabled={
-                        (user?.role !== "admin" && user?.role !== "doctor") ||
-                        appointment.status === "completed" ||
-                        appointment.status === "cancelled" ||
-                        appointment.status === "hold" ||
-                        (user.role === "doctor" &&
-                          appointment.status === "overdue")
-                      }
-                    >
-                      <DropdownTrigger>
-                        <Chip
-                          variant="dot"
-                          // @ts-ignore
-                          color={
-                            TestStatus.find(
-                              (status) => status.value === appointment.status
-                            )?.color
-                          }
-                          onClick={() => {
-                            if (appointment.status === "overdue") {
-                              setSelected(appointment);
-                              scheduleTestModal.onOpenChange();
-                            }
-                          }}
-                        >
-                          {appointment.status}
-                        </Chip>
-                      </DropdownTrigger>
-                      {appointment.status != "completed" &&
-                        appointment.status !== "overdue" &&
-                        appointment.status !== "hold" && (
-                          <DropdownMenu aria-label="Test Status">
-                            {TestStatus.filter(
-                              (status) =>
-                                status.value !== "overdue" &&
-                                status.value !== "hold"
-                            ).map((status) => (
-                              <DropdownItem
-                                key={status.value}
-                                onClick={() => {
-                                  handleStatusChange(appointment, status.value);
-                                }}
-                              >
-                                {status.label}
-                              </DropdownItem>
-                            ))}
-                          </DropdownMenu>
-                        )}
-                    </Dropdown>
-                  </TableCell>
-                  <TableCell>{appointment.name}</TableCell>
-                  <TableCell>{appointment.phone}</TableCell>
-                  <TableCell>{appointment.addedby}</TableCell>
-                  <TableCell>
-                    {humanReadableDate(appointment.appointmentdate)}
-                  </TableCell>
-                  <TableCell>
-                    {humanReadableDate(appointment.createdAt)}
-                  </TableCell>
-                  <TableCell>
-                    {((appointment.status !== "cancelled" &&
-                      appointment.status !== "hold") ||
-                      user?.role === "admin" ||
-                      user?.role === "doctor") && (
-                      <Dropdown>
+            <TableBody emptyContent={"No Appointments to display"}>
+              {appointments
+                .filter((appointment) => {
+                  return handleSearch(appointment);
+                })
+                .map((appointment) => (
+                  <TableRow key={appointment._id}>
+                    <TableCell>
+                      <Dropdown
+                        isDisabled={
+                          (user?.role !== "admin" && user?.role !== "recp") ||
+                          appointment.status === "completed" ||
+                          appointment.status === "cancelled" ||
+                          appointment.status === "hold" ||
+                          (user.role === "recp" &&
+                            appointment.status === "overdue")
+                        }
+                      >
                         <DropdownTrigger>
-                          <Button
-                            variant="light"
-                            isIconOnly
-                            radius="full"
-                            aria-label="Actions"
-                            size="sm"
+                          <Chip
+                            variant="dot"
+                            // @ts-ignore
+                            color={
+                              TestStatus.find(
+                                (status) => status.value === appointment.status
+                              )?.color
+                            }
+                            onClick={() => {
+                              if (appointment.status === "overdue") {
+                                setSelected(appointment);
+                                scheduleTestModal.onOpenChange();
+                              }
+                            }}
                           >
-                            <IconDotsVertical size={16} />
-                          </Button>
+                            {appointment.status}
+                          </Chip>
                         </DropdownTrigger>
-                        <DropdownMenu
-                          aria-label="Test Actions"
-                          disabledKeys={
-                            user?.role === "doctor"
-                              ? ["schedule"]
-                              : appointment.status === "completed" ||
-                                appointment.status === "cancelled"
-                              ? ["schedule", "edit"]
-                              : appointment.status === "hold"
-                              ? ["schedule"]
-                              : ["edit"]
-                          }
-                        >
-                          <DropdownItem
-                            className={`${
-                              appointment.status === "hold" ? "" : "hidden"
-                            }`}
-                            key="edit"
-                            startContent={<IconPencil size={16} />}
-                            onClick={() => {
-                              navigate(
-                                `/dashboard/tests/complete/report/${appointment._id}`
-                              );
-                            }}
-                            textValue="Edit Test"
-                          >
-                            Edit Test
-                          </DropdownItem>
-
-                          <DropdownItem
-                            className={`${
-                              appointment.status === "completed" ||
-                              appointment.status === "cancelled" ||
-                              appointment.status === "hold"
-                                ? "hidden"
-                                : ""
-                            }`}
-                            key={"schedule"}
-                            onClick={() => {
-                              setSelected(appointment);
-                              scheduleTestModal.onOpenChange();
-                            }}
-                            startContent={<IconCalendarClock size={16} />}
-                            textValue="Schedule Date"
-                          >
-                            {appointment.appointmentdate ||
-                            appointment.status === "overdue"
-                              ? "Re-"
-                              : ""}
-                            Schedule Date
-                          </DropdownItem>
-                          <DropdownItem
-                            className={`text-danger ${
-                              user?.role === "admin" ? "" : "hidden"
-                            }`}
-                            key="delete"
-                            color="danger"
-                            startContent={<IconTrash size={16} />}
-                            onClick={() => {
-                              setSelected(appointment);
-                              deleteTestModal.onOpenChange();
-                            }}
-                            textValue="Delete Appointment"
-                          >
-                            Delete Appointment
-                          </DropdownItem>
-                        </DropdownMenu>
+                        {appointment.status != "completed" &&
+                          appointment.status !== "overdue" &&
+                          appointment.status !== "hold" && (
+                            <DropdownMenu aria-label="Test Status">
+                              {TestStatus.filter(
+                                (status) =>
+                                  status.value !== "overdue" &&
+                                  status.value !== "hold"
+                              ).map((status) => (
+                                <DropdownItem
+                                  key={status.value}
+                                  onClick={() => {
+                                    handleStatusChange(
+                                      appointment,
+                                      status.value
+                                    );
+                                  }}
+                                >
+                                  {status.label}
+                                </DropdownItem>
+                              ))}
+                            </DropdownMenu>
+                          )}
                       </Dropdown>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
+                    </TableCell>
+                    <TableCell>{appointment.name}</TableCell>
+                    <TableCell>{appointment.phone}</TableCell>
+                    <TableCell>{appointment.addedby}</TableCell>
+                    <TableCell>
+                      {humanReadableDate(appointment.appointmentdate)}
+                    </TableCell>
+                    <TableCell>
+                      {humanReadableDate(appointment.createdAt)}
+                    </TableCell>
+                    <TableCell>
+                      {((appointment.status !== "cancelled" &&
+                        appointment.status !== "hold") ||
+                        user?.role === "admin" ||
+                        user?.role === "doctor") && (
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <Button
+                              variant="light"
+                              isIconOnly
+                              radius="full"
+                              aria-label="Actions"
+                              size="sm"
+                            >
+                              <IconDotsVertical size={16} />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu
+                            aria-label="Test Actions"
+                            disabledKeys={
+                              user?.role === "doctor"
+                                ? ["schedule"]
+                                : appointment.status === "completed" ||
+                                  appointment.status === "cancelled"
+                                ? ["schedule", "edit"]
+                                : appointment.status === "hold"
+                                ? ["schedule"]
+                                : ["edit"]
+                            }
+                          >
+                            <DropdownItem
+                              className={`${
+                                appointment.status === "hold" ? "" : "hidden"
+                              }`}
+                              key="edit"
+                              startContent={<IconPencil size={16} />}
+                              onClick={() => {
+                                navigate(
+                                  `/dashboard/tests/complete/report/${appointment._id}`
+                                );
+                              }}
+                              textValue="Edit Test"
+                            >
+                              Edit Test
+                            </DropdownItem>
+
+                            <DropdownItem
+                              className={`${
+                                appointment.status === "completed" ||
+                                appointment.status === "cancelled" ||
+                                appointment.status === "hold"
+                                  ? "hidden"
+                                  : ""
+                              }`}
+                              key={"schedule"}
+                              onClick={() => {
+                                setSelected(appointment);
+                                scheduleTestModal.onOpenChange();
+                              }}
+                              startContent={<IconCalendarClock size={16} />}
+                              textValue="Schedule Date"
+                            >
+                              {appointment.appointmentdate ||
+                              appointment.status === "overdue"
+                                ? "Re-"
+                                : ""}
+                              Schedule Date
+                            </DropdownItem>
+                            <DropdownItem
+                              className={`text-danger ${
+                                user?.role === "admin" ? "" : "hidden"
+                              }`}
+                              key="delete"
+                              color="danger"
+                              startContent={<IconTrash size={16} />}
+                              onClick={() => {
+                                setSelected(appointment);
+                                deleteTestModal.onOpenChange();
+                              }}
+                              textValue="Delete Appointment"
+                            >
+                              Delete Appointment
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </div>
