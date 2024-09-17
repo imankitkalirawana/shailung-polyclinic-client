@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { Doctor, Report } from "../../../interface/interface";
 import DynamicTable from "./DisplayReportTable";
 import { getDoctorsWithIds } from "../../../functions/get";
-import { Button, Kbd } from "@nextui-org/react";
+import { Button, cn, Kbd } from "@nextui-org/react";
 import { IconPrinter } from "@tabler/icons-react";
 import { Helmet } from "react-helmet-async";
 
@@ -18,6 +18,8 @@ interface ReportSectionProps {
 
 const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
   const reportArea = useRef<HTMLDivElement>(null);
+  const mainContent = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState(0);
 
   const handlePrint = () => {
     if (reportArea.current) {
@@ -30,10 +32,21 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
     }
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      setHeight(mainContent.current.clientHeight);
+    }, 100);
+  }, []);
+
+  console.log("height", height);
+
   return (
     <>
       <div
-        className="relative mx-auto aspect-[1/1.4] w-[1000px] justify-between"
+        className={cn(
+          "relative mx-auto  w-[1000px] min-h-[1390px] justify-between"
+          // height <= 740 && height > 0 ? "aspect-[1/1.39]" : ""
+        )}
         data-theme="light"
         ref={reportArea}
       >
@@ -46,7 +59,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
           data-theme="light"
           className="flex flex-col justify-between top-0 left-0 w-full h-full pt-48"
         >
-          <main className="px-8 mt-4 min-h-[740px] text-base">
+          <main className="px-8 mt-4 min-h-[740px] text-base" ref={mainContent}>
             <div className="space-y-4 font-roboto flex flex-col gap-4">
               <div className="flex justify-between">
                 <div className="flex gap-4">
@@ -107,7 +120,12 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
             </div>
             <div className="space-y-2"></div>
           </main>
-          <div className="relative">
+          <div
+            className={cn(
+              "",
+              height > 740 ? "absolute top-[188%]" : "absolute bottom-[0%]"
+            )}
+          >
             <footer className="absolute z-10 w-full -top-24">
               <div className="flex w-full justify-evenly gap-4 text-center">
                 {doctors?.slice(0, 4).map((doc: Doctor) => (
@@ -129,7 +147,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
                 ))}
               </div>
             </footer>
-            <div className="relative">
+            <div>
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${report?._id}/download`}
                 className="h-[100px] w-[100px] absolute bottom-[70px] right-[25px]"
