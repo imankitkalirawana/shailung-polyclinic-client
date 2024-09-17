@@ -8,7 +8,7 @@ import DynamicTable from "./DisplayReportTable";
 import { getDoctorsWithIds } from "../../../functions/get";
 import { Button, Kbd } from "@nextui-org/react";
 import { IconPrinter } from "@tabler/icons-react";
-import { data } from "../../../utils/data";
+import { Helmet } from "react-helmet-async";
 
 interface ReportSectionProps {
   report: Report;
@@ -46,9 +46,9 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
           data-theme="light"
           className="flex flex-col justify-between top-0 left-0 w-full h-full pt-48"
         >
-          <main className="px-8 mt-4 min-h-[740px]">
+          <main className="px-8 mt-4 min-h-[740px] text-base">
             <div className="space-y-4 font-roboto flex flex-col gap-4">
-              <div className="flex text-xs justify-between">
+              <div className="flex justify-between">
                 <div className="flex gap-4">
                   <div className="flex flex-col">
                     <b>Name :</b>
@@ -87,20 +87,18 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
             <div className="my-4" key={row._id}>
               <div className="space-y-2">
                 <div className="space-y-1">
-                  <h3 className="text-sm text-center font-semibold leading-none">
+                  <h3 className="text-center font-semibold leading-none">
                     {row.testDetail.name}
                   </h3>
-                  <p className="text-center text-xs">
-                    {row.testDetail.description}
-                  </p>
+                  <p className="text-center">{row.testDetail.description}</p>
                 </div>
               </div>
               <DynamicTable tableid={row._id} />
               <div className="mt-3">
                 {row.testDetail.summary && (
                   <div>
-                    <h3 className="text-xs font-semibold">Test Information:</h3>
-                    <p className="text-xs whitespace-pre-wrap">
+                    <h3 className="font-semibold">Test Information:</h3>
+                    <p className="whitespace-pre-wrap">
                       {row.testDetail.summary}
                     </p>
                   </div>
@@ -120,7 +118,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
                         className="w-32 aspect-[4/3] object-contain"
                       />
                     </span>
-                    <p className="text-xs font-semibold">
+                    <p className="font-semibold">
                       {doc && doc.name}
                       <br />
                       {doc && doc.designation}
@@ -133,7 +131,7 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
             </footer>
             <div className="relative">
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${data.url}/report/${report?._id}/download`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${report?._id}/download`}
                 className="h-[100px] w-[100px] absolute bottom-[70px] right-[25px]"
                 alt=""
               />
@@ -192,6 +190,9 @@ const Download = () => {
 
   return (
     <>
+      <Helmet>
+        <title>{`${report?.name}_${report?.reportDate}`}</title>
+      </Helmet>
       <div className="flex justify-center print:hidden mt-36 mb-2">
         <Button
           endContent={<IconPrinter size={18} />}

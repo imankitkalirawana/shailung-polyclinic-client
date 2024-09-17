@@ -91,7 +91,7 @@ const Website = () => {
                 id="title"
                 name="title"
                 type="text"
-                placeholder="eg. Prvaha"
+                placeholder="eg. Acme Clinic"
                 label="Title"
                 value={formik.values.title}
                 onChange={formik.handleChange}
@@ -135,7 +135,7 @@ const Website = () => {
               <Textarea
                 id="website-description"
                 name="description"
-                placeholder="eg: Prvaha is a medical facility that provides various health services to the people of Nepal."
+                placeholder="eg: Shailung Polyclinic is a medical facility that provides various health services to the people of Nepal."
                 label="Description"
                 value={formik.values.description}
                 onChange={formik.handleChange}

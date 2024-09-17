@@ -80,6 +80,7 @@ const Mer = () => {
                 className="absolute top-[50%] left-[50%] translate-x-[-50%] opacity-10 mix-blend-multiply translate-y-[-50%] w-[90%]"
                 src="/mer.png"
                 loading="eager"
+                alt="logo"
               />
               <div className="w-full h-full p-2 border-1 border-black flex flex-col">
                 <header>

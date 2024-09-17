@@ -84,7 +84,7 @@ const DynamicTable = ({ tableid }: DynamicTableProps) => {
 
   return (
     <div>
-      <table className="table text-xs border-collapse">
+      <table className="table text-base border-collapse">
         <thead>{renderTableHead()}</thead>
         <tbody>{renderTableBody()}</tbody>
       </table>
