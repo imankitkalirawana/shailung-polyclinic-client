@@ -191,7 +191,7 @@ const Mer = () => {
                           <td>{report?.generalExamination.weight}kg</td>
                           <td>Pulse:</td>
                           <td>{report?.generalExamination.pulseRate}/min</td>
-                          <td>Height:</td>
+                          <td>Temperature:</td>
                           <td>{report?.generalExamination.temperature}°F</td>
                         </tr>
                         <tr>
@@ -671,16 +671,16 @@ const Mer = () => {
                               <td colSpan={3}>Nil</td>
                             </tr>
                             <tr>
-                              <td colSpan={3}>Pus Cells fapf</td>
+                              <td colSpan={3}>Pus Cells</td>
+                              <td colSpan={3}>0-2</td>
+                            </tr>
+                            <tr>
+                              <td colSpan={3}>RBCs</td>
                               <td colSpan={3}>Nil</td>
                             </tr>
                             <tr>
-                              <td colSpan={3}>RBCs /hpf</td>
-                              <td colSpan={3}>Nil</td>
-                            </tr>
-                            <tr>
-                              <td colSpan={3}>Epithelial cells /hpf</td>
-                              <td colSpan={3}>Nil</td>
+                              <td colSpan={3}>Epithelial cells</td>
+                              <td colSpan={3}>1-2</td>
                             </tr>
                             {/* other */}
                             {/* <td

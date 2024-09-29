@@ -34,11 +34,10 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
 
   useEffect(() => {
     setTimeout(() => {
+      // @ts-ignore
       setHeight(mainContent.current.clientHeight);
     }, 100);
   }, []);
-
-  console.log("height", height);
 
   return (
     <>
@@ -126,17 +125,22 @@ const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
               height > 740 ? "absolute top-[188%]" : "absolute bottom-[0%]"
             )}
           >
-            <footer className="absolute z-10 w-full -top-24">
+            <footer
+              className={cn(
+                "absolute z-10 w-full",
+                height > 740 ? "-top-56" : "-top-52"
+              )}
+            >
               <div className="flex w-full justify-evenly gap-4 text-center">
                 {doctors?.slice(0, 4).map((doc: Doctor) => (
                   <div key={doc._id}>
                     <span className="flex items-center justify-center">
                       <img
                         src={`${API_BASE_URL}/api/upload/single/${doc.sign}`}
-                        className="w-32 aspect-[4/3] object-contain"
+                        className="w-48 aspect-[4/3] object-contain"
                       />
                     </span>
-                    <p className="font-semibold">
+                    <p className="text-sm">
                       {doc && doc.name}
                       <br />
                       {doc && doc.designation}
