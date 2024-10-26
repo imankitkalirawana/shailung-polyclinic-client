@@ -1,189 +1,158 @@
-import axios from "axios";
-import { useEffect, useRef, useState } from "react";
-import { API_BASE_URL } from "../../../utils/config";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import {
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+  PDFViewer,
+  Image,
+  PDFDownloadLink,
+} from "@react-pdf/renderer";
 import { useParams } from "react-router-dom";
 import { Doctor, Report } from "../../../interface/interface";
-import DynamicTable from "./DisplayReportTable";
+import { API_BASE_URL } from "../../../utils/config";
+import axios from "axios";
 import { getDoctorsWithIds } from "../../../functions/get";
-import { Button, cn, Kbd } from "@nextui-org/react";
-import { IconPrinter } from "@tabler/icons-react";
-import { Helmet } from "react-helmet-async";
+import { toast } from "sonner";
+import { Font } from "@react-pdf/renderer";
+import DynamicTable from "./DisplayReportTable";
+import { Button } from "@nextui-org/react";
 
-interface ReportSectionProps {
+Font.register({
+  family: "Roboto",
+  fonts: [
+    { src: "/fonts/Roboto-Regular.ttf", fontWeight: "normal" },
+    { src: "/fonts/Roboto-Bold.ttf", fontWeight: "bold" },
+    { src: "/fonts/Roboto-Light.ttf", fontWeight: "light" },
+    { src: "/fonts/Roboto-Italic.ttf", fontStyle: "italic" },
+  ],
+});
+
+// Header and Footer components
+const Header = () => (
+  <View style={styles.header}>
+    <Image src={"/header-bar.jpg"} />
+  </View>
+);
+
+interface FooterProps {
+  reportId: string;
+}
+
+const Footer = ({ reportId }: FooterProps) => (
+  <View style={styles.footer}>
+    <Image src={"/footer-bar.jpg"} />
+    <Image
+      style={{
+        position: "absolute",
+        bottom: 37,
+        right: 30,
+        left: "86.63%",
+        width: 70,
+      }}
+      src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${reportId}/download`}
+    />
+  </View>
+);
+
+interface MyDocumentProps {
   report: Report;
-  row: any;
+  reportRows: any[];
   doctors: Doctor[];
 }
 
-const ReportSection = ({ report, row, doctors }: ReportSectionProps) => {
-  const reportArea = useRef<HTMLDivElement>(null);
-  const mainContent = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(0);
-
-  const handlePrint = () => {
-    if (reportArea.current) {
-      const printContent = reportArea.current.innerHTML;
-      const originalContents = document.body.innerHTML;
-      document.body.innerHTML = printContent;
-      window.print();
-      document.body.innerHTML = originalContents;
-      window.location.reload();
-    }
-  };
-
-  useEffect(() => {
-    setTimeout(() => {
-      // @ts-ignore
-      setHeight(mainContent.current.clientHeight);
-    }, 100);
-  }, []);
-
+const MyDocument = ({ report, reportRows, doctors }: MyDocumentProps) => {
   return (
-    <>
-      <div
-        className={cn(
-          "relative mx-auto  w-[1000px] min-h-[1390px] justify-between"
-          // height <= 740 && height > 0 ? "aspect-[1/1.39]" : ""
-        )}
-        data-theme="light"
-        ref={reportArea}
-      >
-        <img
-          src="/report-header.jpg"
-          className="absolute top-0 mix-blend-multiply"
-          loading="eager"
-        />
-        <div
-          data-theme="light"
-          className="flex flex-col justify-between top-0 left-0 w-full h-full pt-48"
-        >
-          <main className="px-8 mt-4 min-h-[740px] text-base" ref={mainContent}>
-            <div className="space-y-4 font-roboto flex flex-col gap-4">
-              <div className="flex justify-between">
-                <div className="flex gap-4">
-                  <div className="flex flex-col">
-                    <b>Name :</b>
-                    <b>Address :</b>
-                    <b>Ref. By :</b>
-                    <b>Lab ID:</b>
-                  </div>
-                  <div className="flex flex-col">
-                    <span>{report?.name || "-"}</span>
-                    <span>{report?.address || "-"}</span>
-                    <span>{report?.refby || "-"}</span>
-                    <span>{report?.labId || "-"}</span>
-                  </div>
-                </div>
-                <div className="flex gap-4 pr-16">
-                  <div className="flex flex-col">
-                    <b>Age/Sex :</b>
-                    <b>Report Date :</b>
-                    <b>Collection Date :</b>
-                    <b>Report ID :</b>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="capitalize">
-                      {`${report?.age} Yrs ${
-                        report?.gender && `/${report.gender}`
-                      }`}
-                    </span>
-                    <span>{report?.reportDate || "-"}</span>
-                    <span>{report?.collectiondate || "-"}</span>
-                    <span>{report?._id.slice(0, 6)}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <Document title={report.name} author={doctors[0].name}>
+      {reportRows.map((row) => (
+        <Page key={row._id} size="A4" style={styles.page}>
+          <Image src="/logo.png" style={styles.background} />
+          <Header />
+          <View style={styles.main}>
+            <View style={styles.flexSection}>
+              <View style={styles.headerList}>
+                <View style={styles.headerTitles}>
+                  <Text style={styles.headerTitle}>Name :</Text>
+                  <Text style={styles.headerTitle}>Address :</Text>
+                  <Text style={styles.headerTitle}>Ref. By :</Text>
+                  <Text style={styles.headerTitle}>Lab ID:</Text>
+                </View>
+                <View style={styles.headerTitles}>
+                  <Text>{report.name || "-"}</Text>
+                  <Text>{report?.address || "-"}</Text>
+                  <Text>{report?.refby || "-"}</Text>
+                  <Text>{report?.labId || "-"}</Text>
+                </View>
+              </View>
+              <View style={styles.headerList}>
+                <View style={styles.headerTitles}>
+                  <Text style={styles.headerTitle}>Age/Sex :</Text>
+                  <Text style={styles.headerTitle}>Report Date :</Text>
+                  <Text style={styles.headerTitle}>Collection Date :</Text>
+                  <Text style={styles.headerTitle}>Report ID:</Text>
+                </View>
+                <View style={styles.headerTitles}>
+                  <Text>{`${report?.age} Yrs ${
+                    report?.gender && `/${report.gender}`
+                  }`}</Text>
+                  <Text>{report?.reportDate || "-"}</Text>
+                  <Text>{report?.collectiondate || "-"}</Text>
+                  <Text>{report?._id.slice(0, 6)}</Text>
+                </View>
+              </View>
+            </View>
+            {/* Render the table here */}
 
-            <div className="my-4" key={row._id}>
-              <div className="space-y-2">
-                <div className="space-y-1">
-                  <h3 className="text-center font-semibold leading-none">
-                    {row.testDetail.name}
-                  </h3>
-                  <p className="text-center">{row.testDetail.description}</p>
-                </div>
-              </div>
-              <DynamicTable tableid={row._id} />
-              <div className="mt-3">
-                {row.testDetail.summary && (
-                  <div>
-                    <h3 className="font-semibold">Test Information:</h3>
-                    <p className="whitespace-pre-wrap">
-                      {row.testDetail.summary}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="space-y-2"></div>
-          </main>
-          <div
-            className={cn(
-              "",
-              height > 740 ? "absolute top-[188%]" : "absolute bottom-[0%]"
-            )}
-          >
-            <footer
-              className={cn(
-                "absolute z-10 w-full",
-                height > 740 ? "-top-56" : "-top-52"
-              )}
-            >
-              <div className="flex w-full justify-evenly gap-4 text-center">
-                {doctors?.slice(0, 4).map((doc: Doctor) => (
-                  <div key={doc._id}>
-                    <span className="flex items-center justify-center">
-                      <img
-                        src={`${API_BASE_URL}/api/upload/single/${doc.sign}`}
-                        className="w-48 aspect-[4/3] object-contain"
+            <View style={styles.section}>
+              <View style={styles.formHeader}>
+                <Text style={styles.headerTitle}>{row.testDetail.name}</Text>
+                <Text>{row.testDetail.description}</Text>
+              </View>
+              {row._id && <DynamicTable tableid={row._id} />}
+              <View style={styles.summary}>
+                <Text>{row.testDetail.summary}</Text>
+              </View>
+              {/* doctors sign */}
+              <View>
+                <View
+                  style={styles.doctors}
+                  // minPresenceAhead={300}
+                  wrap={false}
+                >
+                  {doctors.map((doctor) => (
+                    <View key={doctor._id} style={styles.doctor}>
+                      <Image
+                        style={{
+                          width: 100,
+                          height: 100,
+                          objectFit: "contain",
+                        }}
+                        src={`${API_BASE_URL}/api/upload/single/${doctor.sign}`}
                       />
-                    </span>
-                    <p className="text-sm">
-                      {doc && doc.name}
-                      <br />
-                      {doc && doc.designation}
-                      <br />
-                      {doc && doc.regno}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </footer>
-            <div>
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://report.shailungpolyclinic.com/report/${report?._id}/download`}
-                className="h-[100px] w-[100px] absolute bottom-[70px] right-[25px]"
-                alt=""
-              />
-              <img src="/report-footer.jpg" loading="eager" />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-col print:hidden justify-center items-center mt-8">
-        <Button
-          onClick={handlePrint}
-          color="primary"
-          variant="flat"
-          className="mb-8 hidden"
-          endContent={<Kbd keys={["command"]}>P</Kbd>}
-        >
-          Print
-        </Button>
-      </div>
-    </>
+                      <Text>{doctor.name}</Text>
+                      <Text>{doctor.designation}</Text>
+                      <Text>{doctor.regno}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </View>
+          </View>
+
+          <Footer reportId={report._id} />
+        </Page>
+      ))}
+    </Document>
   );
 };
 
-const Download = () => {
+export default function Download() {
   const { reportId }: any = useParams();
-  const [report, setReport] = useState<Report | null>(null);
-  let [reportRows, setReportRows] = useState<any[]>([]);
+  const [report, setReport] = useState<Report>({} as Report);
+  const [reportRows, setReportRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
-  const reportRefs = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -191,13 +160,10 @@ const Download = () => {
         const { data } = await axios.get(
           `${API_BASE_URL}/api/report/${reportId}`
         );
-        let res = await axios.get(
+        const res = await axios.get(
           `${API_BASE_URL}/api/report/report-row/by-reportid/${data._id}`
         );
         const doctorsData = await getDoctorsWithIds(data.doctors);
-        // remove that test from the report which has data.data has only formid and no other data
-        // res.data = res.data.filter((row) => row.data && row.data.length > 1);
-
         setReport(data);
         setReportRows(res.data);
         setDoctors(doctorsData);
@@ -211,41 +177,128 @@ const Download = () => {
   }, [reportId]);
 
   return (
-    <>
-      <Helmet>
-        <title>{`${report?.name}_${report?.reportDate}`}</title>
-      </Helmet>
-      <div className="flex justify-center print:hidden mt-36 mb-2">
-        <Button
-          endContent={<IconPrinter size={18} />}
-          onClick={() => window.print()}
-          color="primary"
-          variant="flat"
-        >
-          Print
-        </Button>
-      </div>
+    <div className="mt-24">
       {loading ? (
-        <div className="flex flex-col items-center justify-center min-h-96">
-          <span className="loading loading-infinity loading-lg"></span>
-        </div>
+        <div>Loading...</div>
       ) : (
         <>
-          {reportRows.map((row) => (
-            <ReportSection
-              key={row._id}
+          <PDFDownloadLink
+            document={
+              <MyDocument
+                report={report}
+                reportRows={reportRows}
+                doctors={doctors}
+              />
+            }
+            className="flex justify-center my-8"
+            fileName={`${report?.name}-${report?.reportDate}.pdf`}
+          >
+            {
               // @ts-ignore
+              ({ blob, url, loading, error }) => (
+                <Button
+                  color={url ? "primary" : "default"}
+                  variant={url ? "flat" : "light"}
+                  isLoading={!url}
+                >
+                  {url ? "Download Report" : "Generating PDF"}
+                </Button>
+              )
+            }
+          </PDFDownloadLink>
+          <PDFViewer style={{ width: "100%", height: "100vh" }}>
+            <MyDocument
               report={report}
-              row={row}
+              reportRows={reportRows}
               doctors={doctors}
-              // @ts-ignore
-              ref={(el) => (reportRefs.current[index] = el)}
             />
-          ))}
+          </PDFViewer>
         </>
       )}
-    </>
+    </div>
   );
-};
+}
 
-export default Download;
+// Create styles
+const styles = StyleSheet.create({
+  page: {
+    backgroundColor: "#ffffff",
+    fontSize: 10,
+    fontFamily: "Roboto",
+    paddingBottom: 10,
+  },
+  row: { flexDirection: "row" },
+  cell: { flex: 1, padding: 5, border: "1px solid #000" },
+  background: {
+    position: "absolute",
+    top: "20%",
+    left: "10%",
+    right: "10%",
+    bottom: "20%",
+    opacity: 0.05,
+    aspectRatio: 1,
+  },
+  main: {
+    paddingBottom: 50,
+  },
+  header: {
+    textAlign: "center",
+  },
+  footer: {
+    textAlign: "center",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  section: {
+    margin: 10,
+    padding: 10,
+    flexGrow: 1,
+    fontSize: 10,
+  },
+  flexSection: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    margin: 10,
+    padding: 10,
+  },
+  headerList: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 16,
+  },
+  headerTitles: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  headerTitle: {
+    fontWeight: "bold",
+  },
+  formHeader: {
+    textAlign: "center",
+  },
+  formHeaderDescription: {
+    fontSize: 10,
+    textAlign: "center",
+    whiteSpace: "no-wrap",
+  },
+  summary: {
+    marginTop: 10,
+  },
+  doctors: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+    width: "100%",
+  },
+  doctor: {
+    aspectRatio: 1,
+    width: 135,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+});
