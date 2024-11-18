@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Page,
   Text,
@@ -17,7 +17,7 @@ import { getDoctorsWithIds } from "../../../functions/get";
 import { toast } from "sonner";
 import { Font } from "@react-pdf/renderer";
 import DynamicTable from "./DisplayReportTable";
-import { Button } from "@nextui-org/react";
+import { Button, Kbd } from "@nextui-org/react";
 
 Font.register({
   family: "Roboto",
@@ -176,36 +176,54 @@ export default function Download() {
     fetchReport();
   }, [reportId]);
 
+  const downloadButtonRef = useRef<HTMLButtonElement | null>(null); // Add a ref for the button
+
+  // click the download button when pressing cmd + p(on mac) or ctrl p(in windows)
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault(); // Prevent default print dialog
+        downloadButtonRef.current?.click(); // Trigger button click
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, []);
+
   return (
     <div className="mt-24">
       {loading ? (
         <div>Loading...</div>
       ) : (
         <>
-          <PDFDownloadLink
-            document={
-              <MyDocument
-                report={report}
-                reportRows={reportRows}
-                doctors={doctors}
-              />
-            }
-            className="flex justify-center my-8"
-            fileName={`${report?.name}-${report?.reportDate}.pdf`}
-          >
-            {
-              // @ts-ignore
-              ({ blob, url, loading, error }) => (
-                <Button
-                  color={url ? "primary" : "default"}
-                  variant={url ? "flat" : "light"}
-                  isLoading={!url}
-                >
-                  {url ? "Download Report" : "Generating PDF"}
-                </Button>
-              )
-            }
-          </PDFDownloadLink>
+          <div className="flex justify-center my-8">
+            <PDFDownloadLink
+              document={
+                <MyDocument
+                  report={report}
+                  reportRows={reportRows}
+                  doctors={doctors}
+                />
+              }
+              fileName={`${report?.name}-${report?.reportDate}.pdf`}
+            >
+              {
+                // @ts-ignore
+                ({ blob, url, loading, error }) => (
+                  <Button
+                    ref={downloadButtonRef}
+                    color={url ? "primary" : "default"}
+                    variant={url ? "flat" : "light"}
+                    isLoading={!url}
+                    endContent={<Kbd keys={["command"]}>S</Kbd>}
+                  >
+                    {url ? "Download Report" : "Generating PDF"}
+                  </Button>
+                )
+              }
+            </PDFDownloadLink>
+          </div>
           <PDFViewer style={{ width: "100%", height: "100vh" }}>
             <MyDocument
               report={report}
